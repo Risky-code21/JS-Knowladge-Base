@@ -108,3 +108,76 @@ console.log(dumpSensor);
 dumpSensor = [];
 
 // todo ------------------------------------------------------ Material section
+
+// todo ------------------------------------------------------ Question section
+
+// todo ----------- sorting the array, and compartor used
+let termalDegree = [100, 89, 10, 197, 100, 123];
+let termalDegDumm = termalDegree.map((val) => val);
+
+// Before sort
+console.log(termalDegree);
+console.log(termalDegDumm);
+
+// After sort with builtin mutating methode
+console.log("Before sort ------------------------- Builtin methode");
+// !! Eng version, use comperator function, in this case i use arrow function to simplfy definate a small function without important return. Comperator function is use to compare with subtraction each element of the array ASCII, so we make sure that the sort we always accurate because the sort method in this case is not indirect use their element decimal value, but the sort use the ASCII value of the element
+// !! Indo version, gunakan comperator function disini, saya menggunakan arrow function untuk memudahkan mendefinsikan function kecil tanpa return yang penting. Comperator function sendiri digunakan untuk memastikan nilai perbandingan kita sesuai dan akurat, dengan melakukan operasi pada setiap nilai yang ada di dalam array, karena sorting pada kasus ini tidak secara langsung mengurutkan berdasarkan nilai desimal, melainkan berdasarkan nilai ASCII angka
+termalDegree.sort((a, b) => b - a);
+console.log(termalDegree);
+
+// After sort with personal loop but in this case all sort is only from biggest to smallest
+console.log("Before sort ------------------------- Personal methode");
+for (let j = 0; j < termalDegDumm.length; j++) {
+  for (let i = 0; i < termalDegDumm.length - 1; i++) {
+    let sortEach = termalDegDumm[i] - termalDegDumm[i + 1];
+    if (sortEach > 0) {
+      termalDegDumm.splice(i, 2, termalDegDumm[i], termalDegDumm[i + 1]);
+    } else if (sortEach < 0) {
+      termalDegDumm.splice(i, 2, termalDegDumm[i + 1], termalDegDumm[i]);
+    } else if (sortEach == 0) {
+      termalDegDumm.splice(i, 2, termalDegDumm[i], termalDegDumm[i + 1]);
+    }
+  }
+}
+console.log(termalDegDumm);
+
+// todo ----------- Delete the main, but no the backup
+
+let mainHistory = ["Login", "Klik Tombol", "Logout"];
+let backUpHistory = mainHistory;
+
+// Before delete the main history
+console.log("Before delete ------------ main history");
+console.log(mainHistory);
+console.log(backUpHistory);
+
+// After delete the main history
+// Change the value of main history to empty array
+// !! Eng version, Old array won't delete, because the backup array is stay to refrence on its pointer, and GC won't delete all var, array, object if they have a refrence. In this case, we only change the value of the label or variable, no value of the array
+// !! Ind version, Array lama yang telah kita buat tidak akan terhapus, karena backup array masih memegang refrensi pointer yang sama yang ada pada HEAP, yang artinya selama pointer array masih ada yang punya array masih akan tetap hidup walau label atau variable pertama yang telah merefensikannya sudah tidak merefrensikannya sekarang
+mainHistory = [];
+console.log("After delete ------------ main history");
+console.log(mainHistory);
+console.log(backUpHistory);
+
+// !! Gabungan Eng / Ind ---- Diffrent with methode below, this method will cut the array size even they have elements inside. Metode ini berbeda dengan diatas, ini adalah cara kita memotong kapisitas array refrensi secara langsung sehingga ikut memangkas elemen yang ada didalamnya, dan semua refrensi yang terikat kesini akan memiliki nilai yang tersisa sesuai pemangkasannya
+mainHistory = backUpHistory;
+mainHistory.length = 0;
+console.log("Easter egg ------------ diffrent methode");
+console.log(mainHistory);
+console.log(backUpHistory);
+
+// todo ----------- Reverse the array, and delete the last element
+
+let exmpDegg = [100, 10, 1, 101, 80];
+
+console.log("Before reverse and pop");
+console.log(exmpDegg);
+
+console.log("After reverse and pop");
+// Use non mutating methode to make new array without change the old array, the change -> [80,101,1,10,100]
+let reverseExmDeg = exmpDegg.toReversed();
+// Pop last element and set new array to => [80,101,1,10]
+reverseExmDeg.pop();
+console.log(reverseExmDeg);
