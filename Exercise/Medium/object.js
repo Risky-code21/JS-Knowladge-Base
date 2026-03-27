@@ -134,8 +134,8 @@ console.log(firstUser);
 console.log("----------------- Constructor function object\n\n");
 
 // ----- Blueprint class methode
-// !! Recomendation methode for structured object and inheritance object
-// !! This methode have same work flow as object create, but object create use inhertical prototype approach, but class use class approach with never lost its object charcteristic because it is just a syntatic sugar to make js look like language that implements object oriented programming approach.
+// !! Eng version, Recomendation methode for structured object and inheritance object
+// !! Indo version, This methode have same work flow as object create, but object create use inhertical prototype approach, but class use class approach with never lost its object charcteristic because it is just a syntatic sugar to make js look like language that implements object oriented programming approach.
 console.log("----------------- Class definition or Blueprint object");
 class BalisticMisile {
   // !! Work flow same as constructor function but use class blueprint apporach to make the programmer familiar with this sturcture
@@ -172,8 +172,8 @@ console.log(protoMisile.__proto__);
 console.log("----------------- Class definition or Blueprint object\n\n");
 
 // ---- Object create methode
-// !! use this method if we need to make a inhertical prototyple in object with old method. or you can use this method to build a new god object base on your idea because this method can give you a flexibelity to setup manualy your new object you make.
-// !! Gunakan metode ini jika kita membutuhkan pewarisan prototype model lama, atau bisa juga digunakan untuk membuat god object sesuai ide kita sendiri jika kita ingin membuat base object untuk refrensi object lainnya, dan pewarisan untuk object disini bisa kita  tentukan sendiri juga karena fleksibelitas yang telah dibuat dan ketika membuat object kita bisa melakukan setup manual sendiri karena pewarisan dibebaskan yang artinya kita tidak diharuskan mewarisi proto seperti object literal pada umumnya, ini berlaku jika kita memberikan parameter object refrensi sebelum membuat objectnya. Terkadang jika ingin setup sendiri dan mengarah ke lanjutan kita perlu melakukan beberapa operasi untuk menampilkan nilainya dan itu lumayan sulit, jadi sekarang metode ini lebih cocok ketika kita ingin membuat object dengan skala untuk framework atau object besar.
+// !! Eng version, use this method if we need to make a inhertical prototyple in object with old method. or you can use this method to build a new god object base on your idea because this method can give you a flexibelity to setup manualy your new object you make.
+// !! Indo version, Gunakan metode ini jika kita membutuhkan pewarisan prototype model lama, atau bisa juga digunakan untuk membuat god object sesuai ide kita sendiri jika kita ingin membuat base object untuk refrensi object lainnya, dan pewarisan untuk object disini bisa kita  tentukan sendiri juga karena fleksibelitas yang telah dibuat dan ketika membuat object kita bisa melakukan setup manual sendiri karena pewarisan dibebaskan yang artinya kita tidak diharuskan mewarisi proto seperti object literal pada umumnya, ini berlaku jika kita memberikan parameter object refrensi sebelum membuat objectnya. Terkadang jika ingin setup sendiri dan mengarah ke lanjutan kita perlu melakukan beberapa operasi untuk menampilkan nilainya dan itu lumayan sulit, jadi sekarang metode ini lebih cocok ketika kita ingin membuat object dengan skala untuk framework atau object besar.
 console.log("----------------- Object create methode object");
 let superMachine = {
   name: "super machine",
@@ -196,6 +196,54 @@ console.log(duplicateSuperMachine);
 // todo ------------------------------------------- Methode to create an object section begin end
 
 // todo ------------------------------------------- Explore the god object or Object proto begin
+
+// -------------------- Linking keyword in objec ___proto___
+console.log("------------------------- Linking keyword with __proto__");
+let dollBluePrint = {
+  factoryName: "Rolex doll",
+  ownerName: "Risky Andika",
+};
+
+let doll1 = Object.create(dollBluePrint);
+doll1.name = "JS Roles doll super";
+console.log(doll1);
+
+// Try to see the linking by ___proto___ keyword
+// !! First proto ---> dollBluePrint
+console.log(doll1.__proto__);
+
+// !! Second proto ---> God object or object prototype --> end of linking proto
+console.log(doll1.__proto__.__proto__);
+
+// !! third proto ---> null
+console.log(doll1.__proto__.__proto__.__proto__);
+console.log("------------------------- Linking keyword with __proto__\n\n");
+
+// -------------------- God object properties that inheritance to other object
+
+console.log("----------- Get the properties of the object itself");
+console.log(Object.getOwnPropertyNames(Object.prototype));
+console.log(Object.getOwnPropertyNames(doll1)); // -> easter egg, because without keyword prototype to accses the properties
+console.log("----------- Get the properties of the object itself\n\n");
+
+console.log("----------- Checking some properties are there in the object");
+console.log(doll1.hasOwnProperty("name")); // -> true, real own of this object
+console.log(doll1.hasOwnProperty("ownerName")); // -> false, cause ownername is refrence variable from object refrencend
+console.log("----------- Checking some properties are there in the object\n\n");
+
+// -------------------- Visual object properties between static and instance
+
+// console.log("----------- Checking the instance or object refrence");
+// console.log(doll1 instanceof dollBluePrint);
+// console.log(doll1 instanceof Object);
+// console.log("----------- Checking the instance or object refrence\n\n");
+
+console.dir(dollBluePrint);
+
+// -------------------- Proto refrence checking
+
+const proto = Object.getPrototypeOf(doll1);
+console.log(proto === dollBluePrint.prototype); // true
 
 // todo ------------------------------------------- Explore the god object or Object proto end
 
