@@ -249,4 +249,60 @@ console.log(proto === dollBluePrint.prototype); // true
 
 // todo ------------------------------------------- How the formuia works begin
 
+console.log("--------------------------- Formula work flow");
+/// !! This is the formula where can we see the visualitation about heap to save all of object or dictionary implement type data
+function v8ForumlaHeap(key, capacity) {
+  let totalSum = 0;
+  const p = 31;
+
+  // !! Sigma symbol refrence process (Σ)
+  for (let i = 0; i < key.length; i++) {
+    // Find ascii code foe each char in array of key object
+    let asciiChar = key.charCodeAt(i);
+
+    // The ascii that we have fopnd before will calculate with p elemen that always represent unique number (31)
+    let calculation = asciiChar * Math.pow(p, i);
+
+    // Sava the sumation that will used in mpdulo operation after this sigma process
+    totalSum += calculation;
+
+    console.log(
+      `Alphabet ${key[i]} -> Ascii: ${asciiChar} * Exponent: ${p}^${i} = ${calculation}`,
+    );
+  }
+
+  // Modulo process, that will modulo all calculation ascii before with capcity of the memory. In this case, we use imitation value because we don't know spesificly about the maximum size of the memory
+  let finalMemoIndex = totalSum % capacity;
+  console.log(
+    `Result, the object key will save in memory number -> ${finalMemoIndex}\n\n`,
+  );
+
+  // Final index where we save the memory in array heap or heap locker
+  return finalMemoIndex;
+}
+
+// The testing's section
+// Imitation capcity from memory
+const HEAP_CAPACITY = 20;
+
+// Imitation heap locker or array heap
+// Array index that doesn't have any value will filled  with value [empty] as we can see in our code editor
+const heapLocker = new Array(HEAP_CAPACITY).fill("[Empty]");
+
+// We test the v8 forumla heap that will return spesific number to save the memory with the key although we knew that the array newver has a key inside because it is not use dictionary and hash table concept
+let indexOfId = v8ForumlaHeap("kode", HEAP_CAPACITY);
+let indexOfName = v8ForumlaHeap("username", HEAP_CAPACITY);
+let indexOfValue = v8ForumlaHeap("value", HEAP_CAPACITY);
+
+// Intialitation the value object from spesifc memory that we have created before
+heapLocker[indexOfId] = 1;
+heapLocker[indexOfName] = "Risky andika";
+heapLocker[indexOfValue] = 10000;
+
+// Show the final result
+heapLocker.forEach((val, index) => {
+  console.log(`Locker - ${index}: ${val}`);
+});
+console.log("--------------------------- Formula work flow\n\n");
+
 // todo ------------------------------------------- How the formuia works begin
