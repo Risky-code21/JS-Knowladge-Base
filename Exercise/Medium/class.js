@@ -2,10 +2,16 @@
 
 // Default class definiation
 // This concept is actually an object literal concept, but js made this for syntatic sugar for the proggramer spesificly programmer with OOP background.
+// todo --------------------------------------------- Basic class definition
 class Schedule {
-  constructor(name, time) {
+  #workTime;
+  #meTime;
+
+  constructor(name, time, busyTime, specialTime) {
     this.name = name;
     this.totalTime = time;
+    this.#workTime = busyTime;
+    this.#meTime = specialTime;
   }
 
   // Arrow function binding this
@@ -16,6 +22,21 @@ class Schedule {
       `Time reminder from schedule ${this.name} is ${this.totalTime}`,
     );
   };
+
+  showWorkTime() {
+    console.log(
+      `The golden time for schedule ${this.name} is ${this.#workTime}`,
+    );
+  }
+
+  get showSpecialTime() {
+    return `The special time for schedule ${this.name} is ${this.#meTime}`;
+  }
+
+  set changeSpecialTime(newTime) {
+    this.#meTime = newTime;
+    console.log("Me time changed");
+  }
 }
 
 // !! Eng version, checking element that build the class, and a the same time prove that class is just a syntatic sugar for object literal, and the method that we create inside the class is just a function that we assign to the property of the class.
@@ -49,3 +70,22 @@ setTimeout(() => schoolSchedule1.showtime(), 100);
 setTimeout(schoolSchedule1.showtime.bind(schoolSchedule1), 100);
 
 // The last case is use arrow function to build a method class. Why? because arrow function still maintin its scope permanently, so the class refrence or parent refrence is stay the same, in this case is Schedule class or their instances. Implementation above ☝️😁
+
+// todo --------------------------------------------- encapsulation
+// New instance, asumtion as a perfect schedule that we have made.
+const perfectSchedule = new Schedule("Perfect schedule", 480, 120, 120);
+// Show the private value from the private properti called workTime in the class
+perfectSchedule.showWorkTime(); // -> The work time for schedule Perfect schedule is 120
+
+// Try to change the private value from the private properti with normal rule we always use to changed the method in an object.
+perfectSchedule.workTime = 900;
+
+// The private value never change, because the private properti is only can be access and change inside the class, so we need two special function, that called GETTER and SETTER function that will act as server that changes our private method in the class refrence
+console.log(perfectSchedule);
+
+// -------- Getter a special time
+console.log(perfectSchedule.showSpecialTime);
+
+// -------- Setter a special time
+perfectSchedule.changeSpecialTime = 50;
+console.log(perfectSchedule.showSpecialTime);
