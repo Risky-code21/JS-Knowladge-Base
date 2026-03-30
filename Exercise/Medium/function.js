@@ -177,5 +177,29 @@ console.table(filteredExamByTeacher);
 console.log("\n\n");
 
 // Mark to delete from memory with garbage collector
-examScheduleList.length = 0;
-filteredExamByTeacher = null;
+// examScheduleList.length = 0;
+// filteredExamByTeacher = null;
+
+// todo ------------------- Second exercies of this material 2️⃣
+// !! The case obliged me to create two new array. First array contains all title from the previous array of object we used before, and then the second one contains all reducer calculation from total question from the same array to.
+
+// First case, we use let,because we need to change the refrence from the variable, so that array data that useless and float on the heap will deleted by the garbage collector.
+let scheduleNameList = examScheduleList.map((examSchedule) => {
+  return examSchedule.title;
+});
+console.table(scheduleNameList);
+console.log("\n\n");
+
+// Reintialitation and mark for garbage collector to delete.
+scheduleNameList = null;
+
+// Second first case. we use let for the sama resson.
+let totalQUestions = examScheduleList.reduce((acc, examSchedule) => {
+  return acc + examSchedule.totalQuestions;
+}, 0);
+
+console.log(`Total questions from all schedule existing: ${totalQUestions}`);
+console.log("\n\n");
+
+// Reintialitation and mark for garbage collector to delete.
+totalQUestions = null;
