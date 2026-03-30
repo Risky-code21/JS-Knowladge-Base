@@ -104,3 +104,78 @@ students
   });
 
 // todo ------------------- First exercies of this material 1️⃣
+// !! The case obliged me to filter array instance and get data where the teacher's name is Mr Smith. I use the previous refrence class from class exercise file because the case still leading there.
+class ScheduleUpdate {
+  // Private property status
+  #status;
+
+  // Constructor main class schedule update
+  constructor(title, duration) {
+    this.title = title;
+    this.duration = duration;
+    this.#status = "Hasn't start yet";
+  }
+
+  // Mutator property setter for change status from this class
+  set changeStatus(newStatus) {
+    this.#status = newStatus;
+  }
+
+  // Acessor propery getter for get the current status from this class
+  get currentStatus() {
+    return this.#status;
+  }
+
+  markAsDone() {
+    this.changeStatus = "Done";
+    console.log(`Schedule ${this.title} mark as done.`);
+  }
+}
+
+// Class that extends scheduleUpdate or main class
+class ExamSechedule extends ScheduleUpdate {
+  constructor(title, duration, teacher, totalQuestions) {
+    super(title, duration);
+    this.teacher = teacher;
+    this.totalQuestions = totalQuestions;
+  }
+}
+
+const physicsExamSchedule = new ExamSechedule(
+  "Physics exam schedule",
+  120,
+  "Mr. John",
+  50,
+);
+
+const mathExamSchedule = new ExamSechedule(
+  "Math exam schedule",
+  90,
+  "Mrs. Jane",
+  40,
+);
+
+const biolgicalExamSchedule = new ExamSechedule(
+  "Biological exam schedule",
+  90,
+  "Mrs. Smith",
+  40,
+);
+
+// Grouped with one medium array
+const examScheduleList = [
+  physicsExamSchedule,
+  mathExamSchedule,
+  biolgicalExamSchedule,
+];
+
+// Filtered array
+let filteredExamByTeacher = examScheduleList.filter((examSchedule) => {
+  return examSchedule.teacher === "Mrs. Smith";
+});
+console.table(filteredExamByTeacher);
+console.log("\n\n");
+
+// Mark to delete from memory with garbage collector
+examScheduleList.length = 0;
+filteredExamByTeacher = null;
