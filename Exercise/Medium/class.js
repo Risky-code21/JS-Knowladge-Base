@@ -60,7 +60,7 @@ schoolSchedule1.showtime();
 // This acident
 // !! Eng version, This's happend because this concept inside the instance that refrence class doesn't have a good binding, and always relative to the function that their called. The function is setimeout, and as it happens setimeout doesn't have a default value for this concep, so it will fallback a undefined value for this situation.
 // !! Indo version, Ini terjadi karena konsep this didalam instance yang dibuat dari refrensi class tidak memiliki binding atau pengikatan refrensi yang kuat pada class yang di refrensi, jadi dia menggunakan konsep this awal yang akan selalu merefrensi hal yang paling dekat, yang dalam hal ini adalah settimeout. Namun karena kebetulan settimeout tidak memiliki nilai default bawaan untuk this maka settimout menggembalikan nilai undefined untuk this valuenya.
-setTimeout(schoolSchedule1.showtime, 100);
+// setTimeout(schoolSchedule1.showtime, 100);
 
 // resolve
 // ---- Closure
@@ -129,6 +129,10 @@ class ExamSechedule extends ScheduleUpdate {
     this.teacher = teacher;
     this.totalQuestions = totalQuestions;
   }
+
+  markAsDone() {
+    console.log("Try break the mark as done function from exam schedule class");
+  }
 }
 
 class ScheduleTools {
@@ -163,3 +167,34 @@ physicsExamSchedule.markAsDone();
 console.log("\n\n");
 console.log("--------------------- Compare schedule");
 ScheduleTools.compareTimeSchedule(physicsExamSchedule, mathExamSchedule);
+
+// todo --------------------------------------------- Polymorphisme
+class DailyTestSchedule extends ScheduleUpdate {
+  constructor(title, duration, teacher, totalQuestions) {
+    super(title, duration);
+    this.teacher = teacher;
+    this.totalQuestions = totalQuestions;
+    this.minimumScore = 75;
+  }
+
+  // !! Eng version, We can override builtin methode that we have declartion in the parent class. We use this, because to make sure that every child from parent class have the same methode but they have their own role to execution the method.
+  // !! Indo version, Kita bisa melakukan pengesampingan metode bawaan yang kita deklarasikan di kelas induk. Kita menggunakan ini, karena untuk memastikan bahwa setiap anak dari kelas induk memiliki metode yang sama tetapi mereka memiliki peran dan cara mereka untuk berjalan tergantung situasional mereka.
+  markAsDone() {
+    console.log(
+      "Try to break the mark as done function from daily test schedule class.",
+    );
+  }
+}
+
+const dailyTestSchedule = new DailyTestSchedule(
+  "Daily test schedule",
+  60,
+  "Mr. Smith",
+  20,
+);
+
+const allSchedules = [physicsExamSchedule, mathExamSchedule, dailyTestSchedule];
+
+console.log("\n\n");
+console.log("--------------------- Break built in method from main class");
+allSchedules.forEach((instance) => instance.markAsDone());
