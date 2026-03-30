@@ -29,10 +29,12 @@ class Schedule {
     );
   }
 
+  // !! Acessor property getter
   get showSpecialTime() {
     return `The special time for schedule ${this.name} is ${this.#meTime}`;
   }
 
+  // !! Mutator property setter
   set changeSpecialTime(newTime) {
     this.#meTime = newTime;
     console.log("Me time changed");
@@ -63,11 +65,11 @@ setTimeout(schoolSchedule1.showtime, 100);
 // resolve
 // ---- Closure
 // Use closure to bind the this concept to the class that we want to refrence, in this case is schoolSchedule1
-setTimeout(() => schoolSchedule1.showtime(), 100);
+// setTimeout(() => schoolSchedule1.showtime(), 100);
 
 // ---- Binding
 // Use bind method to bind the this concept to the class that we want to refrence, in this case is schoolSchedule1
-setTimeout(schoolSchedule1.showtime.bind(schoolSchedule1), 100);
+// setTimeout(schoolSchedule1.showtime.bind(schoolSchedule1), 100);
 
 // The last case is use arrow function to build a method class. Why? because arrow function still maintin its scope permanently, so the class refrence or parent refrence is stay the same, in this case is Schedule class or their instances. Implementation above ☝️😁
 
@@ -89,3 +91,75 @@ console.log(perfectSchedule.showSpecialTime);
 // -------- Setter a special time
 perfectSchedule.changeSpecialTime = 50;
 console.log(perfectSchedule.showSpecialTime);
+
+// todo --------------------------------------------- Inheritance
+// New schedule class
+class ScheduleUpdate {
+  // Private property status
+  #status;
+
+  // Constructor main class schedule update
+  constructor(title, duration) {
+    this.title = title;
+    this.duration = duration;
+    this.#status = "Hasn't start yet";
+  }
+
+  // Mutator property setter for change status from this class
+  set changeStatus(newStatus) {
+    this.#status = newStatus;
+  }
+
+  // Acessor propery getter for get the current status from this class
+  get currentStatus() {
+    return this.#status;
+  }
+
+  markAsDone() {
+    this.changeStatus = "Done";
+    console.log(`Schedule ${this.title} mark as done.`);
+  }
+}
+
+// Exam schedule that has extended with shcedule update, so it will have all the method and property that exist in schedule update class
+class ExamSechedule extends ScheduleUpdate {
+  constructor(title, duration, teacher, totalQuestions) {
+    // super is relative to constructor function of the parent class
+    super(title, duration);
+    this.teacher = teacher;
+    this.totalQuestions = totalQuestions;
+  }
+}
+
+class ScheduleTools {
+  // Static function that can only use if we use it with calling the main class that's have the function
+  static compareTimeSchedule(...schedule) {
+    const result = [...schedule].sort((a, b) => a.duration - b.duration);
+    console.table(result);
+  }
+}
+
+const physicsExamSchedule = new ExamSechedule(
+  "Physics exam schedule",
+  120,
+  "Mr. John",
+  50,
+);
+
+const mathExamSchedule = new ExamSechedule(
+  "Math exam schedule",
+  90,
+  "Mrs. Jane",
+  40,
+);
+
+console.log("\n\n");
+console.log(`--------------------- ${physicsExamSchedule.title} `);
+console.table(physicsExamSchedule);
+physicsExamSchedule.currentStatus; // -> that return the value, if no one variable or function catch it, it will be deleted by garbage collector, so we need to catch it with variable or function to make it stay in the memory, like the implementation below 👇
+console.log(physicsExamSchedule.currentStatus); // -> that return the value, and stay in the memory because we catch it with console.log function
+physicsExamSchedule.markAsDone();
+
+console.log("\n\n");
+console.log("--------------------- Compare schedule");
+ScheduleTools.compareTimeSchedule(physicsExamSchedule, mathExamSchedule);
