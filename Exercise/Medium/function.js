@@ -203,3 +203,105 @@ console.log("\n\n");
 
 // Reintialitation and mark for garbage collector to delete.
 totalQUestions = null;
+
+// todo -------------------------- Pure and Impure function
+
+console.log("--------------------- Pure function");
+// Pure function (Function with return value)
+/*
+  !! Some rule to use a function as pure function
+  1.If we need to make changes to somethings, but we don't change directly from th source, we made the copied data and after that we gift freedom to other function, variable, object to use or don't use that return value
+  2.If we need to make super complex calucation and reusable function that can use  anywhere of blockcode in your project
+*/
+
+// Make the change from the object without changes the source
+// Source object before mutating from function
+console.log(
+  "------------- Current object before mutating from the function \n",
+);
+console.table(mathExamSchedule);
+console.log("\n\n");
+
+// Mutating object from the function
+function changeWithImplementObject(
+  object,
+  newTitle,
+  newTeacher,
+  newQuestionQuantity,
+) {
+  // Remamber that, if we use pure function we dont't allowed to change the source, so that we goonna need copied the object and make a new cloning from the object
+  return {
+    ...object,
+    title: newTitle,
+    teacher: newTeacher,
+    newQuestionQuantity: newQuestionQuantity,
+  };
+}
+
+// Cloning object was saved in to the variable
+let newCloningSchedule = changeWithImplementObject(
+  mathExamSchedule,
+  "Duo lingo schedule",
+  "Risky Andika Sigma",
+  1000,
+);
+
+// Look, the object we have mutated doesn't change, that mean we succes to create its mutating without changes its source directly
+console.log("------------- Current object after mutating from the function \n");
+console.table(mathExamSchedule);
+console.log("\n\n");
+
+// Show the cloning or changes that we make from the function
+console.log("------------- Changes from the function \n");
+console.table(newCloningSchedule);
+console.log("\n\n");
+
+console.log("--------------------- Impure function");
+// Impure function (Function without return value, void function)
+/*
+  !! Some rule to use a function as impure function or void function 
+  1.If we need to do change variable, property and other, those are come from outside or not from function scope A.K.A change the things with mutating concept
+  2.If we need to show somethings in our screen, like: Dom manipulatiob, Console function and soon.
+  3.If we need to get and post data outside of this JS File, like: API, Cloud storage, Database and other that need connection to exchange information from outside.
+*/
+
+// Console log, that need to show text in to the console of our browser
+function printConsoleWithNumber(number) {
+  console.log(`I have secret number from somewhere. The number is: ${number}`);
+}
+printConsoleWithNumber(12);
+console.log("\n\n");
+
+// Change property object from outside
+// Before object mutated from the function, the object normal and dosen't change with previouse pure function
+console.log(
+  "------------- Current object before mutating from the function \n",
+);
+console.table(mathExamSchedule);
+console.log("\n\n");
+
+// Change the object
+function changeObjectSecretly(object) {
+  console.log("------------- Normal propery before changed \n");
+  console.table(object);
+  console.log("\n\n");
+
+  // change the property inside the object that directly change the property from the source
+  // Remamber, if we use impure function,, we have the permission to manipulate the source, and that we need carefull if we change the propery directly from the source
+  object.title = "Sigma lesson number one";
+  object.teacher = "Mr Sigma Boy";
+  object.totalQUestions = 1000;
+
+  // Prove it with show it in to the console
+  console.log("------------- Normal propery after changed \n");
+  console.table(object);
+  console.log("\n\n");
+}
+
+// Look, the object properties are change, and next.....
+changeObjectSecretly(mathExamSchedule);
+
+// But what, the source is change as well follow the change we have made from the function
+console.log("------------- Current object after mutating from the function \n");
+console.table(mathExamSchedule);
+console.log("\n\n");
