@@ -47,7 +47,7 @@ setTimeout(function () {
   // Check the ground humidity
   let dryGround = true;
   console.log(
-    "Oh no, the ground is dray, we need to turn on automaticly water plant machine 💦",
+    "Oh no, the ground is dry, we need to turn on automaticly water plant machine 💦",
   );
 
   if (dryGround) {
@@ -83,7 +83,7 @@ function checkTheGroundhumidity() {
 
       if (isDamp == false) {
         resolve(
-          "Oh no, the ground is dray, we need to turn on automaticly water plant machine 💦",
+          "Oh no, the ground is dry, we need to turn on automaticly water plant machine 💦",
         );
       } else {
         reject(
@@ -141,3 +141,66 @@ checkTheGroundhumidity()
   });
 
 console.log("Wait async to finish... ⌛");
+
+// todo ------- Problem with then, then hell or then triangle
+// !! Eng version, Then designed to handle one responsibility in every chaining function, so we can't get other variable form other function because then is blocked that. But with this approach bellow, you can do the same thing as hadoken did. But this is one of bad approach cause will make a new hell concept, always called as then hell. Even though then will give us all access to variable from all scope but this is still bad approach to do, that will make leak memory because the data we aren't use will always availabel in the memory.
+// !! Indo version, Then dirancang untuk menangani satu tanggung jawab di setiap fungsi berantai, sehingga kita tidak bisa mendapatkan variabel lain dari fungsi lain karena akan terblokir. Tetapi dengan pendekatan dibawah ini, Anda dapat melakukan hal yang sama seperti yang dilakukan Hadoken triangle. Namun ini adalah salah satu pendekatan yang buruk karena akan menciptakan konsep hell baru, yang selalu disebut sebagai then hell. Meskipun itu akan memberi kita akses penuh ke variabel dari semua cakupan, tetapi ini tetap merupakan pendekatan yang buruk, yang akan menyebabkan kebocoran memori karena data yang tidak kita gunakan akan selalu tersedia di memori, dan nantinya bisa menyebabkan kebocoran memory yang membuat program crash.
+setTimeout(() => {
+  checkTheGroundhumidity().then((messageGround) => {
+    console.log("\n\n-------------- Then hell");
+    console.log(
+      "-------- Automaticlly watering plant from the promise garden begin 🫗",
+    );
+    console.log(`original message from ground: ${messageGround}`);
+    return checkTheWeather().then((messageWeather) => {
+      console.log(`original message from weather: ${messageWeather}`);
+      console.log(`the same message as before from ground: ${messageGround}`);
+      return activeTheMachine();
+    });
+  });
+}, 10000);
+
+// todo ------- Solve then hell with new approach, async and await
+// There is a synchronus block here
+async function automaticlyWateringSystem() {
+  // try is synchronus
+  try {
+    console.log("\n\n-------------- Async and await");
+    console.log(
+      "-------- Automaticlly watering plant from the promise garden begin 🫗",
+    );
+    let checkTheGround = await checkTheGroundhumidity();
+    console.log(`original message from ground: ${checkTheGround}`);
+
+    let checkWeather = await checkTheWeather();
+    console.log(`original message from weather: ${checkWeather}`);
+    console.log(`the same message as before from ground: ${checkTheGround}`);
+
+    activeTheMachine();
+  } catch (errorMessage) {
+    // Catch is synchronus
+    console.log(`Warning error detected: ${errorMessage}`);
+  } finally {
+    // Finally is synchronus
+    console.log(`Proggram end, thanks for trying`);
+  }
+}
+
+// More cleary then some concept and triangle hell before, right? but there is an easter egg in the function.
+/*
+  Although the function call asynchronus function, there is some block that still use synchronus concept, there is:
+  1. Try
+  2. Catch
+  3. Finally
+  It proven by the line that has code like this: activeTheMachine();
+  I use setTimeOut inside the function, and finally console show first then activeMachine console i have, because try has done, so finally take over its job, no metter about the counting time inside the function, if try has done, its time to finally run.
+*/
+
+// !! All async function have super power that issued by await. Although the async function have synchronus block, await will stop execution in its line without break process in other synchronus program, and it will run again if the goal is to return the required promise that it need.
+// !! Semua async function punya kekuatan super yang dikeluarkan melalui await. Padahal seperti yang kita tahu ada block yang menggunakan konsep synchronus didalam function async, await tetap melakukan tugasnya untuk memberhentikan sementara proses didalam function, tanpa mengganggu block synchronus diluarnya, dan kemudian proses didalam function dijalankan lagi jika await sudah mendapatkan promise yang dia butuhkan.
+
+setTimeout(() => {
+  automaticlyWateringSystem();
+}, 24000);
+
+// todo ------- V1 of asynchronus material has done,, see you in the next version 👋
