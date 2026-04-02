@@ -68,3 +68,8 @@ class ManipulatedStorage {
 }
 
 // todo --------------------------- Frontend implementation
+// Ambil semua elemen yang terkait
+// Button trigger form
+// Form dan input
+// Button action input
+// Main element penampung halaman
