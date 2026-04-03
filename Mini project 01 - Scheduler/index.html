@@ -12,103 +12,424 @@
   </head>
 
   <!-- Body tag -->
-  <body class="bg-black w-full h-sceen">
+  <body class="bg-black text-[#e3e3e3] w-full flex flex-col min-h-screen">
     <!-- Navbar section -->
-    <header class="w-full flex">
-      <nav></nav>
+    <header class="w-full flex justify-between py-8 px-20">
+      <!-- Identity app -->
+      <div
+        class="flex gap-4 justify-center items-center"
+        aria-label="container logo app smart scheduler"
+      >
+        <!-- App name -->
+        <h1 class="text-2xl font-semibold" aria-label="logo: smart scheduler">
+          <span class="text-blue-400" aria-label="highlight text from logo">
+            Smart
+          </span>
+          scheduler
+        </h1>
+      </div>
+
+      <!-- Remainding time -->
+      <div
+        class="p-2 flex gap-2 justify-center w-fit rounded-full bg-gradient-to-br from-red-800 to-red-400"
+        aria-label="remainding time container"
+        title="remanding time in a day"
+      >
+        <!-- Icon schedule -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          class="size-6"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z"
+            clip-rule="evenodd"
+          />
+        </svg>
+
+        <p class="font-semibold" aria-label="remainding time in a day">
+          120 Minutes
+        </p>
+      </div>
     </header>
 
     <!-- Create and sorting section -->
-    <section class="flex"></section>
+    <nav
+      id="container-primary-action"
+      aria-label="control sistem to create, read, update, and delete"
+      class="flex gap-4 py-2 px-20 font-semibold"
+    >
+      <!-- Add new schedule -->
+      <button
+        class="flex justify-center items-center gap-2 bg-gradient-to-br from-blue-800 to-blue-400 px-4 py-2 rounded-md"
+        aria-label="button trigger show form to create new schedule data"
+      >
+        <!-- Plus icon -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          class="size-5"
+          aria-label="icon button create"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z"
+            clip-rule="evenodd"
+          />
+        </svg>
+
+        <!-- label -->
+        <label aria-label="label button create">Create a schedule</label>
+      </button>
+
+      <!-- Sorting schedule -->
+      <button
+        class="flex justify-center items-center gap-2 bg-gradient-to-br from-red-800 to-red-400 px-4 py-2 rounded-md"
+        aria-label="button trigger to sort order schedule from all status"
+      >
+        <!-- Sorting icon -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          class="size-5"
+          aria-label="icon button sort"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M6.97 2.47a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1-1.06 1.06L8.25 4.81V16.5a.75.75 0 0 1-1.5 0V4.81L3.53 8.03a.75.75 0 0 1-1.06-1.06l4.5-4.5Zm9.53 4.28a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V7.5a.75.75 0 0 1 .75-.75Z"
+            clip-rule="evenodd"
+          />
+        </svg>
+
+        <!-- label -->
+        <label aria-label="label button sort">Sort schedule by</label>
+      </button>
+    </nav>
 
     <!-- Main section that contains all schedule that we have created -->
-    <main class="p-4 flex gap-4">
-      <!-- Card component -->
-      <article
-        class="max-w-sm rounded-md bg-[#1e1f20] border border-[#e3e3e3]/10 text-[#e3e3e3]"
+    <!-- !! Section base on status -->
+    <main
+      class="flex py-8 px-20 gap-4"
+      aria-label="Wrapper from both section status of schedule"
+    >
+      <!-- Section on progress -->
+      <section
+        class="space-y-6 w-1/2"
+        aria-label="Section wrapper to wrap schedule with status on progress"
       >
-        <header
-          class="flex justify-between items-center p-4 border-b border-[#e3e3e3]/10 font-semibold"
-        >
-          <p
-            class="border border-green-600 rounded-full text-green-600 bg-green-200 px-4 py-1"
+        <!-- Header in every section -->
+        <header class="flex gap-4">
+          <!-- Container icon -->
+          <span
+            aria-label="container icon from section wrapper on progress"
+            class="p-2 flex w-fit rounded-full bg-gradient-to-br from-orange-800 to-orange-400"
           >
-            Study
-          </p>
-          <p>120 Minutes</p>
+            <!-- Icon rocket -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              class="size-6"
+              aria-label="icon from section wrapper on progress"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M9.315 7.584C12.195 3.883 16.695 1.5 21.75 1.5a.75.75 0 0 1 .75.75c0 5.056-2.383 9.555-6.084 12.436A6.75 6.75 0 0 1 9.75 22.5a.75.75 0 0 1-.75-.75v-4.131A15.838 15.838 0 0 1 6.382 15H2.25a.75.75 0 0 1-.75-.75 6.75 6.75 0 0 1 7.815-6.666ZM15 6.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z"
+                clip-rule="evenodd"
+              />
+              <path
+                d="M5.26 17.242a.75.75 0 1 0-.897-1.203 5.243 5.243 0 0 0-2.05 5.022.75.75 0 0 0 .625.627 5.243 5.243 0 0 0 5.022-2.051.75.75 0 1 0-1.202-.897 3.744 3.744 0 0 1-3.008 1.51c0-1.23.592-2.323 1.51-3.008Z"
+              />
+            </svg>
+          </span>
+          <!-- Title status -->
+          <h2
+            class="text-2xl font-semibold"
+            aria-label="Title from section wrapper on progress"
+          >
+            On progress
+          </h2>
         </header>
-        <div class="p-4 border-b border-[#e3e3e3]/10">
-          <p>
-            Pastikan kelembapan tanah di blok A di atas 60% sebelum menyalakan
-            irigasi.
-          </p>
+
+        <!-- Schedule card -->
+        <div
+          class="space-y-6"
+          id="container-schedule-on-progresss"
+          aria-label="Container data schedule from section wrapper on progress"
+        >
+          <!-- Dummy schedule card -->
+          <article
+            class="max-w-full rounded-md bg-[#1e1f20] border border-[#e3e3e3]/10"
+            aria-labelledby="title"
+          >
+            <!-- Header card schedule -->
+            <header
+              class="flex justify-between items-center p-4 border-b border-[#e3e3e3]/10 font-semibold"
+            >
+              <p
+                class="border border-green-600 rounded-full text-green-600 bg-green-200 px-4 py-1"
+                aria-label="Category: study"
+              >
+                Study
+              </p>
+              <p aria-label="Estimation time doing: 120 minutes">120 Minutes</p>
+            </header>
+
+            <!-- Main content of card -->
+            <div class="p-4 border-b border-[#e3e3e3]/10">
+              <!-- Title -->
+              <!-- !! Update, use h1 element once in our html file, in sub elemen use smaller heading then h1, lika: h2, h3, and soon -->
+              <h2 class="text-2xl font-semibold mb-2" id="title">
+                Check the ground
+              </h2>
+              <!-- Description -->
+              <p>
+                Pastikan kelembapan tanah di blok A di atas 60% sebelum
+                menyalakan irigasi.
+              </p>
+            </div>
+
+            <!-- Footer card -->
+            <footer class="p-4 flex justify-between items-center">
+              <!-- Day created -->
+              <!-- !! Update, use time for text that represent a date, or spesific time -->
+              <time datetime="2026-04-03" class="text-sm opacity-40"
+                >03 April 2026</time
+              >
+
+              <!-- CTA container -->
+              <div class="flex gap-2">
+                <!-- Button delete -->
+                <button
+                  class="cursor-pointer p-2 border border-red-600 rounded-full text-red-600 bg-red-200 text-sm"
+                  aria-label="Delete schedule button trigger"
+                  title="Delete this schedule"
+                >
+                  <!-- Trash icon for the button -->
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="size-4"
+                    id="trash-icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                    />
+                  </svg>
+                </button>
+
+                <!-- Button update -->
+                <button
+                  class="cursor-pointer p-2 border border-blue-600 rounded-full text-blue-600 bg-blue-200 text-sm"
+                  aria-label="Edit schedule button trigger"
+                  title="Edit this schedule"
+                >
+                  <!-- Pencil icon for the button -->
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    class="size-4"
+                  >
+                    <path
+                      d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z"
+                    />
+                  </svg>
+                </button>
+
+                <!-- Button mark as done -->
+                <button
+                  class="cursor-pointer p-2 border border-green-600 rounded-full text-green-600 bg-green-200 text-sm"
+                  aria-label="Mark as done schedule button trigger"
+                  title="Mark as done this schedule"
+                >
+                  <!-- Check icon fot the button -->
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    class="size-4"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </footer>
+          </article>
         </div>
-        <footer class="p-4 flex justify-between items-center">
-          <p class="text-sm opacity-40">03 April 2026</p>
+      </section>
 
-          <div class="flex gap-2">
-            <!-- Button delete -->
-            <button
-              class="p-2 border border-red-600 rounded-full text-red-600 bg-red-200 text-sm"
-            ></button>
-
-            <!-- Button update -->
-            <button
-              class="p-2 border border-blue-600 rounded-full text-blue-600 bg-blue-200 text-sm"
-            ></button>
-
-            <!-- Button markdown -->
-            <button
-              class="p-2 border border-green-600 rounded-full text-green-600 bg-green-200 text-sm"
-            ></button>
-          </div>
-        </footer>
-      </article>
-
-      <article
-        class="max-w-sm rounded-md bg-[#1e1f20] border border-[#e3e3e3]/10 text-[#e3e3e3]"
+      <!-- Section done -->
+      <section
+        class="space-y-6 w-1/2"
+        aria-label="Section wrapper to wrap schedule with status done"
       >
-        <header
-          class="flex justify-between items-center p-4 border-b border-[#e3e3e3]/10 font-semibold"
-        >
-          <p
-            class="border border-green-600 rounded-full text-green-600 bg-green-200 px-4 py-1"
+        <!-- Header in every section -->
+        <header class="flex gap-4">
+          <!-- Container icon -->
+          <span
+            aria-label="container icon from section wrapper done"
+            class="p-2 flex w-fit rounded-full bg-gradient-to-br from-green-800 to-green-400"
           >
-            Study
-          </p>
-          <p>120 Minutes</p>
+            <!-- Icon done -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              class="size-6"
+              aria-label="icon from section wrapper done"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </span>
+          <!-- Title status -->
+          <h2
+            class="text-2xl font-semibold"
+            aria-label="Title from section wrapper done"
+          >
+            Done
+          </h2>
         </header>
-        <div class="p-4 border-b border-[#e3e3e3]/10">
-          <p>
-            Pastikan kelembapan tanah di blok A di atas 60% sebelum menyalakan
-            irigasi.
-          </p>
+
+        <!-- Schedule card -->
+        <div
+          class="space-y-6"
+          id="container-schedule-dones"
+          aria-label="Container data schedule from section wrapper on progress"
+        >
+          <!-- Dummy schedule card -->
+          <article
+            class="max-w-full rounded-md bg-[#1e1f20] border border-[#e3e3e3]/10"
+            aria-labelledby="title"
+          >
+            <!-- Header card schedule -->
+            <header
+              class="flex justify-between items-center p-4 border-b border-[#e3e3e3]/10 font-semibold"
+            >
+              <p
+                class="border border-green-600 rounded-full text-green-600 bg-green-200 px-4 py-1"
+                aria-label="Category: study"
+              >
+                Study
+              </p>
+              <p aria-label="Estimation time doing: 120 minutes">120 Minutes</p>
+            </header>
+
+            <!-- Main content of card -->
+            <div class="p-4 border-b border-[#e3e3e3]/10">
+              <!-- Title -->
+              <!-- !! Update, use h1 element once in our html file, in sub elemen use smaller heading then h1, lika: h2, h3, and soon -->
+              <h2 class="text-2xl font-semibold mb-2" id="title">
+                Check the ground
+              </h2>
+              <!-- Description -->
+              <p>
+                Pastikan kelembapan tanah di blok A di atas 60% sebelum
+                menyalakan irigasi.
+              </p>
+            </div>
+
+            <!-- Footer card -->
+            <footer class="p-4 flex justify-between items-center">
+              <!-- Day created -->
+              <!-- !! Update, use time for text that represent a date, or spesific time -->
+              <time datetime="2026-04-03" class="text-sm opacity-40"
+                >03 April 2026</time
+              >
+
+              <!-- CTA container -->
+              <div class="flex gap-2">
+                <!-- Button delete -->
+                <button
+                  class="cursor-pointer p-2 border border-red-600 rounded-full text-red-600 bg-red-200 text-sm"
+                  aria-label="Delete schedule button trigger"
+                  title="Delete this schedule"
+                >
+                  <!-- Trash icon for the button -->
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="size-4"
+                    id="trash-icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                    />
+                  </svg>
+                </button>
+
+                <!-- Button update -->
+                <button
+                  class="cursor-pointer p-2 border border-blue-600 rounded-full text-blue-600 bg-blue-200 text-sm"
+                  aria-label="Edit schedule button trigger"
+                  title="Edit this schedule"
+                >
+                  <!-- Pencil icon for the button -->
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    class="size-4"
+                  >
+                    <path
+                      d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z"
+                    />
+                  </svg>
+                </button>
+
+                <!-- Button mark as done -->
+                <button
+                  class="cursor-pointer p-2 border border-green-600 rounded-full text-green-600 bg-green-200 text-sm"
+                  aria-label="Mark as done schedule button trigger"
+                  title="Mark as done this schedule"
+                >
+                  <!-- Check icon fot the button -->
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    class="size-4"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </footer>
+          </article>
         </div>
-        <footer class="p-4 flex justify-between items-center">
-          <p class="text-sm opacity-40">03 April 2026</p>
-
-          <div class="flex gap-2">
-            <!-- Button delete -->
-            <button
-              class="p-2 border border-red-600 rounded-full text-red-600 bg-red-200 text-sm"
-            ></button>
-
-            <!-- Button update -->
-            <button
-              class="p-2 border border-blue-600 rounded-full text-blue-600 bg-blue-200 text-sm"
-            ></button>
-
-            <!-- Button markdown -->
-            <button
-              class="p-2 border border-green-600 rounded-full text-green-600 bg-green-200 text-sm"
-            ></button>
-          </div>
-        </footer>
-      </article>
+      </section>
     </main>
 
     <!-- Footer for copy right -->
-    <footer></footer>
+    <footer class="bg-[#1e1f20] p-6 mt-auto flex justify-center items-center">
+      &copy; 2026 Smart scheduler. All right reserved.
+    </footer>
   </body>
 
   <!-- Todo connect file js externally -->
