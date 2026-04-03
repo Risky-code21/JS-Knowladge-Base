@@ -12,26 +12,23 @@
   </head>
 
   <!-- Body tag -->
-  <body class="bg-black text-[#e3e3e3] w-full flex flex-col min-h-screen">
+  <body class="bg-[#0e0e0e] text-[#e3e3e3] w-full flex flex-col min-h-screen">
     <!-- Navbar section -->
-    <header class="w-full flex justify-between py-8 px-20">
+    <header
+      class="w-full max-w-[1440px] mx-auto flex flex-col md:flex-row md:justify-between gap-4 md:gap-0 py-8 px-4 sm:px-12 md:px-20"
+    >
       <!-- Identity app -->
-      <div
-        class="flex gap-4 justify-center items-center"
-        aria-label="container logo app smart scheduler"
-      >
+      <div class="flex gap-4 md:justify-center items-center">
         <!-- App name -->
-        <h1 class="text-2xl font-semibold" aria-label="logo: smart scheduler">
-          <span class="text-blue-400" aria-label="highlight text from logo">
-            Smart
-          </span>
+        <h1 class="text-2xl font-semibold">
+          <span class="text-blue-400"> Smart </span>
           scheduler
         </h1>
       </div>
 
       <!-- Remainding time -->
       <div
-        class="p-2 flex gap-2 justify-center w-fit rounded-full bg-gradient-to-br from-red-800 to-red-400"
+        class="p-2 flex gap-2 justify-center w-fit rounded-full bg-gradient-to-br from-orange-800 to-orange-400"
         aria-label="remainding time container"
         title="remanding time in a day"
       >
@@ -59,12 +56,11 @@
     <nav
       id="container-primary-action"
       aria-label="control sistem to create, read, update, and delete"
-      class="flex gap-4 py-2 px-20 font-semibold"
+      class="flex flex-col sm:flex-row gap-4 py-2 px-4 sm:px-12 md:px-20 font-semibold w-full max-w-[1440px] mx-auto"
     >
       <!-- Add new schedule -->
       <button
         class="flex justify-center items-center gap-2 bg-gradient-to-br from-blue-800 to-blue-400 px-4 py-2 rounded-md"
-        aria-label="button trigger show form to create new schedule data"
       >
         <!-- Plus icon -->
         <svg
@@ -72,7 +68,7 @@
           viewBox="0 0 24 24"
           fill="currentColor"
           class="size-5"
-          aria-label="icon button create"
+          aria-hidden="true"
         >
           <path
             fill-rule="evenodd"
@@ -82,13 +78,12 @@
         </svg>
 
         <!-- label -->
-        <label aria-label="label button create">Create a schedule</label>
+        <span>Create a schedule</span>
       </button>
 
       <!-- Sorting schedule -->
       <button
         class="flex justify-center items-center gap-2 bg-gradient-to-br from-red-800 to-red-400 px-4 py-2 rounded-md"
-        aria-label="button trigger to sort order schedule from all status"
       >
         <!-- Sorting icon -->
         <svg
@@ -96,7 +91,7 @@
           viewBox="0 0 24 24"
           fill="currentColor"
           class="size-5"
-          aria-label="icon button sort"
+          aria-hidden="true"
         >
           <path
             fill-rule="evenodd"
@@ -106,26 +101,26 @@
         </svg>
 
         <!-- label -->
-        <label aria-label="label button sort">Sort schedule by</label>
+        <span>Sort schedule by</span>
       </button>
     </nav>
 
     <!-- Main section that contains all schedule that we have created -->
     <!-- !! Section base on status -->
     <main
-      class="flex py-8 px-20 gap-4"
+      class="flex flex-col md:flex-row py-8 px-4 sm:px-12 md:px-20 gap-6 w-full max-w-[1440px] mx-auto"
       aria-label="Wrapper from both section status of schedule"
     >
       <!-- Section on progress -->
       <section
-        class="space-y-6 w-1/2"
+        class="space-y-6 w-full md:w-1/2"
         aria-label="Section wrapper to wrap schedule with status on progress"
       >
         <!-- Header in every section -->
         <header class="flex gap-4">
           <!-- Container icon -->
           <span
-            aria-label="container icon from section wrapper on progress"
+            aria-hidden="true"
             class="p-2 flex w-fit rounded-full bg-gradient-to-br from-orange-800 to-orange-400"
           >
             <!-- Icon rocket -->
@@ -134,7 +129,6 @@
               viewBox="0 0 24 24"
               fill="currentColor"
               class="size-6"
-              aria-label="icon from section wrapper on progress"
             >
               <path
                 fill-rule="evenodd"
@@ -147,20 +141,11 @@
             </svg>
           </span>
           <!-- Title status -->
-          <h2
-            class="text-2xl font-semibold"
-            aria-label="Title from section wrapper on progress"
-          >
-            On progress
-          </h2>
+          <h2 class="text-2xl font-semibold">On progress</h2>
         </header>
 
         <!-- Schedule card -->
-        <div
-          class="space-y-6"
-          id="container-schedule-on-progresss"
-          aria-label="Container data schedule from section wrapper on progress"
-        >
+        <div class="space-y-6" id="container-schedule-on-progresss">
           <!-- Dummy schedule card -->
           <article
             class="max-w-full rounded-md bg-[#1e1f20] border border-[#e3e3e3]/10"
@@ -183,9 +168,9 @@
             <div class="p-4 border-b border-[#e3e3e3]/10">
               <!-- Title -->
               <!-- !! Update, use h1 element once in our html file, in sub elemen use smaller heading then h1, lika: h2, h3, and soon -->
-              <h2 class="text-2xl font-semibold mb-2" id="title">
+              <h3 class="text-2xl font-semibold mb-2" id="title">
                 Check the ground
-              </h2>
+              </h3>
               <!-- Description -->
               <p>
                 Pastikan kelembapan tanah di blok A di atas 60% sebelum
@@ -274,14 +259,14 @@
 
       <!-- Section done -->
       <section
-        class="space-y-6 w-1/2"
+        class="space-y-6 w-full md:w-1/2"
         aria-label="Section wrapper to wrap schedule with status done"
       >
         <!-- Header in every section -->
         <header class="flex gap-4">
           <!-- Container icon -->
           <span
-            aria-label="container icon from section wrapper done"
+            aria-hidden="true"
             class="p-2 flex w-fit rounded-full bg-gradient-to-br from-green-800 to-green-400"
           >
             <!-- Icon done -->
@@ -290,7 +275,6 @@
               viewBox="0 0 24 24"
               fill="currentColor"
               class="size-6"
-              aria-label="icon from section wrapper done"
             >
               <path
                 fill-rule="evenodd"
@@ -427,8 +411,8 @@
     </main>
 
     <!-- Footer for copy right -->
-    <footer class="bg-[#1e1f20] p-6 mt-auto flex justify-center items-center">
-      &copy; 2026 Smart scheduler. All right reserved.
+    <footer class="bg-[#1e1f20] p-6 mt-auto text-center">
+      <p>&copy; 2026 Smart scheduler. All right reserved.</p>
     </footer>
   </body>
 
