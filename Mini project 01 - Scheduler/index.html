@@ -28,9 +28,10 @@
 
       <!-- Remainding time -->
       <div
-        class="p-2 flex gap-2 justify-center w-fit rounded-full bg-gradient-to-br from-orange-800 to-orange-400"
+        class="py-2 px-4 flex gap-2 justify-center w-fit rounded-full bg-gradient-to-br from-orange-800 to-orange-400"
         aria-label="remainding time container"
         title="remanding time in a day"
+        aria-hidden="true"
       >
         <!-- Icon schedule -->
         <svg
@@ -38,6 +39,7 @@
           viewBox="0 0 24 24"
           fill="currentColor"
           class="size-6"
+          aria-hidden="true"
         >
           <path
             fill-rule="evenodd"
@@ -46,9 +48,11 @@
           />
         </svg>
 
-        <p class="font-semibold" aria-label="remainding time in a day">
-          120 Minutes
-        </p>
+        <p
+          class="font-semibold"
+          aria-label="remainding time in a day"
+          id="reminder-time"
+        ></p>
       </div>
     </header>
 
@@ -60,7 +64,9 @@
     >
       <!-- Add new schedule -->
       <button
-        class="flex justify-center items-center gap-2 bg-gradient-to-br from-blue-800 to-blue-400 px-4 py-2 rounded-md"
+        class="flex justify-center items-center gap-2 bg-gradient-to-br from-blue-800 to-blue-400 px-4 py-2 rounded-md cursor-pointer"
+        id="btn-create-form-trigger"
+        type="button"
       >
         <!-- Plus icon -->
         <svg
@@ -83,7 +89,9 @@
 
       <!-- Sorting schedule -->
       <button
-        class="flex justify-center items-center gap-2 bg-gradient-to-br from-red-800 to-red-400 px-4 py-2 rounded-md"
+        class="flex justify-center items-center gap-2 bg-gradient-to-br from-red-800 to-red-400 px-4 py-2 rounded-md cursor-pointer"
+        id="btn-sort-form-trigger"
+        type="button"
       >
         <!-- Sorting icon -->
         <svg
@@ -295,7 +303,7 @@
         <!-- Schedule card -->
         <div
           class="space-y-6"
-          id="container-schedule-dones"
+          id="container-schedule-done"
           aria-label="Container data schedule from section wrapper on progress"
         >
           <!-- Dummy schedule card -->
@@ -414,6 +422,98 @@
     <footer class="bg-[#1e1f20] p-6 mt-auto text-center">
       <p>&copy; 2026 Smart scheduler. All right reserved.</p>
     </footer>
+
+    <!-- Black screen -->
+    <div
+      id="black-overlay"
+      class="fixed backdrop-blur-sm inset-0 min-h-full bg-black/50 flex justify-center items-center px-4 sm:px-12 md:px-2 invisible opacity-0 transition-all duration-200"
+    >
+      <!-- Crud element -->
+      <!-- Form create and update schedule -->
+      <form
+        class="bg-[#1e1f20] p-4 md:p-6 flex flex-col gap-4 rounded-md border border-[#e3e3e3]/10 w-full max-w-[516px]"
+        id="form-manipulation-flexible"
+      >
+        <!-- Header input -->
+        <header class="space-y-2 mb-2">
+          <h2 class="text-xl md:text-2xl lg:text-4xl font-semibold">
+            Create your schedule
+          </h2>
+          <!-- <p class="text-sm md:text-base">
+            Complete the information below to create your schedule.
+          </p> -->
+        </header>
+
+        <!-- Hidden input to swithc CRUD methode  -->
+        <input id="scheduleId" name="scheduleId" type="hidden" />
+
+        <!-- Input form -->
+        <!-- Title input -->
+        <div class="flex flex-col gap-2">
+          <label for="title">Schedule title</label>
+          <input
+            id="title"
+            type="text"
+            name="title"
+            class="p-3 rounded-md border border-[#e3e3e3]/10 transition-all duration-200 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+            placeholder="Insert schedule title"
+          />
+        </div>
+
+        <!-- Description input -->
+        <div class="flex flex-col gap-2">
+          <label for="description">Schedule description</label>
+          <textarea
+            id="description"
+            name="description"
+            class="p-3 rounded-md border border-[#e3e3e3]/10 resize-none min-h-36 transition-all duration-200 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+            placeholder="Insert schedule description"
+          ></textarea>
+        </div>
+
+        <!-- Time doing -->
+        <div class="flex flex-col gap-2">
+          <label for="timeDoing">Schedule time doing</label>
+          <input
+            id="timeDoing"
+            name="timeDoing"
+            type="text"
+            class="p-3 rounded-md border border-[#e3e3e3]/10 transition-all duration-200 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+            placeholder="Insert schedule time doing"
+          />
+        </div>
+
+        <!-- Category -->
+        <div class="flex flex-col gap-2">
+          <label for="category">Schedule category</label>
+          <input
+            id="category"
+            name="category"
+            type="text"
+            class="p-3 rounded-md border border-[#e3e3e3]/10 transition-all duration-200 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+            placeholder="Insert unqiue schedule category"
+          />
+        </div>
+
+        <!-- Button submit -->
+        <button
+          class="bg-gradient-to-br from-blue-800 to-blue-400 ml-auto py-2 px-4 rounded-md font-semibold"
+        >
+          <span>Create schedule</span>
+        </button>
+      </form>
+
+      <!-- Pop up or alert element -->
+      <!-- Create succuessfull -->
+      <!-- Update succuessfull -->
+      <!-- Delete succuessfull -->
+
+      <!-- Confirm before delete -->
+
+      <!-- Create failed -->
+      <!-- Update failed -->
+      <!-- Delete failed -->
+    </div>
   </body>
 
   <!-- Todo connect file js externally -->
