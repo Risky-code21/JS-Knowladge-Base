@@ -12,6 +12,7 @@ class Schedule {
     this.category = information.category;
     this.status = "On progress";
     this.createdAt = Helper.convertionDate(Date.now());
+    this.preference = { categoryPreference: generateUniqueColorCategory() };
   }
 
   get secretIdentity() {
@@ -26,28 +27,61 @@ class Schedule {
 // Controller
 class ScehduleController {
   // Controller property
-  static scheduleStroage = [];
+  static ScheduleStorage = {
+    key: "ScheduleStorage",
+    getData() {
+      return JSON.parse(localStorage.getItem(this.key));
+    },
+    setData(data = []) {
+      localStorage.setItem(this.key, JSON.stringify(data));
+    },
+  };
+
   static totalTimeInOneDay = 960;
-  static massiveDelet() {
-    this.scheduleStroage = [];
+
+  static calculationRemindingTime() {
+    const totalTimeSchedule = (this.ScheduleStorage.getData() || []).reduce(
+      (acc, schedule) => {
+        return schedule.timeDoing + acc;
+      },
+      0,
+    );
+    console.log(totalTimeSchedule);
+
+    const reminding = 960 - totalTimeSchedule;
+
+    this.totalTimeInOneDay = reminding < 0 ? 0 : reminding;
+
+    return this.totalTimeInOneDay;
+  }
+
+  static massiveDelete() {
+    this.ScheduleStorage.setData([]);
   }
 
   // Sorting
   static sortingSchedule(sortingMethode) {
-    this.scheduleStroage.toSorted(() => {});
+    this.ScheduleStorage.getData();
   }
 
+  // todo --> Need refactor
   // Create
   static createSchedule(information) {
     const newSchedule = new Schedule(information);
-    const updatedStorage = [...this.scheduleStroage, newSchedule];
+    let updatedStorage = [];
+
+    if (this.ScheduleStorage.getData()) {
+      updatedStorage = [...this.ScheduleStorage.getData(), newSchedule];
+    } else {
+      updatedStorage = [newSchedule];
+    }
+
     const checkRemindingTime = updatedStorage.reduce((acc, schedule) => {
       return schedule.timeDoing + acc;
     }, 0);
 
-    if (checkRemindingTime < 960) {
-      this.scheduleStroage = updatedStorage;
-      this.totalTimeInOneDay -= newSchedule.timeDoing;
+    if (checkRemindingTime <= 960) {
+      this.ScheduleStorage.setData(updatedStorage);
 
       this.updateListCard();
       return true;
@@ -57,11 +91,14 @@ class ScehduleController {
     }
   }
 
+  // todo --> Need refactor
   static updateListCard() {
+    this.calculationRemindingTime();
     DOM.remainderTime.textContent = `${this.totalTimeInOneDay} Minutes`;
+    console.log(this.totalTimeInOneDay);
 
     const filterdMappedSchedule = (status) =>
-      this.scheduleStroage
+      (this.ScheduleStorage.getData() || [])
         .filter((schedule) => {
           return schedule.status == status;
         })
@@ -70,8 +107,15 @@ class ScehduleController {
         })
         .join("");
 
-    const onProgressCard = filterdMappedSchedule("On progress");
-    const doneCard = filterdMappedSchedule("Done");
+    let onProgressCard = [];
+    let doneCard = [];
+
+    if (!this.ScheduleStorage.getData()) {
+      return;
+    }
+
+    onProgressCard = filterdMappedSchedule("On progress");
+    doneCard = filterdMappedSchedule("Done");
 
     DOM.containerScheduleOnProgress.innerHTML = onProgressCard;
     DOM.containerScheduleDone.innerHTML = doneCard;
@@ -106,7 +150,37 @@ const Helper = {
 };
 
 // View or familiar with DOM in js
+function generateUniqueColorCategory() {
+  const baseOfColor = [
+    {
+      name: "blue",
+      border: "border-blue-600",
+      background: "bg-blue-200",
+      text: "text-blue-600",
+    },
+    {
+      name: "green",
+      border: "border-green-600",
+      background: "bg-green-200",
+      text: "text-green-600",
+    },
+    {
+      name: "orange",
+      border: "border-orange-600",
+      background: "bg-orange-200",
+      text: "text-orange-600",
+    },
+  ];
+
+  const selectedColor =
+    baseOfColor[Math.floor(Math.random() * baseOfColor.length)];
+
+  return selectedColor;
+}
+
 function cardScheduleComponent(informationCard) {
+  let preferenceCard = informationCard.preference.categoryPreference;
+
   return `<article
             class="max-w-full rounded-md bg-[#1e1f20] border border-[#e3e3e3]/10"
             aria-labelledby="title-${informationCard.secretIdentity}"
@@ -116,7 +190,7 @@ function cardScheduleComponent(informationCard) {
               class="flex justify-between items-center p-4 border-b border-[#e3e3e3]/10 font-semibold"
             >
               <p
-                class="border border-green-600 rounded-full text-green-600 bg-green-200 px-4 py-1"
+                class="border ${preferenceCard.border} rounded-full ${preferenceCard.text} ${preferenceCard.background} px-4 py-1"
               >
                 ${informationCard.category}
               </p>
