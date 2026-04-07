@@ -25,7 +25,7 @@ class Schedule {
 }
 
 // Controller
-class ScehduleController {
+class ScheduleController {
   // Controller property
   static ScheduleStorage = {
     key: "ScheduleStorage",
@@ -299,30 +299,85 @@ const DOM = {
     "container-schedule-on-progresss",
   ),
   containerScheduleDone: document.getElementById("container-schedule-done"),
+  errorsElement: document.querySelectorAll(".error"),
 };
 
 // Show flexible form
 DOM.triggerFormCreate.addEventListener("click", function () {
-  DOM.flexibleForm.classList.remove("hidden");
-  DOM.blackOverlay.classList.remove("invisible", "opacity-0");
-  DOM.blackOverlay.classList.add("visible", "opacity-100");
+  showForm(true);
 });
+
+// event delegetion
+DOM.blackOverlay.addEventListener("click", function (event) {
+  if (event.target === DOM.blackOverlay) {
+    showForm(false);
+  }
+});
+
+function formValidation(formInputs) {
+  const errors = {};
+
+  if (!formInputs.title || !formInputs.title.trim() === "") {
+    errors.title = "Title cannot be empty";
+  }
+
+  if (!formInputs.timeDoing || isNaN(formInputs.timeDoing)) {
+    if (formInputs.timeDoing <= 0) {
+      errors.timeDoing = "Time doing must be more than 1 minute";
+    } else {
+      errors.timeDoing = "Time doing must be a number.";
+    }
+  }
+
+  return errors;
+}
+
+function showForm(showState = false) {
+  let visiblity = showState;
+
+  DOM.flexibleForm.classList.toggle("hidden", !visiblity);
+
+  DOM.blackOverlay.classList.toggle("invisible", !visiblity);
+  DOM.blackOverlay.classList.toggle("opacity-0", !visiblity);
+
+  DOM.blackOverlay.classList.toggle("visible", visiblity);
+  DOM.blackOverlay.classList.toggle("opacity-100", visiblity);
+
+  if (!visiblity) {
+    document.documentElement.style.overflow = "auto";
+  } else {
+    document.documentElement.style.overflow = "hidden";
+  }
+}
 
 // Flexible form submit event
 DOM.flexibleForm.addEventListener("submit", function (event) {
   event.preventDefault();
-
   const form = new FormData(this);
   const formInputsValue = Object.fromEntries(form);
-  const isSucces = ScehduleController.createSchedule({ ...formInputsValue });
 
-  if (isSucces) {
-    this.reset();
-    this.classList.add("hidden");
-    DOM.blackOverlay.classList.add("invisible", "opacity-0");
-    DOM.blackOverlay.classList.remove("visible", "opacity-100");
+  const iconAlert = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
+  <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" />
+</svg>
+`;
+  const formErrors = formValidation(formInputsValue);
+
+  if (Object.keys(formErrors).length === 0) {
+    const isSucces = ScheduleController.createSchedule({ ...formInputsValue });
+    if (isSucces) {
+      this.reset();
+      showForm(false);
+    }
+  } else {
+    for (key in formErrors) {
+      const errorElement = document.getElementById(`error-${key}`);
+
+      if (errorElement) {
+        errorElement.innerHTML = `${iconAlert} ${formErrors[key]}`;
+      }
+    }
   }
 });
 
 // Intial state for the web
-ScehduleController.updateListCard();
+ScheduleController.updateListCard();

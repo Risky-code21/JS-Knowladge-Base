@@ -240,6 +240,10 @@
             class="p-3 rounded-md border border-[#e3e3e3]/10 transition-all duration-200 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
             placeholder="Insert schedule title"
           />
+          <div
+            id="error-title"
+            class="text-red-400 flex gap-2 items-center"
+          ></div>
         </div>
 
         <!-- Description input -->
@@ -261,8 +265,12 @@
             name="timeDoing"
             type="text"
             class="p-3 rounded-md border border-[#e3e3e3]/10 transition-all duration-200 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
-            placeholder="Insert schedule time doing"
+            placeholder="Insert schedule time doing in minutes range"
           />
+          <div
+            id="error-timeDoing"
+            class="text-red-400 flex gap-2 items-center"
+          ></div>
         </div>
 
         <!-- Category -->
