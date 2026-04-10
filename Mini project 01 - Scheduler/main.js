@@ -5,14 +5,16 @@ class Schedule {
   #id;
 
   constructor(information) {
-    this.#id = Helper.generateUniqueId();
+    this.#id = information.id || Helper.generateUniqueId();
     this.title = information.title;
     this.description = information.description;
-    this.timeDoing = parseInt(information.timeDoing);
+    this.timeDoing = information.timeDoing;
     this.category = information.category;
-    this.status = "On progress";
-    this.createdAt = Helper.convertionDate(Date.now());
-    this.preference = { categoryPreference: generateUniqueColorCategory() };
+    this.status = information.status || "On progress";
+    this.createdAt = information.createdAt || Helper.convertionDate(Date.now());
+    this.preference = information.preference || {
+      categoryPreference: ScheduleView.generateUniqueColorCategory(),
+    };
   }
 
   get secretIdentity() {
@@ -22,6 +24,22 @@ class Schedule {
   markAsDone() {
     this.status = "Done";
   }
+
+  // Convert all property if that take by JSON format
+  // Magic methode
+  toJSON() {
+    return {
+      // Cek keamanan id jika langsung di paparkan begitu saja di local storage
+      id: this.secretIdentity,
+      title: this.title,
+      description: this.description,
+      timeDoing: this.timeDoing,
+      category: this.category,
+      status: this.status,
+      createdAt: this.createdAt,
+      preference: this.preference,
+    };
+  }
 }
 
 // Controller
@@ -30,15 +48,20 @@ class ScheduleController {
   static ScheduleStorage = {
     key: "ScheduleStorage",
     getData() {
-      return JSON.parse(localStorage.getItem(this.key));
+      const rawData = JSON.parse(localStorage.getItem(this.key)) || [];
+
+      // Reyhdration to make new object with same data that saved in local storage
+      return rawData.map((data) => {
+        return new Schedule(data);
+      });
     },
     setData(data = []) {
       localStorage.setItem(this.key, JSON.stringify(data));
     },
   };
-
   static totalTimeInOneDay = 960;
 
+  // Caluculation total time that used by schedule
   static calculationRemindingTime() {
     const totalTimeSchedule = (this.ScheduleStorage.getData() || []).reduce(
       (acc, schedule) => {
@@ -46,7 +69,6 @@ class ScheduleController {
       },
       0,
     );
-    console.log(totalTimeSchedule);
 
     const reminding = 960 - totalTimeSchedule;
 
@@ -55,26 +77,16 @@ class ScheduleController {
     return this.totalTimeInOneDay;
   }
 
-  static massiveDelete() {
-    this.ScheduleStorage.setData([]);
-  }
-
-  // Sorting
-  static sortingSchedule(sortingMethode) {
-    this.ScheduleStorage.getData();
-  }
-
-  // todo --> Need refactor
   // Create
-  static createSchedule(information) {
-    const newSchedule = new Schedule(information);
-    let updatedStorage = [];
+  static create(information) {
+    const newSchedule = new Schedule({
+      ...information,
+      timeDoing: Number(information.timeDoing),
+    });
 
-    if (this.ScheduleStorage.getData()) {
-      updatedStorage = [...this.ScheduleStorage.getData(), newSchedule];
-    } else {
-      updatedStorage = [newSchedule];
-    }
+    let updatedStorage = this.ScheduleStorage.getData()
+      ? [...this.ScheduleStorage.getData(), newSchedule]
+      : (updatedStorage = [newSchedule]);
 
     const checkRemindingTime = updatedStorage.reduce((acc, schedule) => {
       return schedule.timeDoing + acc;
@@ -83,7 +95,12 @@ class ScheduleController {
     if (checkRemindingTime <= 960) {
       this.ScheduleStorage.setData(updatedStorage);
 
-      this.updateListCard();
+      this.calculationRemindingTime();
+
+      ScheduleView.updateUI(
+        this.ScheduleStorage.getData(),
+        this.totalTimeInOneDay,
+      );
       return true;
     } else {
       // Pop up will be here
@@ -91,34 +108,37 @@ class ScheduleController {
     }
   }
 
-  // todo --> Need refactor
-  static updateListCard() {
-    this.calculationRemindingTime();
-    DOM.remainderTime.textContent = `${this.totalTimeInOneDay} Minutes`;
-    console.log(this.totalTimeInOneDay);
+  // Delete
+  static delete() {
+    this.ScheduleStorage.setData([]);
+  }
 
-    const filterdMappedSchedule = (status) =>
-      (this.ScheduleStorage.getData() || [])
-        .filter((schedule) => {
-          return schedule.status == status;
-        })
-        .map((schedule) => {
-          return cardScheduleComponent(schedule);
-        })
-        .join("");
+  // Sorting
+  static sorting(sortingMethode) {
+    this.ScheduleStorage.getData();
+  }
+}
 
-    let onProgressCard = [];
-    let doneCard = [];
+// Request validation
+class ScheduleRequest {
+  static formValidation(formInputs) {
+    const errors = {};
 
-    if (!this.ScheduleStorage.getData()) {
-      return;
+    if (!formInputs.title || formInputs.title.trim() === "") {
+      errors.title = "Title cannot be empty";
     }
 
-    onProgressCard = filterdMappedSchedule("On progress");
-    doneCard = filterdMappedSchedule("Done");
+    const timeDoing = Number(formInputs.timeDoing);
 
-    DOM.containerScheduleOnProgress.innerHTML = onProgressCard;
-    DOM.containerScheduleDone.innerHTML = doneCard;
+    if (!formInputs.timeDoing || formInputs.timeDoing.trim() === "") {
+      errors.timeDoing = "Time doing cannot be empty";
+    } else if (isNaN(timeDoing)) {
+      errors.timeDoing = "Time doing must be a number";
+    } else if (timeDoing <= 0) {
+      errors.timeDoing = "Time doing must be more than 1 minute";
+    }
+
+    return errors;
   }
 }
 
@@ -149,39 +169,113 @@ const Helper = {
   },
 };
 
-// View or familiar with DOM in js
-function generateUniqueColorCategory() {
-  const baseOfColor = [
-    {
-      name: "blue",
-      border: "border-blue-600",
-      background: "bg-blue-200",
-      text: "text-blue-600",
-    },
-    {
-      name: "green",
-      border: "border-green-600",
-      background: "bg-green-200",
-      text: "text-green-600",
-    },
-    {
-      name: "orange",
-      border: "border-orange-600",
-      background: "bg-orange-200",
-      text: "text-orange-600",
-    },
-  ];
+// View and DOM
+class ScheduleView {
+  // Update UI
+  static updateUI(
+    scheduleData = ScheduleController.ScheduleStorage.getData(),
+    remindingTime = ScheduleController.totalTimeInOneDay,
+  ) {
+    const data = scheduleData || "";
 
-  const selectedColor =
-    baseOfColor[Math.floor(Math.random() * baseOfColor.length)];
+    if (!data) {
+      return;
+    }
 
-  return selectedColor;
+    const filterdMappedSchedule = (status) =>
+      data
+        .filter((schedule) => {
+          return schedule.status == status;
+        })
+        .map((schedule) => {
+          return Component.cardScheduleComponent(schedule);
+        })
+        .join("");
+
+    // Update reminder time UI
+    DOM.remainderTime.textContent = `${remindingTime} Minutes`;
+
+    // Update card list UI
+    DOM.containerScheduleOnProgress.innerHTML =
+      filterdMappedSchedule("On progress");
+    DOM.containerScheduleDone.innerHTML = filterdMappedSchedule("Done");
+  }
+
+  // Generate random category color
+  static generateUniqueColorCategory() {
+    const baseOfColor = [
+      {
+        name: "blue",
+        border: "border-blue-600",
+        background: "bg-blue-200",
+        text: "text-blue-600",
+      },
+      {
+        name: "green",
+        border: "border-green-600",
+        background: "bg-green-200",
+        text: "text-green-600",
+      },
+      {
+        name: "orange",
+        border: "border-orange-600",
+        background: "bg-orange-200",
+        text: "text-orange-600",
+      },
+    ];
+
+    const selectedColor =
+      baseOfColor[Math.floor(Math.random() * baseOfColor.length)];
+
+    return selectedColor;
+  }
+
+  // Visibility form setting
+  static showForm(showState = false) {
+    let visiblity = showState;
+
+    DOM.flexibleForm.classList.toggle("hidden", !visiblity);
+
+    DOM.blackOverlay.classList.toggle("invisible", !visiblity);
+    DOM.blackOverlay.classList.toggle("opacity-0", !visiblity);
+
+    DOM.blackOverlay.classList.toggle("visible", visiblity);
+    DOM.blackOverlay.classList.toggle("opacity-100", visiblity);
+
+    if (!visiblity) {
+      document.documentElement.style.overflow = "auto";
+    } else {
+      document.documentElement.style.overflow = "hidden";
+    }
+  }
+
+  // Show error validation
+  static showErrorMessage(errors) {
+    // Reinsialisation the content of the object
+    document
+      .querySelectorAll(".error")
+      .forEach((element) => (element.innerHTML = ""));
+
+    //Set content error
+    for (const key in errors) {
+      const errorElement = document.getElementById(`error-${key}`);
+      const errorMessage = errors[key];
+
+      if (errorMessage) {
+        errorElement.innerHTML = `${Component.iconAlert()} ${errorMessage}`;
+      } else {
+        errorElement.innerHTML = "";
+      }
+    }
+  }
 }
 
-function cardScheduleComponent(informationCard) {
-  let preferenceCard = informationCard.preference.categoryPreference;
+// Reusable component
+const Component = {
+  cardScheduleComponent: function (informationCard) {
+    let preferenceCard = informationCard.preference.categoryPreference;
 
-  return `<article
+    return `<article
             class="max-w-full rounded-md bg-[#1e1f20] border border-[#e3e3e3]/10"
             aria-labelledby="title-${informationCard.secretIdentity}"
           >
@@ -286,9 +380,16 @@ function cardScheduleComponent(informationCard) {
               </div>
             </footer>
           </article>`;
-}
+  },
+  iconAlert: function () {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
+  <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" />
+</svg>
+`;
+  },
+};
 
-// Dom element object
+// Dom or single element html
 const DOM = {
   blackOverlay: document.getElementById("black-overlay"),
   triggerFormCreate: document.getElementById("btn-create-form-trigger"),
@@ -302,82 +403,36 @@ const DOM = {
   errorsElement: document.querySelectorAll(".error"),
 };
 
-// Show flexible form
+// Show flexible form by clicking button trigger
 DOM.triggerFormCreate.addEventListener("click", function () {
-  showForm(true);
+  ScheduleView.showForm(true);
 });
 
-// event delegetion
 DOM.blackOverlay.addEventListener("click", function (event) {
+  // Event delegetion to hidden form when outside element clicked
   if (event.target === DOM.blackOverlay) {
-    showForm(false);
+    ScheduleView.showForm(false);
   }
 });
-
-function formValidation(formInputs) {
-  const errors = {};
-
-  if (!formInputs.title || !formInputs.title.trim() === "") {
-    errors.title = "Title cannot be empty";
-  }
-
-  if (!formInputs.timeDoing || isNaN(formInputs.timeDoing)) {
-    if (formInputs.timeDoing <= 0) {
-      errors.timeDoing = "Time doing must be more than 1 minute";
-    } else {
-      errors.timeDoing = "Time doing must be a number.";
-    }
-  }
-
-  return errors;
-}
-
-function showForm(showState = false) {
-  let visiblity = showState;
-
-  DOM.flexibleForm.classList.toggle("hidden", !visiblity);
-
-  DOM.blackOverlay.classList.toggle("invisible", !visiblity);
-  DOM.blackOverlay.classList.toggle("opacity-0", !visiblity);
-
-  DOM.blackOverlay.classList.toggle("visible", visiblity);
-  DOM.blackOverlay.classList.toggle("opacity-100", visiblity);
-
-  if (!visiblity) {
-    document.documentElement.style.overflow = "auto";
-  } else {
-    document.documentElement.style.overflow = "hidden";
-  }
-}
 
 // Flexible form submit event
 DOM.flexibleForm.addEventListener("submit", function (event) {
   event.preventDefault();
-  const form = new FormData(this);
-  const formInputsValue = Object.fromEntries(form);
-
-  const iconAlert = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
-  <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" />
-</svg>
-`;
-  const formErrors = formValidation(formInputsValue);
+  const formatedFormElement = new FormData(this);
+  const formInputsValue = Object.fromEntries(formatedFormElement);
+  let formErrors = ScheduleRequest.formValidation(formInputsValue);
 
   if (Object.keys(formErrors).length === 0) {
-    const isSucces = ScheduleController.createSchedule({ ...formInputsValue });
-    if (isSucces) {
+    const isSuccess = ScheduleController.create({ ...formInputsValue });
+
+    if (isSuccess) {
       this.reset();
-      showForm(false);
+      ScheduleView.showForm(false);
     }
   } else {
-    for (key in formErrors) {
-      const errorElement = document.getElementById(`error-${key}`);
-
-      if (errorElement) {
-        errorElement.innerHTML = `${iconAlert} ${formErrors[key]}`;
-      }
-    }
+    ScheduleView.showErrorMessage(formErrors);
   }
 });
 
 // Intial state for the web
-ScheduleController.updateListCard();
+ScheduleView.updateUI();
