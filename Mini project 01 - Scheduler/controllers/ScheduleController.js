@@ -1,9 +1,11 @@
+// Menggunakan metode ES6 module, yang dimana kita mulai mengunakan server dari node JS untuk menangani CORS dari website kita
 import Schedule from "../models/Schedule.js";
 import { HelperUI } from "../utils/Helper.js";
 import ScheduleView from "../views/ScheduleView.js";
 
 export default class ScheduleController {
   // Controller property
+  // Penggunaan object utama yang berfungsi untuk menangani pengambilan dan penyimpanan data yang ada didalam local storage
   static ScheduleStorage = {
     key: "ScheduleStorage",
     getData() {
@@ -20,8 +22,11 @@ export default class ScheduleController {
   };
 
   // Caluculation total time that used by schedule
+  // Membuat calucaltion mengembalikan object yang berisi hasil operasi yang diperlukan untuk penghitungan sistem dan penghitungan di sisi UI yang akan ditampilkan kepada pengguna
   static calculationTime(data) {
     const currentDataStorage = data || this.ScheduleStorage.getData();
+
+    // Variable yang akan digunakan untuk perhitungan sistem, yang berisi jumlah akumulasi waktu dari semua jadwal
     const totalTimeSchedule = (currentDataStorage || []).reduce(
       (acc, schedule) => {
         return schedule.timeDoing + acc;
@@ -29,6 +34,7 @@ export default class ScheduleController {
       0,
     );
 
+    // Variable yang akan ditampilkan kepada pengguna serta proses insialisasi dan manipulasinya, variable ini berisi sisa waktu yang berasal dari waktu dalam sheari, yaitu 960 dikurangi waktu yang telah dikonsumusi oleh jadwal keseluruhan
     let remindingTime = 960 - totalTimeSchedule;
     remindingTime = remindingTime < 0 ? 0 : remindingTime;
 
@@ -48,14 +54,12 @@ export default class ScheduleController {
       },
     });
 
-    // Refactor #1 membuat penyimpanan data dengan lebih rapi dan lebih efektif, agar proses berat dari parsing JSON di local storage tidak membebani V8 engine JS dan tidak menurunkan performa website
+    // Memperbarui cara menyimpan data yang ambil dari local storage, agar proses pengambilan hanya dilakukan sekali, dan proses selanjutnya akan menggunakan data yang sudah diambil dari local storage
     const currentStorageData = this.ScheduleStorage.getData() || [];
-    // Tetap masukan data yang sudah didefinisikan diatas, jika sebelumnya data berisi array berarti data akan ditambah data berikutnya (data baru) jika tidak berarti inserta data baru (data kosong dan baru dinsialisasi oleh data baru)
-    let updatedStorage = [...currentStorageData, newSchedule];
-
-    // Refactor #2 membuat function yang lebih optimal untuk mengelola sisa waktu harian dalam website
+    const updatedStorage = [...currentStorageData, newSchedule];
     const currentTime = this.calculationTime(updatedStorage);
 
+    // Tidak menggunakan reminding time dari proses caluculating pada fungsi sebelumnya, karena akan menghasilkan false setiap waktu sudah habis dan akan menghasilkan error pop up yang tidak akan terduga, dan bisa mengganggu pengguna
     if (currentTime.totalTimeSchedule <= 960) {
       this.ScheduleStorage.setData(updatedStorage);
 
@@ -68,15 +72,19 @@ export default class ScheduleController {
   }
 
   // Delete
+  // Coming soon
   static delete() {
     this.ScheduleStorage.setData([]);
   }
 
   // Sorting
+  // Coming soon
   static sorting(sortingMethode) {
     this.ScheduleStorage.getData();
   }
 
+  // Init function
+  // Init function digunakan untuk menginsialisasi UI saat website pertama kali dibuka kembali oleh pengguna
   static init() {
     const currentData = this.ScheduleStorage.getData();
     const currentTime = this.calculationTime();

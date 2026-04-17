@@ -1,6 +1,7 @@
 import { HelperData } from "../utils/Helper.js";
 
 export default class Schedule {
+  // Private methode
   #id;
 
   constructor(information) {
@@ -16,16 +17,20 @@ export default class Schedule {
     this.preference = information.preference;
   }
 
+  // Getter methode
+  // Digunakan untuk mengambil properti private dari class ini
   get secretIdentity() {
     return this.#id;
   }
 
+  // Mark as done
+  // Digunakan untuk mengganti status dari yang defaultnya "On proggres" menjadi "Done" untuk menandai jadwal sebagai selesai
   markAsDone() {
     this.status = "Done";
   }
 
   // Convert all property if that take by JSON format
-  // Magic methode
+  // Magic methode, setiap function JSON stringfy dipanggil, instance yang dijadikan data akan membuat object baru yang berisi pemetaan data baru sebagai berikut, ini memungkinkan kita untuk menjaga keberlangsungan ID lama yang telah dibuat sebelumnya dalam data
   toJSON() {
     return {
       // Cek keamanan id jika langsung di paparkan begitu saja di local storage
