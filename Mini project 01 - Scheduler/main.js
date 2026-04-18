@@ -5,11 +5,16 @@ import { DOM } from "./views/ScheduleView.js";
 
 // Refactor #5 event delegation new
 document.body.addEventListener("click", function (event) {
+  const cardSelected = event.target.closest("[data-card-edit]");
   // Membuat seleksi dengan satu listner global yang ditanamkan didalam body element, berfungsi untuk mengurangi beban engine dalam mengekskusi banyak listner di banyak element sebelumnya.
   // Show on form
   // Menggunakan methode closes untuk pengelolaan event bubbling, karena button berisi beberapa elemen html
   if (event.target.closest(`#${DOM.triggerFormCreate.id}`)) {
     ScheduleView.showForm(true);
+  }
+  if (cardSelected) {
+    const cardId = cardSelected.getAttribute("data-card-edit");
+    ScheduleController.edit(cardId);
   }
 
   // Show off form
@@ -21,20 +26,7 @@ document.body.addEventListener("click", function (event) {
 // Flexible form submit event
 DOM.flexibleForm.addEventListener("submit", function (event) {
   event.preventDefault();
-  const formatedFormElement = new FormData(this);
-  const formInputsValue = Object.fromEntries(formatedFormElement);
-  let formErrors = ScheduleRequest.formValidation(formInputsValue);
-
-  if (Object.keys(formErrors).length === 0) {
-    const isSuccess = ScheduleController.create({ ...formInputsValue });
-
-    if (isSuccess) {
-      this.reset();
-      ScheduleView.showForm(false);
-    }
-  } else {
-    ScheduleView.showErrorMessage(formErrors);
-  }
+  ScheduleController.handleSubmit(this);
 });
 
 // Intial state for the web

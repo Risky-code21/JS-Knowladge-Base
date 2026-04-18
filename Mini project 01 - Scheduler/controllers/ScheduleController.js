@@ -1,5 +1,6 @@
 // Menggunakan metode ES6 module, yang dimana kita mulai mengunakan server dari node JS untuk menangani CORS dari website kita
 import Schedule from "../models/Schedule.js";
+import ScheduleRequest from "../request/FormRequestValidation.js";
 import { HelperUI } from "../utils/Helper.js";
 import ScheduleView from "../views/ScheduleView.js";
 
@@ -71,6 +72,101 @@ export default class ScheduleController {
     }
   }
 
+  static edit(elementId) {
+    // filter data berdasarkan id yang didapat dari button
+    const scheduleData = this.ScheduleStorage.getData().find((schedule) => {
+      console.log(schedule.secretIdentity);
+      return schedule.secretIdentity == elementId;
+    });
+    console.log(scheduleData);
+    console.log(elementId);
+    const opperandData = {
+      ...scheduleData,
+      scheduleId: scheduleData.secretIdentity,
+    };
+
+    // Masukan data dari schedule yang di filter kedalam form update kita
+    ScheduleView.editFormSet(opperandData);
+  }
+
+  static update(elementId, updatedData) {
+    // Melakukan mapping untuk memasikan data yang sedang di update sekarang sudah diedit tidak akan tertimpa dengan data lamanya
+    const filteredData = this.ScheduleStorage.getData().filter((schedule) => {
+      return schedule.secretIdentity != elementId;
+    });
+
+    // Buat array baru berdasarkan data yang telah di maping ditambah 1 data hasil dari update data sebelumnya
+    const newData = [...filteredData, updatedData];
+    console.log(newData);
+    const currentTime = this.calculationTime(newData);
+
+    if (currentTime.totalTimeSchedule <= 960) {
+      this.ScheduleStorage.setData(newData);
+
+      ScheduleView.updateUI(newData, currentTime.remindingTime);
+      return true;
+    } else {
+      // Pop up will be here
+      return false;
+    }
+  }
+
+  static handleSubmit(formElement) {
+    // Pastikan event bubbling tidak aktif agar form tidak mempengaruhi reset halaman
+    event.preventDefault();
+
+    if (!formElement) return;
+
+    // Lakukan format data berdasarkan input yang dikirim dari form tersebut
+    const formatedFormElement = new FormData(formElement);
+
+    // Konversi data input yang telah di format sebagai sebuah object, agar mudah di manipulasi
+    const formInputsValue = Object.fromEntries(formatedFormElement);
+
+    // Lakukan validasi pada input yang dimasukan
+    let formErrors = ScheduleRequest.formValidation(formInputsValue);
+
+    // Sesuai nama DOM element, yaitu: form flexible, artinya kita bisa menggunakan form ini untuk store (menyimpan data lama) dan create(menyimpan dan merubah data lama dengan perubahan baru)
+    const currentId = formInputsValue["scheduleId"];
+    console.log(currentId);
+
+    // IsSuccess sekarang harus fleksibel, karena dia bisa berisi hasil eksekusi dari function create dan update, tergantung kondisinya nanti
+    let isSuccess;
+
+    if (Object.keys(formErrors).length === 0) {
+      if (currentId) {
+        // Menggunakan data yang sudah ada didalam local storage sebelumnya, lalu memilih data lama berdasarkan id dari input form, digunakan supaya bisa menjaga nilai properti yang tidak ada di form bisa tetap terjaga seperti sebelumnya
+        const filterdSchedule = this.ScheduleStorage.getData().find(
+          (schedule) => {
+            if (schedule.secretIdentity == currentId) return schedule;
+          },
+        );
+
+        // Membuat data untuk di opper kedalam update function, kita menggunakan spread operator dari 2 array data, yang pertama dari data sebelumnya yang di fillter, dan kemudian array data dari input, yang akan menimpan nilai dari data lama sesuai properti yang tersedia didalamnya, dan kemudian yang terakhir melakukan casting time doing, agar yang disimpan dari input tetap sebuah nomer
+        const mappedObject = {
+          ...filterdSchedule,
+          ...formInputsValue, // noted kesalaan operand id yang dimana masih menggunakan id public dari input form bukan private
+          timeDoing: Number(formInputsValue.timeDoing) || 0,
+        };
+
+        const opperandData = new Schedule(mappedObject);
+
+        console.log(opperandData);
+
+        isSuccess = this.update(currentId, opperandData);
+      } else {
+        isSuccess = this.create({ ...formInputsValue });
+      }
+    } else {
+      ScheduleView.showErrorMessage(formErrors);
+    }
+
+    if (isSuccess) {
+      formElement.reset();
+      ScheduleView.showForm(false);
+    }
+  }
+
   // Delete
   // Coming soon
   static delete() {
@@ -89,6 +185,7 @@ export default class ScheduleController {
     const currentData = this.ScheduleStorage.getData();
     const currentTime = this.calculationTime();
 
+    console.log(currentData);
     ScheduleView.updateUI(currentData, currentTime.remindingTime);
   }
 }

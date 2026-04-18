@@ -81,4 +81,21 @@ export default class ScheduleView {
       }
     }
   }
+
+  static editFormSet(data) {
+    let scheduleData = data;
+
+    DOM.flexibleForm.querySelectorAll("[name]").forEach((element) => {
+      const fieldName = element.getAttribute("name");
+      const value = scheduleData[fieldName];
+
+      if (!value) return;
+
+      element.value = value;
+    });
+
+    document.getElementById("create-button").classList.add("hidden");
+    document.getElementById("update-button").classList.remove("hidden");
+    this.showForm(true);
+  }
 }
