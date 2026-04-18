@@ -3,6 +3,7 @@ import Schedule from "../models/Schedule.js";
 import ScheduleRequest from "../request/FormRequestValidation.js";
 import { HelperUI } from "../utils/Helper.js";
 import ScheduleView from "../views/ScheduleView.js";
+import { DOM } from "../views/ScheduleView.js";
 
 export default class ScheduleController {
   // Controller property
@@ -104,9 +105,11 @@ export default class ScheduleController {
       this.ScheduleStorage.setData(newData);
 
       ScheduleView.updateUI(newData, currentTime.remindingTime);
+      ScheduleView.showSpesificAlert(DOM.alertSuccessUpdate);
+
       return true;
     } else {
-      // Pop up will be here
+      // ScheduleView.showSpesificAlert(DOM.alertSuccessUpdate);
       return false;
     }
   }
@@ -163,7 +166,6 @@ export default class ScheduleController {
 
     if (isSuccess) {
       formElement.reset();
-      ScheduleView.showForm(false);
     }
   }
 

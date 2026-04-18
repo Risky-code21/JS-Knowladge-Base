@@ -12,6 +12,7 @@ export const DOM = {
   ),
   containerScheduleDone: document.getElementById("container-schedule-done"),
   errorsElement: document.querySelectorAll(".error"),
+  alertSuccessUpdate: document.getElementById("alert-success-update"),
 };
 
 export default class ScheduleView {
@@ -47,10 +48,11 @@ export default class ScheduleView {
     // Ada atau tidaknya elemen form bersumber dari variable visiblity, jika variablenya false maka form akan disembunyikan dari tampilan UI yang dilihat oleh pengguna. Oh iya, perubahaan ini dipengaruhi oleh penambahan dan penghapusan class yang dilakukan oleh toggle methode
     DOM.flexibleForm.classList.toggle("hidden", !visiblity);
 
-    // Hal serupa terjadi juga pada elemen dibawah ini
-    // Ini kondisi ketika variable visiblity bernilai false, elemen akan disembunikan dari layar pengguna
-    DOM.blackOverlay.classList.toggle("invisible", !visiblity);
-    DOM.blackOverlay.classList.toggle("opacity-0", !visiblity);
+    this.showBlackOverlay(visiblity);
+  }
+
+  static showBlackOverlay(normalState = false) {
+    let visiblity = normalState;
 
     // Ini kondisi ketika variable visiblity bernilai True, elemen akan ditampilkan pada layar pengguna
     DOM.blackOverlay.classList.toggle("visible", visiblity);
@@ -97,5 +99,21 @@ export default class ScheduleView {
     document.getElementById("create-button").classList.add("hidden");
     document.getElementById("update-button").classList.remove("hidden");
     this.showForm(true);
+  }
+
+  static showSpesificAlert(alertElement) {
+    let visibilty = true;
+    this.showForm(visibilty);
+
+    // console.log(visibilty);
+    // console.log(showOff);
+    // console.log(alertElement);
+    alertElement.classList.toggle("hidden", !visibilty);
+    DOM.blackOverlay.classList.toggle("visible", visibilty);
+    DOM.blackOverlay.classList.toggle("opacity-100", visibilty);
+
+    setTimeout(() => {
+      visibilty = false;
+    }, 2000);
   }
 }

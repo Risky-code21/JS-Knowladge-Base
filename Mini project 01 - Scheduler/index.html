@@ -208,12 +208,12 @@
     <!-- Black screen -->
     <div
       id="black-overlay"
-      class="fixed backdrop-blur-sm inset-0 min-h-full bg-black/50 flex justify-center items-center px-4 sm:px-12 md:px-2 invisible opacity-0 transition-all duration-200"
+      class="fixed backdrop-blur-sm inset-0 min-h-full bg-black/50 flex justify-center items-center px-4 sm:px-12 md:px-2 transition-all duration-200 invisible opacity-0"
     >
       <!-- Crud element -->
       <!-- Form create and update schedule -->
       <form
-        class="bg-[#1e1f20] p-4 md:p-6 flex flex-col gap-4 rounded-md border border-[#e3e3e3]/10 w-full max-w-[516px]"
+        class="bg-[#1e1f20] p-4 md:p-6 flex flex-col gap-4 rounded-md border border-[#e3e3e3]/10 w-full max-w-[516px] hidden"
         id="form-manipulation-flexible"
       >
         <!-- Header input -->
@@ -305,6 +305,39 @@
       <!-- Pop up or alert element -->
       <!-- Create succuessfull -->
       <!-- Update succuessfull -->
+      <article
+        class="bg-[#1e1f20] p-6 rounded-xl max-w-md space-y-4 hidden"
+        id="alert-success-update"
+      >
+        <header
+          class="flex flex-col items-center justify-center gap-4 text-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="size-20 text-green-400"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <h2 class="text-2xl font-semibold">
+            Successfully update this schedule
+          </h2>
+        </header>
+
+        <div class="space-y-2 p-4 bg-black/30 rounded-lg pb-6">
+          <p>Changes include:</p>
+          <ul class="list-disc px-4">
+            <li>continuing</li>
+            <li>Create supporting elements to support this</li>
+          </ul>
+        </div>
+      </article>
+
       <!-- Delete succuessfull -->
 
       <!-- Confirm before delete -->
