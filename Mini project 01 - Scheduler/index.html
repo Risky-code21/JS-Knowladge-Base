@@ -208,12 +208,12 @@
     <!-- Black screen -->
     <div
       id="black-overlay"
-      class="fixed backdrop-blur-sm inset-0 min-h-full bg-black/50 flex justify-center items-center px-4 sm:px-12 md:px-2 invisible opacity-0 transition-all duration-200"
+      class="fixed backdrop-blur-sm inset-0 min-h-full bg-black/50 flex justify-center items-center px-4 sm:px-12 md:px-2 transition-all duration-200 invisible opacity-0"
     >
       <!-- Crud element -->
       <!-- Form create and update schedule -->
       <form
-        class="bg-[#1e1f20] p-4 md:p-6 flex flex-col gap-4 rounded-md border border-[#e3e3e3]/10 w-full max-w-[516px]"
+        class="bg-[#1e1f20] p-4 md:p-6 flex flex-col gap-4 rounded-md border border-[#e3e3e3]/10 w-full max-w-[516px] hidden"
         id="form-manipulation-flexible"
       >
         <!-- Header input -->
@@ -227,7 +227,7 @@
         </header>
 
         <!-- Hidden input to swithc CRUD methode  -->
-        <input id="scheduleId" name="scheduleId" type="hidden" />
+        <input id="scheduleId" name="scheduleId" type="hidden" value="" />
 
         <!-- Input form -->
         <!-- Title input -->
@@ -239,6 +239,7 @@
             name="title"
             class="p-3 rounded-md border border-[#e3e3e3]/10 transition-all duration-200 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
             placeholder="Insert schedule title"
+            value=""
           />
           <div
             id="error-title"
@@ -254,6 +255,7 @@
             name="description"
             class="p-3 rounded-md border border-[#e3e3e3]/10 resize-none min-h-36 transition-all duration-200 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
             placeholder="Insert schedule description"
+            value=""
           ></textarea>
         </div>
 
@@ -266,6 +268,7 @@
             type="text"
             class="p-3 rounded-md border border-[#e3e3e3]/10 transition-all duration-200 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
             placeholder="Insert schedule time doing in minutes range"
+            value=""
           />
           <div
             id="error-timeDoing"
@@ -282,14 +285,24 @@
             type="text"
             class="p-3 rounded-md border border-[#e3e3e3]/10 transition-all duration-200 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
             placeholder="Insert unqiue schedule category"
+            value=""
           />
         </div>
 
-        <!-- Button submit -->
+        <!-- Button submit create-->
         <button
           class="bg-gradient-to-br from-blue-800 to-blue-400 ml-auto py-2 px-4 rounded-md font-semibold"
+          id="create-button"
         >
           <span>Create schedule</span>
+        </button>
+
+        <!-- Button submit update -->
+        <button
+          class="bg-gradient-to-br from-blue-800 to-blue-400 ml-auto py-2 px-4 rounded-md font-semibold hidden"
+          id="update-button"
+        >
+          <span>Update schedule</span>
         </button>
       </form>
 

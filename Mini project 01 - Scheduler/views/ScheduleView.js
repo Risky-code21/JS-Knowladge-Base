@@ -1,5 +1,5 @@
 import CardSchedule from "../components/CardSchedule.js";
-import IconAlert from "../components/IconALert.js";
+import ErrorIcon from "../components/Icons/ErrorIcon.js";
 
 export const DOM = {
   blackOverlay: document.getElementById("black-overlay"),
@@ -12,9 +12,13 @@ export const DOM = {
   ),
   containerScheduleDone: document.getElementById("container-schedule-done"),
   errorsElement: document.querySelectorAll(".error"),
+  alertSuccessUpdate: document.getElementById("alert-success-update"),
 };
 
 export default class ScheduleView {
+  static currentElementActive = null;
+  static timeOutID = null;
+
   // Update UI
   static updateUI(scheduleData, remindingTime) {
     // Mengganti pengecualian menjadi array, agar tipe data tetap konsisten meski nantinya data yang dituju tidak menghasilkan data atau kosong, dia tetap mengembalikan array yang bisa di proses dan tidak menyebabkan error apa pun
@@ -41,26 +45,85 @@ export default class ScheduleView {
   }
 
   // Visibility form setting
-  static showForm(showState = false) {
-    let visiblity = showState;
-
-    // Ada atau tidaknya elemen form bersumber dari variable visiblity, jika variablenya false maka form akan disembunyikan dari tampilan UI yang dilihat oleh pengguna. Oh iya, perubahaan ini dipengaruhi oleh penambahan dan penghapusan class yang dilakukan oleh toggle methode
-    DOM.flexibleForm.classList.toggle("hidden", !visiblity);
-
-    // Hal serupa terjadi juga pada elemen dibawah ini
-    // Ini kondisi ketika variable visiblity bernilai false, elemen akan disembunikan dari layar pengguna
-    DOM.blackOverlay.classList.toggle("invisible", !visiblity);
-    DOM.blackOverlay.classList.toggle("opacity-0", !visiblity);
-
-    // Ini kondisi ketika variable visiblity bernilai True, elemen akan ditampilkan pada layar pengguna
-    DOM.blackOverlay.classList.toggle("visible", visiblity);
-    DOM.blackOverlay.classList.toggle("opacity-100", visiblity);
-
-    if (!visiblity) {
-      document.documentElement.style.overflow = "auto";
-    } else {
+  static showForm(showState) {
+    if (showState) {
+      // Cek apakah ada elemen yang aktif didalam blackoverlay saat ini
+      // Jika ada kita non aktifkan element tersebut terlebih dahulu
+      // Jika tidak ada kita langsung eksekusi visiblity form berdasarkan state yag diberikan oleh pemanggil fungsi
+      this.currentElementActive = "form";
       document.documentElement.style.overflow = "hidden";
+      DOM.blackOverlay.classList.add("visible", "opacity-100");
+      DOM.blackOverlay.classList.remove("hidden");
+      DOM.flexibleForm.classList.remove("hidden");
+    } else {
+      if (this.currentElementActive == "form") {
+        document.documentElement.style.overflow = "auto";
+        DOM.blackOverlay.classList.remove("visible", "opacity-100");
+        DOM.blackOverlay.classList.add("hidden");
+        DOM.flexibleForm.classList.add("hidden");
+        this.currentElementActive = null;
+      }
     }
+  }
+
+  // Function untuk menampapilkan form create dan pengelolaan value dari inputnya
+  static showCreateForm() {
+    const currentId = DOM.flexibleForm.querySelector("#scheduleId").value;
+
+    if (currentId) {
+      DOM.flexibleForm.reset();
+    }
+
+    document.getElementById("create-button").classList.remove("hidden");
+    document.getElementById("update-button").classList.add("hidden");
+    this.showForm(true);
+  }
+
+  // Function untuk memanipulasi form mode menjadi mode update, perlu diperbaiki karena mode create masih terganggu
+  static showEditForm(data) {
+    // Metode seleksi hampir sama, kita reset form agar state value dari create ataupun edit sebelumnya bisa hilang
+    DOM.flexibleForm.reset();
+
+    // Kita petakan value baru berdasarkan data yang sedang diakses saat ini
+    let scheduleData = data;
+
+    DOM.flexibleForm.querySelectorAll("[name]").forEach((element) => {
+      const fieldName = element.getAttribute("name");
+      const value = scheduleData[fieldName];
+
+      if (!value) return;
+
+      element.value = value;
+    });
+
+    document.getElementById("create-button").classList.add("hidden");
+    document.getElementById("update-button").classList.remove("hidden");
+    this.showForm(true);
+  }
+
+  // Show alert berdasarkan kondisi dari si pemanggil function ini
+  static showAlert(alertHTMLString, time = 2000) {
+    // Nonaktifkan form element yang sebelumnya
+    if (this.currentElementActive == "form") {
+      DOM.flexibleForm.classList.add("hidden");
+    }
+
+    // Kita gunakan state current element baru dengan alert element
+    this.currentElementActive = "alert";
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = alertHTMLString.trim();
+    const alertElement = tempDiv.firstElementChild;
+
+    DOM.blackOverlay.appendChild(alertElement);
+
+    // Kita pastikan untuk mengurung setTimeout didalam sebuah variable, agar bisa di clear nantinya
+    this.timeOutID = setTimeout(() => {
+      document.documentElement.style.overflow = "auto";
+      DOM.blackOverlay.classList.remove("visible", "opacity-100");
+      DOM.blackOverlay.classList.add("hidden");
+      alertElement.remove();
+      this.currentElementActive = null;
+    }, time);
   }
 
   // Show error validation
@@ -75,7 +138,7 @@ export default class ScheduleView {
       const errorMessage = errors[key];
 
       if (errorMessage) {
-        errorElement.innerHTML = `${IconAlert()} ${errorMessage}`;
+        errorElement.innerHTML = `${ErrorIcon()} ${errorMessage}`;
       } else {
         errorElement.innerHTML = "";
       }

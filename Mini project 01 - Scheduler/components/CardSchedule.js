@@ -1,9 +1,9 @@
 export default function CardSchedule(informationCard) {
   let preferenceCard = informationCard.preference.categoryPreference;
-
   return `<article
+            id="${informationCard.secretIdentity}"
             class="max-w-full rounded-md bg-[#1e1f20] border border-[#e3e3e3]/10"
-            aria-labelledby="title-${informationCard.secretIdentity}"
+            aria-labelledby="title-${informationCard.title}"
           >
             <!-- Header card schedule -->
             <header
@@ -45,6 +45,7 @@ export default function CardSchedule(informationCard) {
                   class="cursor-pointer p-2 border border-red-600 rounded-full text-red-600 bg-red-200 text-sm"
                   aria-label="Delete schedule button trigger"
                   title="Delete this schedule"
+                  data-card-delete="${informationCard.secretIdentity}"
                 >
                   <!-- Trash icon for the button -->
                   <svg
@@ -64,11 +65,12 @@ export default function CardSchedule(informationCard) {
                   </svg>
                 </button>
 
-                <!-- Button update -->
+                <!-- Button edit -->
                 <button
                   class="cursor-pointer p-2 border border-blue-600 rounded-full text-blue-600 bg-blue-200 text-sm"
                   aria-label="Edit schedule button trigger"
                   title="Edit this schedule"
+                  data-card-edit="${informationCard.secretIdentity}"
                 >
                   <!-- Pencil icon for the button -->
                   <svg
@@ -88,6 +90,7 @@ export default function CardSchedule(informationCard) {
                   class="cursor-pointer p-2 border border-green-600 rounded-full text-green-600 bg-green-200 text-sm"
                   aria-label="Mark as done schedule button trigger"
                   title="Mark as done this schedule"
+                  data-card-mark="${informationCard.secretIdentity}"
                 >
                   <!-- Check icon fot the button -->
                   <svg
