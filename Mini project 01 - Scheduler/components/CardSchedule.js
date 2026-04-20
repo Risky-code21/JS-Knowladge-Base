@@ -1,6 +1,5 @@
 export default function CardSchedule(informationCard) {
   let preferenceCard = informationCard.preference.categoryPreference;
-
   return `<article
             id="${informationCard.secretIdentity}"
             class="max-w-full rounded-md bg-[#1e1f20] border border-[#e3e3e3]/10"
@@ -66,7 +65,7 @@ export default function CardSchedule(informationCard) {
                   </svg>
                 </button>
 
-                <!-- Button update -->
+                <!-- Button edit -->
                 <button
                   class="cursor-pointer p-2 border border-blue-600 rounded-full text-blue-600 bg-blue-200 text-sm"
                   aria-label="Edit schedule button trigger"

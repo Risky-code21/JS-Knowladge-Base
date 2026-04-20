@@ -227,7 +227,7 @@
         </header>
 
         <!-- Hidden input to swithc CRUD methode  -->
-        <input id="scheduleId" name="scheduleId" type="hidden" />
+        <input id="scheduleId" name="scheduleId" type="hidden" value="" />
 
         <!-- Input form -->
         <!-- Title input -->
@@ -239,6 +239,7 @@
             name="title"
             class="p-3 rounded-md border border-[#e3e3e3]/10 transition-all duration-200 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
             placeholder="Insert schedule title"
+            value=""
           />
           <div
             id="error-title"
@@ -254,6 +255,7 @@
             name="description"
             class="p-3 rounded-md border border-[#e3e3e3]/10 resize-none min-h-36 transition-all duration-200 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
             placeholder="Insert schedule description"
+            value=""
           ></textarea>
         </div>
 
@@ -266,6 +268,7 @@
             type="text"
             class="p-3 rounded-md border border-[#e3e3e3]/10 transition-all duration-200 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
             placeholder="Insert schedule time doing in minutes range"
+            value=""
           />
           <div
             id="error-timeDoing"
@@ -282,6 +285,7 @@
             type="text"
             class="p-3 rounded-md border border-[#e3e3e3]/10 transition-all duration-200 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
             placeholder="Insert unqiue schedule category"
+            value=""
           />
         </div>
 
@@ -305,39 +309,6 @@
       <!-- Pop up or alert element -->
       <!-- Create succuessfull -->
       <!-- Update succuessfull -->
-      <article
-        class="bg-[#1e1f20] p-6 rounded-xl max-w-md space-y-4 hidden"
-        id="alert-success-update"
-      >
-        <header
-          class="flex flex-col items-center justify-center gap-4 text-center"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            class="size-20 text-green-400"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
-              clip-rule="evenodd"
-            />
-          </svg>
-          <h2 class="text-2xl font-semibold">
-            Successfully update this schedule
-          </h2>
-        </header>
-
-        <div class="space-y-2 p-4 bg-black/30 rounded-lg pb-6">
-          <p>Changes include:</p>
-          <ul class="list-disc px-4">
-            <li>continuing</li>
-            <li>Create supporting elements to support this</li>
-          </ul>
-        </div>
-      </article>
-
       <!-- Delete succuessfull -->
 
       <!-- Confirm before delete -->

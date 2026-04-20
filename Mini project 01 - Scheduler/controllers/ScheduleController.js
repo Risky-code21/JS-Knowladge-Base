@@ -1,4 +1,5 @@
 // Menggunakan metode ES6 module, yang dimana kita mulai mengunakan server dari node JS untuk menangani CORS dari website kita
+import Alert from "../components/Alert.js";
 import Schedule from "../models/Schedule.js";
 import ScheduleRequest from "../request/FormRequestValidation.js";
 import { HelperUI } from "../utils/Helper.js";
@@ -44,6 +45,7 @@ export default class ScheduleController {
   }
 
   // Create
+  // Implementasi create sebagai trigger form, dan store sebagai handler untuk menyimpan data di local storage
   static create(information) {
     // addition #1 Menghentikan eksekusi function jika information kosong
     if (!information) return;
@@ -73,51 +75,46 @@ export default class ScheduleController {
     }
   }
 
+  // Trigger form edit
   static edit(elementId) {
     // filter data berdasarkan id yang didapat dari button
     const scheduleData = this.ScheduleStorage.getData().find((schedule) => {
-      console.log(schedule.secretIdentity);
       return schedule.secretIdentity == elementId;
     });
-    console.log(scheduleData);
-    console.log(elementId);
+
     const opperandData = {
       ...scheduleData,
       scheduleId: scheduleData.secretIdentity,
     };
 
     // Masukan data dari schedule yang di filter kedalam form update kita
-    ScheduleView.editFormSet(opperandData);
+    ScheduleView.showEditForm(opperandData);
   }
 
+  // Update
   static update(elementId, updatedData) {
     // Melakukan mapping untuk memasikan data yang sedang di update sekarang sudah diedit tidak akan tertimpa dengan data lamanya
-    const filteredData = this.ScheduleStorage.getData().filter((schedule) => {
-      return schedule.secretIdentity != elementId;
+
+    const newData = this.ScheduleStorage.getData().map((schedule) => {
+      return schedule.secretIdentity == elementId ? updatedData : schedule;
     });
 
     // Buat array baru berdasarkan data yang telah di maping ditambah 1 data hasil dari update data sebelumnya
-    const newData = [...filteredData, updatedData];
+    // const newData = [...filteredData, updatedData];
     console.log(newData);
     const currentTime = this.calculationTime(newData);
 
     if (currentTime.totalTimeSchedule <= 960) {
       this.ScheduleStorage.setData(newData);
-
       ScheduleView.updateUI(newData, currentTime.remindingTime);
-      ScheduleView.showSpesificAlert(DOM.alertSuccessUpdate);
-
       return true;
     } else {
-      // ScheduleView.showSpesificAlert(DOM.alertSuccessUpdate);
       return false;
     }
   }
 
+  // Handle submit conditional
   static handleSubmit(formElement) {
-    // Pastikan event bubbling tidak aktif agar form tidak mempengaruhi reset halaman
-    event.preventDefault();
-
     if (!formElement) return;
 
     // Lakukan format data berdasarkan input yang dikirim dari form tersebut
@@ -131,7 +128,6 @@ export default class ScheduleController {
 
     // Sesuai nama DOM element, yaitu: form flexible, artinya kita bisa menggunakan form ini untuk store (menyimpan data lama) dan create(menyimpan dan merubah data lama dengan perubahan baru)
     const currentId = formInputsValue["scheduleId"];
-    console.log(currentId);
 
     // IsSuccess sekarang harus fleksibel, karena dia bisa berisi hasil eksekusi dari function create dan update, tergantung kondisinya nanti
     let isSuccess;
@@ -152,20 +148,23 @@ export default class ScheduleController {
           timeDoing: Number(formInputsValue.timeDoing) || 0,
         };
 
+        // Tambahkan metode untuk merubahnya menjadi instance dari class
         const opperandData = new Schedule(mappedObject);
 
-        console.log(opperandData);
-
         isSuccess = this.update(currentId, opperandData);
+
+        if (isSuccess) {
+          formElement.reset();
+          // ScheduleView.showForm(false);
+          ScheduleView.showAlert(Alert("success"));
+        } else {
+          formElement.reset();
+        }
       } else {
         isSuccess = this.create({ ...formInputsValue });
       }
     } else {
       ScheduleView.showErrorMessage(formErrors);
-    }
-
-    if (isSuccess) {
-      formElement.reset();
     }
   }
 
@@ -183,11 +182,11 @@ export default class ScheduleController {
 
   // Init function
   // Init function digunakan untuk menginsialisasi UI saat website pertama kali dibuka kembali oleh pengguna
+  // Bahas sedikit mengenai Boostraping konsep dengan function init ini
   static init() {
     const currentData = this.ScheduleStorage.getData();
     const currentTime = this.calculationTime();
 
-    console.log(currentData);
     ScheduleView.updateUI(currentData, currentTime.remindingTime);
   }
 }

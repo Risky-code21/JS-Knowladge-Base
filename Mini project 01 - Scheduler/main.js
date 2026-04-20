@@ -1,4 +1,5 @@
 import ScheduleController from "./controllers/ScheduleController.js";
+import Schedule from "./models/Schedule.js";
 import ScheduleRequest from "./request/FormRequestValidation.js";
 import ScheduleView from "./views/ScheduleView.js";
 import { DOM } from "./views/ScheduleView.js";
@@ -10,7 +11,7 @@ document.body.addEventListener("click", function (event) {
   // Show on form
   // Menggunakan methode closes untuk pengelolaan event bubbling, karena button berisi beberapa elemen html
   if (event.target.closest(`#${DOM.triggerFormCreate.id}`)) {
-    ScheduleView.showForm(true);
+    ScheduleView.showCreateForm();
   }
   if (cardSelected) {
     const cardId = cardSelected.getAttribute("data-card-edit");
@@ -19,7 +20,9 @@ document.body.addEventListener("click", function (event) {
 
   // Show off form
   if (event.target === DOM.blackOverlay) {
-    ScheduleView.showForm(false);
+    if (ScheduleView.currentElementActive == "form") {
+      ScheduleView.showForm(false);
+    }
   }
 });
 
