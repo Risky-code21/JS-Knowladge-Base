@@ -6,22 +6,29 @@ import { DOM } from "./views/ScheduleView.js";
 
 // Refactor #5 event delegation new
 document.body.addEventListener("click", function (event) {
-  const cardSelected = event.target.closest("[data-card-edit]");
+  const editButton = event.target.closest("[data-card-edit]");
+  const deleteButton = event.target.closest("[data-card-delete]");
   // Membuat seleksi dengan satu listner global yang ditanamkan didalam body element, berfungsi untuk mengurangi beban engine dalam mengekskusi banyak listner di banyak element sebelumnya.
   // Show on form
   // Menggunakan methode closes untuk pengelolaan event bubbling, karena button berisi beberapa elemen html
   if (event.target.closest(`#${DOM.triggerFormCreate.id}`)) {
     ScheduleView.showCreateForm();
   }
-  if (cardSelected) {
-    const cardId = cardSelected.getAttribute("data-card-edit");
+  if (editButton) {
+    const cardId = editButton.getAttribute("data-card-edit");
     ScheduleController.edit(cardId);
+  }
+
+  if (deleteButton) {
+    const cardId = deleteButton.getAttribute("data-card-delete");
+    ScheduleController.delete(cardId);
   }
 
   // Show off form
   if (event.target === DOM.blackOverlay) {
-    if (ScheduleView.currentElementActive == "form") {
+    if (ScheduleView.currentElementActive != "alert") {
       ScheduleView.showForm(false);
+      ScheduleView.showConfirmation(false);
     }
   }
 });

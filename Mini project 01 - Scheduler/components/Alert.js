@@ -29,7 +29,6 @@ export default function AlertError(
 
   return `<div
         class="bg-[#1e1f20] p-6 flex flex-col justify-center items-center rounded-xl max-w-md space-y-4"
-        id="alert-success-update"
       >
       ${fragmentSelected.icon}
         <header
