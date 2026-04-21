@@ -8,6 +8,8 @@ import { DOM } from "./views/ScheduleView.js";
 document.body.addEventListener("click", function (event) {
   const editButton = event.target.closest("[data-card-edit]");
   const deleteButton = event.target.closest("[data-card-delete]");
+  const markAsDoneButton = event.target.closest("[data-card-mark]");
+  const unmarkDoneButton = event.target.closest("[data-card-unmark]");
   // Membuat seleksi dengan satu listner global yang ditanamkan didalam body element, berfungsi untuk mengurangi beban engine dalam mengekskusi banyak listner di banyak element sebelumnya.
   // Show on form
   // Menggunakan methode closes untuk pengelolaan event bubbling, karena button berisi beberapa elemen html
@@ -15,14 +17,28 @@ document.body.addEventListener("click", function (event) {
     ScheduleView.showCreateForm();
   }
 
+  // Edit button dan fungsionalitasnya
   if (editButton) {
     const cardId = editButton.getAttribute("data-card-edit");
     ScheduleController.edit(cardId);
   }
 
+  // Delete button dan fungsionalitasnya
   if (deleteButton) {
     const cardId = deleteButton.getAttribute("data-card-delete");
     ScheduleController.delete(cardId);
+  }
+
+  // Mark as done button dan fungsionalitasnya
+  if (markAsDoneButton) {
+    const cardId = markAsDoneButton.getAttribute("data-card-mark");
+    ScheduleController.markUnMarkDone(cardId);
+  }
+
+  // Un mark button dan fungsionalitasnya
+  if (unmarkDoneButton) {
+    const cardId = unmarkDoneButton.getAttribute("data-card-unmark");
+    ScheduleController.markUnMarkDone(cardId);
   }
 
   // Show off form

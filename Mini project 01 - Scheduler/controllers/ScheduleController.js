@@ -185,7 +185,18 @@ export default class ScheduleController {
     }
   }
 
-  static markAsDone() {}
+  // Mark as done
+  static markUnMarkDone(elementId) {
+    const mappedData = this.ScheduleStorage.getData().map((schedule) =>
+      schedule.secretIdentity == elementId ? schedule.markAsDone() : schedule,
+    );
+    const remindingTime = this.calculationTime();
+
+    this.ScheduleStorage.setData(mappedData);
+
+    ScheduleView.showAlert(Alert("success"));
+    ScheduleView.updateUI(mappedData, remindingTime.remindingTime);
+  }
 
   // Sorting
   // Coming soon

@@ -26,7 +26,10 @@ export default class Schedule {
   // Mark as done
   // Digunakan untuk mengganti status dari yang defaultnya "On proggres" menjadi "Done" untuk menandai jadwal sebagai selesai
   markAsDone() {
-    this.status = "Done";
+    this.status == "Done"
+      ? (this.status = "On progress")
+      : (this.status = "Done");
+    return this;
   }
 
   // Convert all property if that take by JSON format
