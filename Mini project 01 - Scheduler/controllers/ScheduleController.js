@@ -1,5 +1,6 @@
 // Menggunakan metode ES6 module, yang dimana kita mulai mengunakan server dari node JS untuk menangani CORS dari website kita
 import Alert from "../components/Alert.js";
+import Confirmation from "../components/Confirmation.js";
 import Schedule from "../models/Schedule.js";
 import ScheduleRequest from "../request/FormRequestValidation.js";
 import { HelperUI } from "../utils/Helper.js";
@@ -170,9 +171,21 @@ export default class ScheduleController {
 
   // Delete
   // Coming soon
-  static delete() {
-    this.ScheduleStorage.setData([]);
+  static async delete(elementId) {
+    const filteredData = this.ScheduleStorage.getData().filter(
+      (schedule) => schedule.secretIdentity != elementId,
+    );
+    const choice = await ScheduleView.showConfirmation(Confirmation());
+    const currentTime = this.calculationTime();
+
+    if (choice) {
+      this.ScheduleStorage.setData(filteredData);
+      ScheduleView.updateUI(filteredData, currentTime.remindingTime);
+      ScheduleView.showAlert(Alert("success"));
+    }
   }
+
+  static markAsDone() {}
 
   // Sorting
   // Coming soon

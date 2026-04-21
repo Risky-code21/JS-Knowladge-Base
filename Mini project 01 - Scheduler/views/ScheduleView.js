@@ -16,7 +16,7 @@ export const DOM = {
 };
 
 export default class ScheduleView {
-  static currentElementActive = null;
+  static ElementActive = null;
   static timeOutID = null;
 
   // Update UI
@@ -50,18 +50,18 @@ export default class ScheduleView {
       // Cek apakah ada elemen yang aktif didalam blackoverlay saat ini
       // Jika ada kita non aktifkan element tersebut terlebih dahulu
       // Jika tidak ada kita langsung eksekusi visiblity form berdasarkan state yag diberikan oleh pemanggil fungsi
-      this.currentElementActive = "form";
+      this.ElementActive = "form";
       document.documentElement.style.overflow = "hidden";
       DOM.blackOverlay.classList.add("visible", "opacity-100");
       DOM.blackOverlay.classList.remove("hidden");
       DOM.flexibleForm.classList.remove("hidden");
     } else {
-      if (this.currentElementActive == "form") {
+      if (this.ElementActive == "form") {
+        this.ElementActive = null;
         document.documentElement.style.overflow = "auto";
         DOM.blackOverlay.classList.remove("visible", "opacity-100");
         DOM.blackOverlay.classList.add("hidden");
         DOM.flexibleForm.classList.add("hidden");
-        this.currentElementActive = null;
       }
     }
   }
@@ -104,12 +104,16 @@ export default class ScheduleView {
   // Show alert berdasarkan kondisi dari si pemanggil function ini
   static showAlert(alertHTMLString, time = 2000) {
     // Nonaktifkan form element yang sebelumnya
-    if (this.currentElementActive == "form") {
+    if (this.ElementActive === "form") {
       DOM.flexibleForm.classList.add("hidden");
     }
 
-    // Kita gunakan state current element baru dengan alert element
-    this.currentElementActive = "alert";
+    if (this.ElementActive) {
+      document.documentElement.style.overflow = "hidden";
+      DOM.blackOverlay.classList.add("visible", "opacity-100");
+      DOM.blackOverlay.classList.remove("hidden");
+    }
+
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = alertHTMLString.trim();
     const alertElement = tempDiv.firstElementChild;
@@ -122,8 +126,41 @@ export default class ScheduleView {
       DOM.blackOverlay.classList.remove("visible", "opacity-100");
       DOM.blackOverlay.classList.add("hidden");
       alertElement.remove();
-      this.currentElementActive = null;
     }, time);
+  }
+
+  // Show confirmation
+  static showConfirmation(confirmationHTMLString) {
+    // pastikan tidak ada elemen yang tampil didalam blackoverlay
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = confirmationHTMLString.trim();
+    const confirmationElement = tempDiv.firstChild;
+
+    return new Promise((reslove) => {
+      DOM.blackOverlay.classList.add("visible", "opacity-100");
+      DOM.blackOverlay.classList.remove("hidden");
+      DOM.blackOverlay.appendChild(confirmationElement);
+
+      // Event delegation untuk mendapatkan tombol tutup dan tombol konfirmasi
+      confirmationElement.addEventListener("click", function (event) {
+        const option = event.target.closest("[data-option]");
+
+        if (option) {
+          const choice = option.getAttribute("data-option");
+
+          if (choice === "true") {
+            confirmationElement.remove();
+            reslove(true);
+          } else {
+            this.ElementActive = null;
+            DOM.blackOverlay.classList.remove("visible", "opacity-100");
+            DOM.blackOverlay.classList.add("hidden");
+            confirmationElement.remove();
+            reslove(false);
+          }
+        }
+      });
+    });
   }
 
   // Show error validation
