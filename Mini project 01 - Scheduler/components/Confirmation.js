@@ -16,14 +16,14 @@ export default function Confirmation() {
 
         <div class="flex justify-end gap-4 mt-4">
           <button
-            data-option="true"
+            data-option="false"
             class="bg-white/5 rounded-lg px-4 py-2 font-medium transition-all hover:bg-white/10 duration-200"
           >
             Batalkan
           </button>
 
           <button
-            data-option="false"
+            data-option="true"
             class="bg-blue-600 rounded-lg px-4 py-2 font-medium transition-all hover:-translate-y-1 hover:bg-blue-900 duration-200"
           >
             Konfirmasi

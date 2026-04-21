@@ -175,15 +175,13 @@ export default class ScheduleController {
     const filteredData = this.ScheduleStorage.getData().filter(
       (schedule) => schedule.secretIdentity != elementId,
     );
-    const choice = await ScheduleView.showConfirmation(Confirmation(), true);
+    const choice = await ScheduleView.showConfirmation(Confirmation());
     const currentTime = this.calculationTime();
 
     if (choice) {
       this.ScheduleStorage.setData(filteredData);
       ScheduleView.updateUI(filteredData, currentTime.remindingTime);
       ScheduleView.showAlert(Alert("success"));
-    } else {
-      ScheduleView.showAlert(Alert("success"), 5000);
     }
   }
 

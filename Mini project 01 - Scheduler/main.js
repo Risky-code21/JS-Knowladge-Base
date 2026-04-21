@@ -14,6 +14,7 @@ document.body.addEventListener("click", function (event) {
   if (event.target.closest(`#${DOM.triggerFormCreate.id}`)) {
     ScheduleView.showCreateForm();
   }
+
   if (editButton) {
     const cardId = editButton.getAttribute("data-card-edit");
     ScheduleController.edit(cardId);
@@ -26,9 +27,8 @@ document.body.addEventListener("click", function (event) {
 
   // Show off form
   if (event.target === DOM.blackOverlay) {
-    if (ScheduleView.currentElementActive != "alert") {
+    if (ScheduleView.ElementActive === "form") {
       ScheduleView.showForm(false);
-      ScheduleView.showConfirmation(false);
     }
   }
 });

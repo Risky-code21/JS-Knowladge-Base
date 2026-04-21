@@ -104,14 +104,11 @@ export default class ScheduleView {
   // Show alert berdasarkan kondisi dari si pemanggil function ini
   static showAlert(alertHTMLString, time = 2000) {
     // Nonaktifkan form element yang sebelumnya
-    if (this.ElementActive.length != 0) {
-      const childElements = DOM.flexibleForm.children;
-      Array.from(childElements).forEach((element) =>
-        element.classList.add("hidden"),
-      );
+    if (this.ElementActive === "form") {
+      DOM.flexibleForm.classList.add("hidden");
     }
 
-    if (this.ElementActive.length == 0) {
+    if (this.ElementActive) {
       document.documentElement.style.overflow = "hidden";
       DOM.blackOverlay.classList.add("visible", "opacity-100");
       DOM.blackOverlay.classList.remove("hidden");
@@ -133,45 +130,37 @@ export default class ScheduleView {
   }
 
   // Show confirmation
-  static showConfirmation(confirmationHTMLString, showState) {
+  static showConfirmation(confirmationHTMLString) {
     // pastikan tidak ada elemen yang tampil didalam blackoverlay
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = confirmationHTMLString.trim();
     const confirmationElement = tempDiv.firstChild;
 
-    if (showState) {
-      return new Promise((reslove) => {
-        this.ElementActive = "confirm";
-        DOM.blackOverlay.classList.add("visible", "opacity-100");
-        DOM.blackOverlay.classList.remove("hidden");
-        DOM.blackOverlay.appendChild(confirmationElement);
+    return new Promise((reslove) => {
+      DOM.blackOverlay.classList.add("visible", "opacity-100");
+      DOM.blackOverlay.classList.remove("hidden");
+      DOM.blackOverlay.appendChild(confirmationElement);
 
-        // Event delegation untuk mendapatkan tombol tutup dan tombol konfirmasi
-        confirmationElement.addEventListener("click", function (event) {
-          const option = event.target.closest("[data-option]");
+      // Event delegation untuk mendapatkan tombol tutup dan tombol konfirmasi
+      confirmationElement.addEventListener("click", function (event) {
+        const option = event.target.closest("[data-option]");
 
-          if (option) {
-            const choice = option.getAttribute("data-option");
+        if (option) {
+          const choice = option.getAttribute("data-option");
 
-            if (choice) {
-              reslove(true);
-            } else {
-              this.ElementActive = null;
-              DOM.blackOverlay.classList.remove("visible", "opacity-100");
-              DOM.blackOverlay.classList.add("hidden");
-              DOM.blackOverlay.remove(confirmationElement);
-              reslove(false);
-            }
+          if (choice === "true") {
+            confirmationElement.remove();
+            reslove(true);
+          } else {
+            this.ElementActive = null;
+            DOM.blackOverlay.classList.remove("visible", "opacity-100");
+            DOM.blackOverlay.classList.add("hidden");
+            confirmationElement.remove();
+            reslove(false);
           }
-        });
+        }
       });
-    } else {
-      this.ElementActive = null;
-      DOM.blackOverlay.classList.remove("visible", "opacity-100");
-      DOM.blackOverlay.classList.add("hidden");
-      DOM.blackOverlay.remove(confirmationElement);
-      return false;
-    }
+    });
   }
 
   // Show error validation
