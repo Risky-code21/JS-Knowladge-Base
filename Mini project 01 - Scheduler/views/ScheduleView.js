@@ -108,7 +108,8 @@ export default class ScheduleView {
       DOM.flexibleForm.classList.add("hidden");
     }
 
-    if (this.ElementActive) {
+    if (this.ElementActive === null) {
+      console.log("executed");
       document.documentElement.style.overflow = "hidden";
       DOM.blackOverlay.classList.add("visible", "opacity-100");
       DOM.blackOverlay.classList.remove("hidden");
@@ -152,7 +153,6 @@ export default class ScheduleView {
             confirmationElement.remove();
             reslove(true);
           } else {
-            this.ElementActive = null;
             DOM.blackOverlay.classList.remove("visible", "opacity-100");
             DOM.blackOverlay.classList.add("hidden");
             confirmationElement.remove();
