@@ -6,8 +6,10 @@ import ScheduleRequest from "../request/FormRequestValidation.js";
 import { HelperUI } from "../utils/Helper.js";
 import ScheduleView from "../views/ScheduleView.js";
 import { DOM } from "../views/ScheduleView.js";
+import { HelperData } from "../utils/Helper.js";
 
 export default class ScheduleController {
+  static sortByTime = null;
   // Controller property
   // Penggunaan object utama yang berfungsi untuk menangani pengambilan dan penyimpanan data yang ada didalam local storage
   static ScheduleStorage = {
@@ -200,8 +202,23 @@ export default class ScheduleController {
 
   // Sorting
   // Coming soon
-  static sorting(sortingMethode) {
-    this.ScheduleStorage.getData();
+  static sortByTime(sortBy) {
+    const currentData = this.ScheduleStorage.getData();
+    const remindingTime = this.calculationTime();
+    let sortedData = [];
+    this.sortByTime = sortBy;
+
+    if (this.sortByTime === "newest") {
+      sortedData = this.ScheduleStorage.getData().sort(
+        (a, b) => b.createdAt - a.createdAt,
+      );
+    } else {
+      sortedData = this.ScheduleStorage.getData().sort(
+        (a, b) => a.createdAt - b.createdAt,
+      );
+    }
+
+    ScheduleView.updateUI(sortedData, remindingTime.remindingTime);
   }
 
   // Init function

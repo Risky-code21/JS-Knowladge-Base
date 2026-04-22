@@ -12,8 +12,7 @@ export default class Schedule {
     this.timeDoing = information.timeDoing;
     this.category = information.category;
     this.status = information.status || "On progress";
-    this.createdAt =
-      information.createdAt || HelperData.convertionDate(Date.now());
+    this.createdAt = information.createdAt || Date.now();
     this.preference = information.preference;
   }
 

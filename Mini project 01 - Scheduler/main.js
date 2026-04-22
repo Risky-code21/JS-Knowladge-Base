@@ -10,11 +10,19 @@ document.body.addEventListener("click", function (event) {
   const deleteButton = event.target.closest("[data-card-delete]");
   const markAsDoneButton = event.target.closest("[data-card-mark]");
   const unmarkDoneButton = event.target.closest("[data-card-unmark]");
+  const sortBtnByTime = event.target.closest("[data-sort-by-time]");
   // Membuat seleksi dengan satu listner global yang ditanamkan didalam body element, berfungsi untuk mengurangi beban engine dalam mengekskusi banyak listner di banyak element sebelumnya.
   // Show on form
   // Menggunakan methode closes untuk pengelolaan event bubbling, karena button berisi beberapa elemen html
   if (event.target.closest(`#${DOM.triggerFormCreate.id}`)) {
     ScheduleView.showCreateForm();
+  }
+
+  // Show off form
+  if (event.target === DOM.blackOverlay) {
+    if (ScheduleView.ElementActive === "form") {
+      ScheduleView.showForm(false);
+    }
   }
 
   // Edit button dan fungsionalitasnya
@@ -41,11 +49,9 @@ document.body.addEventListener("click", function (event) {
     ScheduleController.markUnMarkDone(cardId);
   }
 
-  // Show off form
-  if (event.target === DOM.blackOverlay) {
-    if (ScheduleView.ElementActive === "form") {
-      ScheduleView.showForm(false);
-    }
+  if (sortBtnByTime) {
+    const sortBy = sortBtnByTime.getAttribute("data-sort-by-time");
+    ScheduleController.sortByTime(sortBy);
   }
 });
 
