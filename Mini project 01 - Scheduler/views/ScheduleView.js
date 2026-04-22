@@ -23,7 +23,6 @@ export default class ScheduleView {
   static updateUI(scheduleData, remindingTime) {
     // Mengganti pengecualian menjadi array, agar tipe data tetap konsisten meski nantinya data yang dituju tidak menghasilkan data atau kosong, dia tetap mengembalikan array yang bisa di proses dan tidak menyebabkan error apa pun
     const data = scheduleData || [];
-
     // Fugsi untuk melakukan fillter schedule sesuai status dari section tempat schedule itu diletakan nantinya
     const filterdMappedSchedule = (status) =>
       data
@@ -35,6 +34,7 @@ export default class ScheduleView {
         })
         .join("");
 
+    // Update category filter UI
     // Update reminder time UI
     DOM.remainderTime.textContent = `${remindingTime} Minutes`;
 
@@ -180,5 +180,15 @@ export default class ScheduleView {
         errorElement.innerHTML = "";
       }
     }
+  }
+
+  static updateCategoryDropdown(categories) {
+    const categorySortOption = categories.map(
+      (category) =>
+        `<button data-sort-by-category="${category}" class="cursor-pointer px-4 py-2 rounded-md hover:bg-white/10 transition-all duration-200">${category}</button>`,
+    );
+
+    document.getElementById("dropdown-sort-category").innerHTML =
+      categorySortOption.join("") || "";
   }
 }

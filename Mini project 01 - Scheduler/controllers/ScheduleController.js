@@ -6,8 +6,11 @@ import ScheduleRequest from "../request/FormRequestValidation.js";
 import { HelperUI } from "../utils/Helper.js";
 import ScheduleView from "../views/ScheduleView.js";
 import { DOM } from "../views/ScheduleView.js";
+import { HelperData } from "../utils/Helper.js";
 
 export default class ScheduleController {
+  static sortByTime = "Newest";
+  static sortByCategory = "All";
   // Controller property
   // Penggunaan object utama yang berfungsi untuk menangani pengambilan dan penyimpanan data yang ada didalam local storage
   static ScheduleStorage = {
@@ -69,6 +72,7 @@ export default class ScheduleController {
       this.ScheduleStorage.setData(updatedStorage);
 
       ScheduleView.updateUI(updatedStorage, currentTime.remindingTime);
+      ScheduleView.updateCategoryDropdown(this.initCategory());
       return true;
     } else {
       // Pop up will be here
@@ -107,7 +111,9 @@ export default class ScheduleController {
 
     if (currentTime.totalTimeSchedule <= 960) {
       this.ScheduleStorage.setData(newData);
+
       ScheduleView.updateUI(newData, currentTime.remindingTime);
+      ScheduleView.updateCategoryDropdown(this.initCategory());
       return true;
     } else {
       return false;
@@ -170,7 +176,6 @@ export default class ScheduleController {
   }
 
   // Delete
-  // Coming soon
   static async delete(elementId) {
     const filteredData = this.ScheduleStorage.getData().filter(
       (schedule) => schedule.secretIdentity != elementId,
@@ -180,7 +185,9 @@ export default class ScheduleController {
 
     if (choice) {
       this.ScheduleStorage.setData(filteredData);
+
       ScheduleView.updateUI(filteredData, currentTime.remindingTime);
+      ScheduleView.updateCategoryDropdown(this.initCategory());
       ScheduleView.showAlert(Alert("success"));
     }
   }
@@ -199,9 +206,42 @@ export default class ScheduleController {
   }
 
   // Sorting
-  // Coming soon
-  static sorting(sortingMethode) {
-    this.ScheduleStorage.getData();
+  // sorting by time
+  static sortBy(timeType = "", categoryType = "") {
+    let procesesData = this.ScheduleStorage.getData();
+    const remindingTime = this.calculationTime();
+
+    // Default adalah newest, namun jika berganti maka akan berganti ke oldest atau jika ingin semantic ke DB kita bisa rubah menjadi konsep ascending dan descending
+    this.sortByTime = timeType || this.sortByTime;
+
+    // Default All yang akan menampilkan semua data yang ada didalam local storage nantinya
+    this.sortByCategory = categoryType || this.sortByCategory;
+
+    // Fiilter berdasarkan category yang dipilih pengguna
+    if (this.sortByCategory && this.sortByCategory != "All") {
+      procesesData = procesesData.filter(
+        (data) => data.category == this.sortByCategory,
+      );
+    }
+
+    // Urutkan berdasarkan waktu pembuatan
+    // Ralat!! kita akan menggunakan methode to sort, karena jika kita tidak memiliki kategori, maka fiilter method tidak akan berfungsi disana, yang artinya tidak akan ada array baru yang berisi salinan dari array data asli
+    if (this.sortByTime == "Newest") {
+      procesesData = procesesData.toSorted((a, b) => b.createdAt - a.createdAt);
+    } else {
+      procesesData = procesesData.toSorted((a, b) => a.createdAt - b.createdAt);
+    }
+
+    ScheduleView.updateUI(procesesData, remindingTime.remindingTime);
+  }
+
+  static initCategory() {
+    const currentData = this.ScheduleStorage.getData();
+    const categoryExist = new Set(
+      currentData.map((data) => data.category).filter(Boolean),
+    );
+
+    return [...categoryExist];
   }
 
   // Init function
@@ -212,5 +252,6 @@ export default class ScheduleController {
     const currentTime = this.calculationTime();
 
     ScheduleView.updateUI(currentData, currentTime.remindingTime);
+    ScheduleView.updateCategoryDropdown(this.initCategory());
   }
 }

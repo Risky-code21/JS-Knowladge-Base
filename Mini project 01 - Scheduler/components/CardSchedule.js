@@ -1,3 +1,5 @@
+import { HelperData } from "../utils/Helper.js";
+
 export default function CardSchedule(informationCard) {
   let preferenceCard = informationCard.preference.categoryPreference;
   return `<article
@@ -35,7 +37,7 @@ export default function CardSchedule(informationCard) {
               <!-- Day created -->
               <!-- !! Update, use time for text that represent a date, or spesific time -->
               <time datetime="2026-04-03" class="text-sm opacity-40"
-                >${informationCard.createdAt}</time
+                >${HelperData.convertionDate(informationCard.createdAt)}</time
               >
 
               <!-- CTA container -->
