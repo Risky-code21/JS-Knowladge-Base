@@ -87,7 +87,7 @@
         <span>Create a schedule</span>
       </button>
 
-      <!-- Sorting schedule -->
+      <!-- Sorting schedule by time-->
       <div class="relative">
         <button
           class="flex bg-white/5 items-center gap-2 rounded-lg px-4 py-2 font-medium transition-all hover:bg-white/10 duration-200 cursor-pointer"
@@ -118,17 +118,49 @@
         >
           <button
             class="text-left p-4 hover:bg-gray-200 text-nowrap"
-            data-sort-by-time="newest"
+            data-sort-by-time="Newest"
           >
             Sort by time
           </button>
           <button
             class="text-left p-4 hover:bg-gray-200 text-nowrap"
-            data-sort-by-time="oldest"
+            data-sort-by-time="Oldest"
           >
             Sort by time
           </button>
         </div>
+      </div>
+
+      <!-- Sorting schedule by time-->
+      <div class="relative">
+        <button
+          class="flex bg-white/5 items-center gap-2 rounded-lg px-4 py-2 font-medium transition-all hover:bg-white/10 duration-200 cursor-pointer"
+          id="btn-sort-form-trigger"
+          type="button"
+        >
+          <!-- Sorting icon -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="size-4"
+            aria-hidden="true"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M6.97 2.47a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1-1.06 1.06L8.25 4.81V16.5a.75.75 0 0 1-1.5 0V4.81L3.53 8.03a.75.75 0 0 1-1.06-1.06l4.5-4.5Zm9.53 4.28a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V7.5a.75.75 0 0 1 .75-.75Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+
+          <!-- label -->
+          <span>Sort by category</span>
+        </button>
+
+        <div
+          class="bg-white rounded-md flex flex-col absolute top-full left-0 w-fit text-gray-800 shadow-lg overflow-hidden text-start"
+          id="dropdown-sort-category"
+        ></div>
       </div>
     </nav>
 
