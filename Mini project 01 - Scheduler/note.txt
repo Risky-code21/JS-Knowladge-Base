@@ -1,3 +1,4 @@
+File ini hanya bersifat sementara, dan akan dihapus pada penutupan project
 Fitur-Fitur
 1. Mark as done
 2. Sorting by category, dan by created at
