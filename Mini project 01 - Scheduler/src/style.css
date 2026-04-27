@@ -14,6 +14,10 @@
 }
 
 @layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     @apply bg-primary font-body text-body;
   }
@@ -61,7 +65,7 @@
   }
 
   textarea {
-    @apply min-h-56 resize-none;
+    @apply min-h-44 md:min-h-56 resize-none;
   }
 
   textarea::-webkit-scrollbar {
@@ -131,7 +135,7 @@
   /* Card style fragment */
   /* Card container style */
   .card-container {
-    @apply flex flex-col self-start h-fit max-w-md overflow-hidden bg-primary rounded-xl transition-all duration-200 ease-in-out;
+    @apply flex flex-col self-start h-fit overflow-hidden bg-primary rounded-xl transition-all duration-200 ease-in-out;
     box-shadow:
       -4px -4px 10px rgba(255, 255, 255, 0.05),
       4px 4px 10px rgba(0, 0, 0, 0.5);
@@ -155,20 +159,37 @@
       inset -2px -2px 4px rgba(0, 0, 0, 0.2);
   }
 
-  /* Form style */
+  /* Form style default */
   .form-container {
-    @apply p-4 rounded-xl bg-primary w-full max-w-lg flex flex-col gap-4;
-    box-shadow:
-      -4px -4px 10px rgba(255, 255, 255, 0.05),
-      4px 4px 10px rgba(0, 0, 0, 0.5);
+    --drag-axisY: 0px;
+    --drag-opacity: 1;
+
+    /* Base style pada perangkat mobile */
+    @apply p-6 pb-10 rounded-t-4xl bg-primary w-full max-w-lg flex flex-col gap-4;
+
+    /* State awal animasi pada perangkat mobile */
+    @apply translate-y-full opacity-0 blur-sm;
+
+    /* Base style pada perangat dekstop */
+    @apply md:pb-6 md:rounded-2xl;
+
+    /* State awal animasi pada perangkat desktop */
+    @apply md:translate-y-20 md:scale-95;
+  }
+
+  /* Cara memberikan class bantuan pada class yang sama seperti sebelumnya */
+  /* Artinya kita mencari elemen yang memiliki kedua class ini, kemudian tambahkan beberapa utilitas pada tailwind berdasarkan direktif apply yang sudah kita berikan */
+  .form-container.active-form {
+    /*Kitaakanmemastikanmasing-masingperangkatmemilikistateakhiranimasinyamasingmasing1.Mobilememilikistateakhirpadatranslate-y-02.Desktopmemilikistateakhirpadascale-100danopacity-100*/
+    @apply translate-y-[var(--drag-axisY)] opacity-[var(--drag-opacity)] blur-none;
   }
 
   .input-primary {
     box-shadow:
       -2px -2px 8px rgba(255, 255, 255, 0.05),
-      inset 4px 4px 8px rgba(0, 0, 0, 0.8),
+      inset 4px 4px 10px rgba(0, 0, 0, 0.6),
       inset -4px -4px 10px rgba(255, 255, 255, 0.05);
-    @apply w-full px-4 py-2.5 rounded-lg focus:outline-none transition-shadow duration-200 ease-in-out;
+    @apply w-full px-4 py-2.5 border border-white/[0.0001] rounded-lg focus:outline-none transition-shadow duration-200 ease-in-out;
   }
 
   /* Alert and confirmation style */
@@ -189,7 +210,7 @@
 
   /* Stats style */
   .stats-box-primary {
-    @apply flex w-full max-w-md flex-col gap-8 p-6 rounded-xl;
+    @apply flex w-full flex-col gap-8 p-6 rounded-xl;
     box-shadow:
       -4px -4px 10px rgba(255, 255, 255, 0.05),
       4px 4px 10px rgba(0, 0, 0, 0.5);

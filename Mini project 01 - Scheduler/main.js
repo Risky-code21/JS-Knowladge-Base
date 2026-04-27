@@ -69,5 +69,7 @@ DOM.flexibleForm.addEventListener("submit", function (event) {
   ScheduleController.handleSubmit(this);
 });
 
+ScheduleView.initFormTouchMobile();
+
 // Intial state for the web
 ScheduleController.init();

@@ -2,23 +2,36 @@ import CardSchedule from "../components/CardSchedule.js";
 import ErrorIcon from "../components/Icons/ErrorIcon.js";
 
 export const DOM = {
-  blackOverlay: document.getElementById("black-overlay"),
+  // Outer elemen atau element yang ada diluar blackoverlay dan akan selalu ada di tampilan layar kapan pun
   triggerFormCreate: document.getElementById("btn-create-form-trigger"),
   triggerSort: document.getElementById("btn-sort-form-trigger"),
-  flexibleForm: document.getElementById("form-manipulation-flexible"),
   remainderTime: document.getElementById("reminder-time"),
   containerScheduleOnProgress: document.getElementById(
     "container-schedule-on-progresss",
   ),
+
+  // Inner element atau element yang berada didalam black overlay yang hanya aktif dikala tertentu saja
   containerScheduleDone: document.getElementById("container-schedule-done"),
+  blackOverlay: document.getElementById("black-overlay"),
+  containerFlexibleForm: document.getElementById("container-form-flexible"),
+  flexibleForm: document.getElementById("form-manipulation-flexible"),
   errorsElement: document.querySelectorAll(".error"),
-  alertSuccessUpdate: document.getElementById("alert-success-update"),
 };
 
 export default class ScheduleView {
+  // Static properti ini hanya digunakan untuk insiasi elemen yang notabanenya adalah elemen yang tidak mandiri untuk menangani transisi ataupun hal-hal yang berkaitan dengan design.
   static ElementActive = null;
+
+  // Static properti yang dilakukan untuk mencatat id khusus yang dihasilakn dari WEB API setTimeout yang kemudian akan digunakan untuk membersihkan timeout agar tidak menurunkan performa dari website kita.
   static timeOutID = null;
 
+  // Static method yang akan digunakan untuk melacak apakah device sudah berganti dari perangkat desktop ke perangkat mobile
+  static isMobile = () => window.innerWidth < 768;
+  // Static properi yang digunakan untuk meletakan nilai kordinat axis pada layar untuk responsivitas di perangkat mobile
+  static startY = 0;
+  static currentY = 0;
+
+  // !! Fungsionalitas untuk insialisasi kedalam elemen DOM yang ada atau diseleksi
   // Update UI
   static updateUI(scheduleData, remindingTime) {
     // Mengganti pengecualian menjadi array, agar tipe data tetap konsisten meski nantinya data yang dituju tidak menghasilkan data atau kosong, dia tetap mengembalikan array yang bisa di proses dan tidak menyebabkan error apa pun
@@ -42,28 +55,6 @@ export default class ScheduleView {
     DOM.containerScheduleOnProgress.innerHTML =
       filterdMappedSchedule("On progress");
     DOM.containerScheduleDone.innerHTML = filterdMappedSchedule("Done");
-  }
-
-  // Visibility form setting
-  static showForm(showState) {
-    if (showState) {
-      // Cek apakah ada elemen yang aktif didalam blackoverlay saat ini
-      // Jika ada kita non aktifkan element tersebut terlebih dahulu
-      // Jika tidak ada kita langsung eksekusi visiblity form berdasarkan state yag diberikan oleh pemanggil fungsi
-      this.ElementActive = "form";
-      document.documentElement.style.overflow = "hidden";
-      DOM.blackOverlay.classList.add("visible", "opacity-100");
-      DOM.blackOverlay.classList.remove("hidden");
-      DOM.flexibleForm.classList.remove("hidden");
-    } else {
-      if (this.ElementActive == "form") {
-        this.ElementActive = null;
-        document.documentElement.style.overflow = "auto";
-        DOM.blackOverlay.classList.remove("visible", "opacity-100");
-        DOM.blackOverlay.classList.add("hidden");
-        DOM.flexibleForm.classList.add("hidden");
-      }
-    }
   }
 
   // Function untuk menampapilkan form create dan pengelolaan value dari inputnya
@@ -101,11 +92,107 @@ export default class ScheduleView {
     this.showForm(true);
   }
 
+  // !! Fungsionalitas untuk menangani animasi didalam eloemen DOM, entah itu untuk elemen DOM saat berada didesktop device atau saat berada didevice lainnya
+
+  // Insiasi event delegation untuk handle bar element yang digunakan untuk menutup form element di perangkat mobile yang memiliki tampilan bottom sheets
+  static initFormTouchMobile() {
+    // Event untuk insialisasi titik vertikal dari sentuhan jari kita saat swipe form dari kondisi sebelumnya yang sedang hilang
+    DOM.blackOverlay.addEventListener("touchstart", (event) => {
+      const handleBar = event.target.closest(".handle-bar");
+      if (!handleBar || !this.isMobile()) return;
+
+      // Kita ambil posisi y axis pada interaksi klik yang kita lakukan pertama kalinya saat swipe ini aktif
+      this.startY = event.touches[0].clientY;
+
+      // Hapus transition yang ada agar saat swipe, swipe yang kita lakukan tidak terganggu oleh animasi yang kita buat untuk perangkat desktop
+      DOM.containerFlexibleForm.style.transition = "none";
+    });
+
+    // Event ketika kita melakukan drag pada element touch bar form
+    DOM.blackOverlay.addEventListener("touchmove", (event) => {
+      const handleBar = event.target.closest(".handle-bar");
+      if (!handleBar || !this.isMobile()) return;
+
+      const touchY = event.touches[0].clientY;
+      this.currentY = touchY - this.startY;
+
+      if (this.currentY > 0) {
+        DOM.containerFlexibleForm.style.setProperty(
+          "--drag-axisY",
+          `${this.currentY}px`,
+        );
+
+        const opacity = 1 - this.currentY / 400;
+        DOM.containerFlexibleForm.style.setProperty(
+          "--drag-opacity",
+          Math.max(opacity, 0),
+        );
+      }
+    });
+
+    // Event final ketika touch sudah dilepas oleh pengguna
+    DOM.blackOverlay.addEventListener("touchend", (event) => {
+      const handleBar = event.target.closest(".handle-bar");
+      if (!handleBar || !this.isMobile()) return;
+
+      DOM.containerFlexibleForm.style.transition = "all 0.5s ease-in-out";
+
+      if (this.currentY > 150) {
+        this.showForm(false);
+        DOM.containerFlexibleForm.style.setProperty("--drag-axisY", "0px");
+        DOM.containerFlexibleForm.style.setProperty("--drag-opacity", "1");
+      } else {
+        DOM.containerFlexibleForm.style.setProperty("--drag-axisY", "0px");
+        DOM.containerFlexibleForm.style.setProperty("--drag-opacity", "1");
+      }
+
+      this.currentY = 0;
+    });
+  }
+
+  // Visibility form setting
+  static showForm(showState) {
+    if (showState) {
+      // Tetapkan state, karena elemen form ini tidak bisa membuat dirinya sendiri mempunyai class hidden, atau istilah lain dia itu tidak mandiri
+      this.ElementActive = "form";
+
+      DOM.containerFlexibleForm.style.transition = "all 0.5s ease-in-out";
+
+      // Hapus class kaku sebelumnya. Class kaku disini maksudnya adalah class yang ketika diaplikasikan antara perpindahan state, tidak bisa diberikan animasi khusus yang halus
+      document.documentElement.style.overflow = "hidden";
+      DOM.blackOverlay.classList.remove("hidden");
+      DOM.containerFlexibleForm.classList.remove("hidden");
+
+      // Tetapkan class halus. Class halus adalah kebalikan dari class kaku, class halus lebih lunak dalam anggapan perpindahan antar state bisa diberikan animasi yang halus dan lembut
+      setTimeout(() => {
+        DOM.containerFlexibleForm.style.transform = "";
+        DOM.blackOverlay.classList.add("visible", "opacity-100");
+        DOM.containerFlexibleForm.classList.add("active-form");
+      }, 10);
+    } else {
+      if (this.ElementActive == "form") {
+        this.ElementActive = null;
+
+        // Sembunyikan class halus sebelum kita benar-benar menetapkan class kaku lagi
+        DOM.blackOverlay.classList.remove("visible", "opacity-100");
+        DOM.containerFlexibleForm.classList.remove("active-form");
+
+        // Tetapkan class kaku yang telah kita hapus sebelumnya
+        setTimeout(() => {
+          document.documentElement.style.overflow = "auto";
+          DOM.containerFlexibleForm.style.transform = "";
+          DOM.blackOverlay.classList.add("hidden");
+          DOM.containerFlexibleForm.classList.add("hidden");
+        }, 500);
+      }
+    }
+  }
+
   // Show alert berdasarkan kondisi dari si pemanggil function ini
   static showAlert(alertHTMLString, time = 2000) {
     // Nonaktifkan form element yang sebelumnya
     if (this.ElementActive === "form") {
-      DOM.flexibleForm.classList.add("hidden");
+      DOM.containerFlexibleForm.classList.add("hidden");
     }
 
     if (this.ElementActive === null) {
@@ -144,7 +231,7 @@ export default class ScheduleView {
 
       // Event delegation untuk mendapatkan tombol tutup dan tombol konfirmasi
       confirmationElement.addEventListener("click", function (event) {
-        const option = event.target.closest("[data-option]");
+        const option = event.target.target.closest("[data-option]");
 
         if (option) {
           const choice = option.getAttribute("data-option");
@@ -182,6 +269,7 @@ export default class ScheduleView {
     }
   }
 
+  // Update category dropdown
   static updateCategoryDropdown(categories) {
     const categorySortOption = categories.map(
       (category) =>
