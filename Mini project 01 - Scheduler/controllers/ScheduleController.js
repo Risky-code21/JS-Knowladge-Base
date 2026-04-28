@@ -203,9 +203,21 @@ export default class ScheduleController {
     // Fase penerusan ke layar pengguna
     if (isSuccess) {
       formElement.reset();
-      ScheduleView.showAlert(Alert(alertInformation), true, 4000);
+
+      // Opperand telah diperbarui menjadi sebuah object
+      ScheduleView.showAlert({
+        alertHTMLString: Alert(alertInformation),
+        isAutoClose: true,
+        readTime: 4000,
+      });
     } else {
-      ScheduleView.showAlert(Alert(alertInformation), false, 4000);
+      // !! Mungkin diakhir kita pikirkan lagi agar bisa mengembalikan form setelah alert error ini muncul, karena alert baru didesign untuk langsung tutup dan tidak bisa memunculkan form lagi, alias satu arah
+      // Memastikan bahwa ketika gagal form tidak direset dan pemnerian manual close pada alert agar pengguna bisa membaca pesan kesalahan sebelum menutup alertnya dan bisa melakukan iterasi kembali setelahnya
+      ScheduleView.showAlert({
+        alertHTMLString: Alert(alertInformation),
+        isAutoClose: false,
+        readTime: 4000,
+      });
     }
   }
 

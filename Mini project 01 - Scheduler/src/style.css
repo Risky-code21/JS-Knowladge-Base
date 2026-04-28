@@ -199,7 +199,7 @@
     --drag-opacity: 1;
 
     /* Base style dari modal */
-    @apply bg-primary flex flex-col w-full min-h-96 md:min-h-0 place-items-center gap-4 blur-sm p-8 transition-all duration-200;
+    @apply bg-primary flex flex-col w-full max-w-xl min-h-96 md:min-h-0 place-items-center gap-4 blur-sm p-8 transition-all duration-500;
 
     /* Base style dari modal pada device mobile, digabung dengan base style general */
     @apply pb-10 rounded-t-4xl;

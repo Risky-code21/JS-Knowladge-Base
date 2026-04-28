@@ -21,6 +21,11 @@ export const DOM = {
 export default class ScheduleView {
   // Static properti ini hanya digunakan untuk insiasi elemen yang notabanenya adalah elemen yang tidak mandiri untuk menangani transisi ataupun hal-hal yang berkaitan dengan design.
   static elementActive = null;
+
+  // Sebuah properti baru untuk mengambil state dari resolve local agar bisa dimanipulasi oleh blok diluarnya
+  static confirmationResolver = null;
+
+  // !! Perlu diperbaiki untuk fugsi close alert
   static modalActive = null;
 
   // Static properti yang dilakukan untuk mencatat id khusus yang dihasilakn dari WEB API setTimeout yang kemudian akan digunakan untuk membersihkan timeout agar tidak menurunkan performa dari website kita.
@@ -108,6 +113,9 @@ export default class ScheduleView {
   // Insiasi event delegation untuk handle bar element yang digunakan untuk menutup form element di perangkat mobile yang memiliki tampilan bottom sheets
   static initFormTouchMobile() {
     // Event untuk insialisasi titik vertikal dari sentuhan jari kita saat swipe form dari kondisi sebelumnya yang sedang hilang
+
+    let currentElement;
+
     DOM.blackOverlay.addEventListener("touchstart", (event) => {
       const handleBar = event.target.closest(".handle-bar");
       if (!handleBar || !this.isMobile()) return;
@@ -116,7 +124,13 @@ export default class ScheduleView {
       this.startY = event.touches[0].clientY;
 
       // Hapus transition yang ada agar saat swipe, swipe yang kita lakukan tidak terganggu oleh animasi yang kita buat untuk perangkat desktop
-      DOM.containerFlexibleForm.style.transition = "none";
+      if (this.elementActive === "form") {
+        currentElement = DOM.containerFlexibleForm;
+      } else if (this.elementActive === "confirmation") {
+        currentElement = document.querySelector(".modal-primary");
+      }
+
+      currentElement.style.transition = "none";
     });
 
     // Event ketika kita melakukan drag pada element touch bar form
@@ -128,13 +142,10 @@ export default class ScheduleView {
       this.currentY = touchY - this.startY;
 
       if (this.currentY > 0) {
-        DOM.containerFlexibleForm.style.setProperty(
-          "--drag-axisY",
-          `${this.currentY}px`,
-        );
+        currentElement.style.setProperty("--drag-axisY", `${this.currentY}px`);
 
         const opacity = 1 - this.currentY / 400;
-        DOM.containerFlexibleForm.style.setProperty(
+        currentElement.style.setProperty(
           "--drag-opacity",
           Math.max(opacity, 0),
         );
@@ -149,12 +160,16 @@ export default class ScheduleView {
       DOM.containerFlexibleForm.style.transition = "all 0.5s ease-in-out";
 
       if (this.currentY > 150) {
-        this.showForm(false);
-        DOM.containerFlexibleForm.style.setProperty("--drag-axisY", "0px");
-        DOM.containerFlexibleForm.style.setProperty("--drag-opacity", "1");
+        if (this.elementActive === "form") {
+          this.showForm(false);
+        } else if (this.elementActive === "confirmation") {
+          this.closeConfirmation(false, true);
+        }
+        currentElement.style.setProperty("--drag-axisY", "0px");
+        currentElement.style.setProperty("--drag-opacity", "1");
       } else {
-        DOM.containerFlexibleForm.style.setProperty("--drag-axisY", "0px");
-        DOM.containerFlexibleForm.style.setProperty("--drag-opacity", "1");
+        currentElement.style.setProperty("--drag-axisY", "0px");
+        currentElement.style.setProperty("--drag-opacity", "1");
       }
 
       this.currentY = 0;
@@ -210,7 +225,7 @@ export default class ScheduleView {
   // Show alert kini sudah bisa membedakan kapan dia harus membangun black overlay elemennya sendiri ataupun menggunakan dependensi dari element lain, sudah mendukung fitur auto close dan manual close, pengelolaan setTimeout yang lebih rapi secara keterbacaan dan pengelolaan oleh sistem
   static showAlert({
     alertHTMLString,
-    isAUtoClose = true,
+    isAutoClose = true,
     readTime = 2000,
   } = {}) {
     // Static methode yang telah dibuat untuk membantu menghapus semua refrensi ke hasil eksekusi dari setTimeout yang telah selesai dijalankan sebelumnya
@@ -236,7 +251,7 @@ export default class ScheduleView {
     const ELEMENT_HIDE_TIME = ELEMENT_LOAD_TIME + readTime;
 
     // Selang waktu yang diberikan untuk menghapus element secara total ataupun menambahkan class kaku seperti hidden dan sejenisnya kepada elemen DOM yang dipilih
-    const ELEMENT_DESTROY_TIME = ELEMENT_HIDE_TIME + CSS_TRANSITION_TIME;
+    const ELEMENT_DESTROY_TIME = ELEMENT_HIDE_TIME + BROWSER_LOAD_TIME;
 
     // Pengecekan black overlay
     // Untuk memastikan apakah element alert saat ini menggunakan dependensi blackoverlay dari elemen sebelumnya atau dia membangkitkan elemen black overlay secara manual
@@ -318,7 +333,7 @@ export default class ScheduleView {
     }
 
     // Animasi yang akan diberikan ketika autoclose berniali true, defaultnya tidak auto close
-    if (isAUtoClose) {
+    if (isAutoClose) {
       this.timeOutIDS.push(
         // Hapus class halus pada element alert dan black overlay terlebih dahulu supaya animasi yang tampil dilayar mulus
         setTimeout(() => {
@@ -346,34 +361,96 @@ export default class ScheduleView {
   // Show confirmation
   static showConfirmation(confirmationHTMLString) {
     // pastikan tidak ada elemen yang tampil didalam blackoverlay
+    if (
+      this.elementActive === "confirmation" ||
+      DOM.blackOverlay.querySelector(".active-modal")
+    ) {
+      // Tolak mentah-mentah eksekusi klik kedua dengan mengembalikan Promise bernilai 'false' (dianggap batal)
+      return Promise.resolve(false);
+    }
+
+    this.elementActive = "confirmation";
+
+    this.clearAllTimeOut();
+
+    // Load class kasar
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = confirmationHTMLString.trim();
     const confirmationElement = tempDiv.firstChild;
+    DOM.blackOverlay.appendChild(confirmationElement);
 
-    return new Promise((reslove) => {
-      DOM.blackOverlay.classList.add("visible", "opacity-100");
-      DOM.blackOverlay.classList.remove("hidden");
-      DOM.blackOverlay.appendChild(confirmationElement);
+    DOM.blackOverlay.classList.remove("hidden");
+    confirmationElement.classList.remove("hidden");
+    document.documentElement.style.overflow = "hidden";
 
-      // Event delegation untuk mendapatkan tombol tutup dan tombol konfirmasi
-      confirmationElement.addEventListener("click", function (event) {
-        const option = event.target.target.closest("[data-option]");
+    // Load class halus
+    this.timeOutIDS.push(
+      setTimeout(() => {
+        DOM.blackOverlay.classList.add("visible", "opacity-100");
+        confirmationElement.classList.add("active-modal");
+      }, 50),
+    );
 
-        if (option) {
-          const choice = option.getAttribute("data-option");
+    return new Promise((resolve) => {
+      this.confirmationResolver = resolve;
 
-          if (choice === "true") {
-            confirmationElement.remove();
-            reslove(true);
-          } else {
-            DOM.blackOverlay.classList.remove("visible", "opacity-100");
-            DOM.blackOverlay.classList.add("hidden");
-            confirmationElement.remove();
-            reslove(false);
-          }
+      const clickOutSide = (event) => {
+        if (event.target == DOM.blackOverlay) {
+          cleanListener();
+          this.closeConfirmation(false, true);
         }
-      });
+      };
+
+      const clickOptions = (event) => {
+        const option = event.target.closest("[data-option]");
+        if (!option) return;
+        cleanListener();
+
+        const choice = option.getAttribute("data-option");
+        if (choice === "true") {
+          this.confirmationResolver(true);
+        } else {
+          this.closeConfirmation(false, true);
+        }
+      };
+
+      const cleanListener = () => {
+        DOM.blackOverlay.removeEventListener("click", clickOutSide);
+        confirmationElement.removeEventListener("click", clickOptions);
+      };
+
+      DOM.blackOverlay.addEventListener("click", clickOutSide);
+      confirmationElement.addEventListener("click", clickOptions);
     });
+  }
+
+  static closeConfirmation(resolveStatus, withOverlay = false) {
+    const currentConfirmation = document.querySelector(".active-modal");
+
+    if (withOverlay) {
+      DOM.blackOverlay.classList.remove("visible", "opacity-100");
+    }
+
+    currentConfirmation.classList.remove("active-modal");
+
+    this.timeOutIDS.push(
+      setTimeout(() => {
+        if (withOverlay) {
+          document.documentElement.style.overflow = "auto";
+          DOM.blackOverlay.classList.add("hidden");
+        }
+        currentConfirmation.classList.add("hidden");
+        currentConfirmation.remove();
+
+        this.elementActive = null;
+      }, 550),
+    );
+
+    if (this.confirmationResolver !== null) {
+      this.confirmationResolver(resolveStatus);
+
+      this.confirmationResolver = null;
+    }
   }
 
   // Show message final ✅

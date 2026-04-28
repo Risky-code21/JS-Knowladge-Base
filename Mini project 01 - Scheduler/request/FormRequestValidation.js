@@ -4,7 +4,8 @@ export default class ScheduleRequest {
   // Form validation kini disertai komentar agar mudah dipelajari di masa depan, dan pemberian conditional untuk category, yang dimana jika pengguna ingin membuat category, pengguna harus memastikan category itu memiliki karakter dibawah atau sama dengan 12, tidak boleh lebih.
   static formValidation(formInputs) {
     // Membuat insialisasi object penampung errors yang akan dikembalikan untuk ditampilkan pada layar pengguna
-    const errors = { title: "", timeDoing: "" };
+    // Kosongkan key object agar proses checking key di controller tidak terus menghalangi eksekusi berikutnya
+    const errors = {};
 
     // Pengecekan properti title atau nilai dari input title, agar memastikan bahwa input tidak kosong
     if (!formInputs.title || formInputs.title.trim() === "") {
@@ -35,7 +36,7 @@ export default class ScheduleRequest {
       errors.category = "Category cannot be empty";
     }
     // Pengecek kedua, mengecek apakah panjang karakter category melebihi batas maksimal karakter yaitu 12
-    else if (formInputs.length > 12) {
+    else if (formInputs.category.length > 12) {
       errors.category = "Maximum characters 12";
     }
 
