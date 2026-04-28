@@ -120,9 +120,12 @@ export default class ScheduleController {
     }
   }
 
-  // Handle submit conditional
+  // Handle submit yang sudah diperbarui ✅
+  // Handle submit digunakan untuk membuat 1 form memiliki 2 sifat transaksi yang fleksibel, yaitu: create dan update data
+  // Handle submit kini sudah memiliki fallback yang lebih rapi dan pemisahan tanggung jawab antara pemroses di latar belakang dan penampil ke UI
   static handleSubmit(formElement) {
-    if (!formElement) return;
+    // Fallback untuk langsung membatalkan aksi jika form element tidak ditemukan, dan sekaligus memberikan alert error custom
+    if (!formElement) return ScheduleView.showAlert(Alert({ type: "error" }));
 
     // Lakukan format data berdasarkan input yang dikirim dari form tersebut
     const formatedFormElement = new FormData(formElement);
@@ -133,45 +136,76 @@ export default class ScheduleController {
     // Lakukan validasi pada input yang dimasukan
     let formErrors = ScheduleRequest.formValidation(formInputsValue);
 
+    // Membatalkan aksi dibawahnya jika ada error dalam proses validasi di request
+    if (Object.keys(formErrors).length > 0) {
+      return ScheduleView.showErrorMessage(formErrors);
+    }
+
     // Sesuai nama DOM element, yaitu: form flexible, artinya kita bisa menggunakan form ini untuk store (menyimpan data lama) dan create(menyimpan dan merubah data lama dengan perubahan baru)
     const currentId = formInputsValue["scheduleId"];
 
     // IsSuccess sekarang harus fleksibel, karena dia bisa berisi hasil eksekusi dari function create dan update, tergantung kondisinya nanti
-    let isSuccess;
+    let isSuccess = false;
+    let alertInformation = {
+      type: "",
+      headingText: "",
+      message: "",
+      buttonText: "",
+    };
 
-    if (Object.keys(formErrors).length === 0) {
-      if (currentId) {
-        // Menggunakan data yang sudah ada didalam local storage sebelumnya, lalu memilih data lama berdasarkan id dari input form, digunakan supaya bisa menjaga nilai properti yang tidak ada di form bisa tetap terjaga seperti sebelumnya
-        const filterdSchedule = this.ScheduleStorage.getData().find(
-          (schedule) => {
-            if (schedule.secretIdentity == currentId) return schedule;
-          },
-        );
+    // Proses update
+    if (currentId) {
+      // Menggunakan data yang sudah ada didalam local storage sebelumnya, lalu memilih data lama berdasarkan id dari input form, digunakan supaya bisa menjaga nilai properti yang tidak ada di form bisa tetap terjaga seperti sebelumnya
+      const filterdSchedule = this.ScheduleStorage.getData().find(
+        (schedule) => schedule.secretIdentity === currentId,
+      );
 
-        // Membuat data untuk di opper kedalam update function, kita menggunakan spread operator dari 2 array data, yang pertama dari data sebelumnya yang di fillter, dan kemudian array data dari input, yang akan menimpan nilai dari data lama sesuai properti yang tersedia didalamnya, dan kemudian yang terakhir melakukan casting time doing, agar yang disimpan dari input tetap sebuah nomer
-        const mappedObject = {
-          ...filterdSchedule,
-          ...formInputsValue, // noted kesalaan operand id yang dimana masih menggunakan id public dari input form bukan private
-          timeDoing: Number(formInputsValue.timeDoing) || 0,
-        };
+      // Membuat data untuk di opper kedalam update function, kita menggunakan spread operator dari 2 array data, yang pertama dari data sebelumnya yang di fillter, dan kemudian array data dari input, yang akan menimpan nilai dari data lama sesuai properti yang tersedia didalamnya, dan kemudian yang terakhir melakukan casting time doing, agar yang disimpan dari input tetap sebuah nomer
+      const mappedObject = {
+        ...filterdSchedule,
+        ...formInputsValue, // noted kesalaan operand id yang dimana masih menggunakan id public dari input form bukan private
+        timeDoing: Number(formInputsValue.timeDoing) || 0,
+      };
 
-        // Tambahkan metode untuk merubahnya menjadi instance dari class
-        const opperandData = new Schedule(mappedObject);
+      // Tambahkan metode untuk merubahnya menjadi instance dari class
+      const opperandData = new Schedule(mappedObject);
 
-        isSuccess = this.update(currentId, opperandData);
+      isSuccess = this.update(currentId, opperandData);
 
-        if (isSuccess) {
-          formElement.reset();
-          // ScheduleView.showForm(false);
-          ScheduleView.showAlert(Alert("success"));
-        } else {
-          formElement.reset();
-        }
-      } else {
-        isSuccess = this.create({ ...formInputsValue });
-      }
+      // Siapkan informasi yang akan diteruskan ke alert nantinya
+      alertInformation = {
+        type: isSuccess ? "success" : "error",
+        headingText: isSuccess
+          ? "Successfully updated schedule"
+          : "Failed to update schedule",
+        message: isSuccess
+          ? "Successfully updated schedule data! Check the main page for changes."
+          : "An error occurred in updating the schedule data, try again in a moment!.",
+        buttonText: isSuccess ? "" : "Back to the dasboard",
+      };
     } else {
-      ScheduleView.showErrorMessage(formErrors);
+      formElement.reset();
+      isSuccess = this.create({ ...formInputsValue });
+
+      // Siapkan informasi yang akan diteruskan ke alert nantinya
+      alertInformation = {
+        type: isSuccess ? "success" : "error",
+        headingText: isSuccess
+          ? "Successfully created a schedule"
+          : "Failed to make a schedule",
+        message: isSuccess
+          ? "Schedule creation was successful!"
+          : "An error occurred in creating the schedule data, try again in a moment!.",
+        buttonText: isSuccess ? "" : "Back to the dasboard",
+      };
+    }
+
+    // Fase penerusan ke layar pengguna
+    if (isSuccess) {
+      formElement.reset();
+      ScheduleView.showAlert(Alert(alertInformation), true, 4000);
+    } else {
+      ScheduleView.showAlert(Alert(alertInformation), false, 4000);
     }
   }
 

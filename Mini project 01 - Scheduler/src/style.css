@@ -165,10 +165,10 @@
     --drag-opacity: 1;
 
     /* Base style pada perangkat mobile */
-    @apply p-6 pb-10 rounded-t-4xl bg-primary w-full max-w-lg flex flex-col gap-4;
+    @apply p-6 pb-10 rounded-t-4xl bg-primary w-full max-w-2xl flex flex-col gap-4 blur-sm;
 
     /* State awal animasi pada perangkat mobile */
-    @apply translate-y-full opacity-0 blur-sm;
+    @apply translate-y-full opacity-0;
 
     /* Base style pada perangat dekstop */
     @apply md:pb-6 md:rounded-2xl;
@@ -181,7 +181,7 @@
   /* Artinya kita mencari elemen yang memiliki kedua class ini, kemudian tambahkan beberapa utilitas pada tailwind berdasarkan direktif apply yang sudah kita berikan */
   .form-container.active-form {
     /*Kitaakanmemastikanmasing-masingperangkatmemilikistateakhiranimasinyamasingmasing1.Mobilememilikistateakhirpadatranslate-y-02.Desktopmemilikistateakhirpadascale-100danopacity-100*/
-    @apply translate-y-[var(--drag-axisY)] opacity-[var(--drag-opacity)] blur-none;
+    @apply translate-y-[var(--drag-axisY)] opacity-[var(--drag-opacity)] blur-none md:scale-100;
   }
 
   .input-primary {
@@ -194,10 +194,33 @@
 
   /* Alert and confirmation style */
   .modal-primary {
-    @apply flex flex-col self-center h-fit place-items-center gap-4 px-8 py-6 rounded-xl;
+    /* Ini akan digunakan pada modal confirmation saja, pada modal alert semua tetap menggunakan nilai default untuk state akhirnya */
+    --drag-axisY: 0px;
+    --drag-opacity: 1;
+
+    /* Base style dari modal */
+    @apply bg-primary flex flex-col w-full min-h-96 md:min-h-0 place-items-center gap-4 blur-sm p-8 transition-all duration-200;
+
+    /* Base style dari modal pada device mobile, digabung dengan base style general */
+    @apply pb-10 rounded-t-4xl;
+
+    /* State awal animasi pada device mobile */
+    @apply translate-y-full opacity-0;
+
+    /* Base style dari modal pada device desktop, digabung dengan base style general */
+    @apply md:pb-8 md:rounded-2xl;
+
+    /* State awal animasi pada device mobile */
+    @apply md:translate-y-20 md:scale-95;
+
     box-shadow:
       -4px -4px 10px rgba(255, 255, 255, 0.05),
       4px 4px 10px rgba(0, 0, 0, 0.5);
+  }
+
+  /* State aktif dari modal */
+  .modal-primary.active-modal {
+    @apply translate-y-[var(--drag-axisY)] opacity-[var(--drag-opacity)] blur-none md:scale-100;
   }
 
   .modal-icon-box {

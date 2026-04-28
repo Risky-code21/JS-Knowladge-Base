@@ -20,10 +20,21 @@ export const DOM = {
 
 export default class ScheduleView {
   // Static properti ini hanya digunakan untuk insiasi elemen yang notabanenya adalah elemen yang tidak mandiri untuk menangani transisi ataupun hal-hal yang berkaitan dengan design.
-  static ElementActive = null;
+  static elementActive = null;
+  static modalActive = null;
 
   // Static properti yang dilakukan untuk mencatat id khusus yang dihasilakn dari WEB API setTimeout yang kemudian akan digunakan untuk membersihkan timeout agar tidak menurunkan performa dari website kita.
-  static timeOutID = null;
+  static timeOutIDS = [];
+  // Static properti yang akan digunakan ketika permulaan eksekusi function yang memiliki proses setTimeout didalamnya
+  static clearAllTimeOut = function () {
+    if (this.timeOutIDS.length > 0) {
+      this.timeOutIDS.forEach((id) => {
+        clearTimeout(id);
+      });
+
+      this.timeOutIDS = [];
+    }
+  };
 
   // Static method yang akan digunakan untuk melacak apakah device sudah berganti dari perangkat desktop ke perangkat mobile
   static isMobile = () => window.innerWidth < 768;
@@ -152,9 +163,11 @@ export default class ScheduleView {
 
   // Visibility form setting
   static showForm(showState) {
+    this.clearAllTimeOut();
+
     if (showState) {
       // Tetapkan state, karena elemen form ini tidak bisa membuat dirinya sendiri mempunyai class hidden, atau istilah lain dia itu tidak mandiri
-      this.ElementActive = "form";
+      this.elementActive = "form";
 
       DOM.containerFlexibleForm.style.transition = "all 0.5s ease-in-out";
 
@@ -164,57 +177,170 @@ export default class ScheduleView {
       DOM.containerFlexibleForm.classList.remove("hidden");
 
       // Tetapkan class halus. Class halus adalah kebalikan dari class kaku, class halus lebih lunak dalam anggapan perpindahan antar state bisa diberikan animasi yang halus dan lembut
-      setTimeout(() => {
-        DOM.containerFlexibleForm.style.transform = "";
-        DOM.blackOverlay.classList.add("visible", "opacity-100");
-        DOM.containerFlexibleForm.classList.add("active-form");
-      }, 10);
+      this.timeOutIDS.push(
+        setTimeout(() => {
+          DOM.containerFlexibleForm.style.transform = "";
+          DOM.blackOverlay.classList.add("visible", "opacity-100");
+          DOM.containerFlexibleForm.classList.add("active-form");
+        }, 10),
+      );
     } else {
-      if (this.ElementActive == "form") {
-        this.ElementActive = null;
+      if (this.elementActive == "form") {
+        this.elementActive = null;
 
         // Sembunyikan class halus sebelum kita benar-benar menetapkan class kaku lagi
         DOM.blackOverlay.classList.remove("visible", "opacity-100");
         DOM.containerFlexibleForm.classList.remove("active-form");
 
         // Tetapkan class kaku yang telah kita hapus sebelumnya
-        setTimeout(() => {
-          document.documentElement.style.overflow = "auto";
-          DOM.containerFlexibleForm.style.transform = "";
-          DOM.blackOverlay.classList.add("hidden");
-          DOM.containerFlexibleForm.classList.add("hidden");
-        }, 500);
+        this.timeOutIDS.push(
+          setTimeout(() => {
+            document.documentElement.style.overflow = "auto";
+            DOM.containerFlexibleForm.style.transform = "";
+            DOM.blackOverlay.classList.add("hidden");
+            DOM.containerFlexibleForm.classList.add("hidden");
+          }, 500),
+        );
       }
     }
   }
 
-  // Show alert berdasarkan kondisi dari si pemanggil function ini
-  static showAlert(alertHTMLString, time = 2000) {
-    // Nonaktifkan form element yang sebelumnya
-    if (this.ElementActive === "form") {
-      DOM.containerFlexibleForm.classList.add("hidden");
+  // Show alert sudah diperbaiki ✅
+  // Show alert digunakan untuk mengelola feedback setelah serangkaian proses yang dilakukan oleh pengguna, hal ini sekaligus mempercantik UI dan mempertegas UX yang ingin disampaikan kepada pengguna, serta meminimkan ambiguitas kepada user
+  // Show alert kini sudah bisa membedakan kapan dia harus membangun black overlay elemennya sendiri ataupun menggunakan dependensi dari element lain, sudah mendukung fitur auto close dan manual close, pengelolaan setTimeout yang lebih rapi secara keterbacaan dan pengelolaan oleh sistem
+  static showAlert({
+    alertHTMLString,
+    isAUtoClose = true,
+    readTime = 2000,
+  } = {}) {
+    // Static methode yang telah dibuat untuk membantu menghapus semua refrensi ke hasil eksekusi dari setTimeout yang telah selesai dijalankan sebelumnya
+    this.clearAllTimeOut();
+
+    // Untuk menangkap element alert yang active sebelumnya, agar bisa diaktifkan dan dinonaktifkan jika menggunakan isAutoClose dalam keadaan false
+    let alertElement;
+
+    // Waktu eksekusi timeout standar untuk alert custom saat ini
+    // Waktu minimum transisi yang biasanya dibutuhkan oleh properti transition CSS
+    const CSS_TRANSITION_TIME = 500;
+    // Waktu minimum yang biasanya dibutuhkan untuk penghapusan class atau pembuatan sebuah element DOM oleh browser, akan kita jadikjan selisih antara perubahan state element, yang dimana elementnya biasanya berada pada fase sembunyi menuju tampil
+    const BROWSER_LOAD_TIME = 50;
+
+    // Lakukan checking terlebih dahulu pada element active saat ini, jika ada element active, maka set waktunya sesuai waktu transisi CSS
+    const ELEMENT_LOAD_TIME =
+      this.elementActive === null ? 0 : CSS_TRANSITION_TIME;
+
+    // Selisih waktu yang diberikan antara load element awal, sebelum diberikan class transisi lanjutan
+    const ELEMENT_SHOW_TIME = ELEMENT_LOAD_TIME + BROWSER_LOAD_TIME;
+
+    // Selang waktu yang diberikan pada element untuk ditampilkan ke layar sebelum class transisinya dihapus atau diset ke defaultnya
+    const ELEMENT_HIDE_TIME = ELEMENT_LOAD_TIME + readTime;
+
+    // Selang waktu yang diberikan untuk menghapus element secara total ataupun menambahkan class kaku seperti hidden dan sejenisnya kepada elemen DOM yang dipilih
+    const ELEMENT_DESTROY_TIME = ELEMENT_HIDE_TIME + CSS_TRANSITION_TIME;
+
+    // Pengecekan black overlay
+    // Untuk memastikan apakah element alert saat ini menggunakan dependensi blackoverlay dari elemen sebelumnya atau dia membangkitkan elemen black overlay secara manual
+
+    // !! Element active disini adalah, element yang memberikan dependensi blackoverlay aktif kepada alert, jadi alert tidak perlu membangkitkan elemen black overlay secara manual, dan ini sekaligus menghilangkan transisi kedap-kedip yang mengganggu ketika black overlay diaktifkan dan kemudian dinonaktifkan
+    // Jika element yang active adalah element form
+    if (this.elementActive === "form") {
+      // Kita hapus class halus
+      DOM.containerFlexibleForm.classList.remove("active-form");
+
+      // Selang waktu beberapa detik, kita tambahkan class kaku, dan set default value dari properti element active
+      this.timeOutIDS.push(
+        setTimeout(() => {
+          DOM.containerFlexibleForm.classList.add("hidden");
+          this.elementActive = null;
+        }, ELEMENT_LOAD_TIME),
+      );
     }
 
-    if (this.ElementActive === null) {
-      console.log("executed");
+    // Jika element yang active
+    else if (this.elementActive === "confirmation") {
+      // Kurang lebihnya alurnya akan sama seperti pada form, cuman beda dicara penangkapan elementnya, karena pada confirmation sendiri kita akan menggunakan static class baru yang sekaligus akan berhubungan dengan alert ketika dia mode independen
+    }
+
+    // Anggapan jika element active kali ini adalah null atau kosong
+    // Artinya alert perlu membangun black overlay secara mandiri, karena tidak disupport oleh elemen manapun
+    // Seleksi ditambahkan, agar ketika element active dan modal active benar-benar null saja yang bisa melakukan aksi ini, guna menghindari pembangunan ulang black overlay untuk elemen alert yang non auto close
+    else if (this.elementActive === null && this.modalActive === null) {
       document.documentElement.style.overflow = "hidden";
-      DOM.blackOverlay.classList.add("visible", "opacity-100");
       DOM.blackOverlay.classList.remove("hidden");
+
+      // Tetap berikan jedakan transisi ketika element black overlay berpindah dari class kaku ke class halus
+      this.timeOutIDS.push(
+        setTimeout(() => {
+          DOM.blackOverlay.classList.add("visible", "opacity-100");
+        }, ELEMENT_LOAD_TIME),
+      );
     }
 
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = alertHTMLString.trim();
-    const alertElement = tempDiv.firstElementChild;
+    // Fase creation conditonal
+    // Fase creation disini sekarang dibagi menjadi dua, ini digunakan untuk mendukung keberlangsungan auto close ataupun manual close nantinya yang akan kita tambahkan pada alert ini
 
-    DOM.blackOverlay.appendChild(alertElement);
+    // Ini dia static properti yang baru yang akan digunakan untuk melacak apakah ada modal yang sedang aktif
+    // Jika modal null maka kita harus buat ulang element alert dari awal
+    if (this.modalActive === null) {
+      // Fase creation yang sama persis seperti sebelumnya
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = alertHTMLString.trim();
+      alertElement = tempDiv.firstElementChild;
+      DOM.blackOverlay.appendChild(alertElement);
 
-    // Kita pastikan untuk mengurung setTimeout didalam sebuah variable, agar bisa di clear nantinya
-    this.timeOutID = setTimeout(() => {
-      document.documentElement.style.overflow = "auto";
-      DOM.blackOverlay.classList.remove("visible", "opacity-100");
-      DOM.blackOverlay.classList.add("hidden");
-      alertElement.remove();
-    }, time);
+      // Fallback jika elemen alert belum mempunyai hardcoded id bawaan, kita berikan dia sebuah id unique
+      if (!alertElement.id) {
+        alertElement.id = `alert-${Date.now()}`;
+      }
+
+      // Sekarag kita akan ambil id dari alert element untuk disimpan ke static properti yang sudah kita buat tadi
+      this.modalActive = alertElement.id;
+
+      // Kemudian jalankan animasi kedatangan dari alertnya
+      this.timeOutIDS.push(
+        setTimeout(() => {
+          alertElement.classList.remove("hidden");
+        }, ELEMENT_LOAD_TIME),
+      );
+
+      this.timeOutIDS.push(
+        setTimeout(() => {
+          alertElement.classList.add("active-modal");
+        }, ELEMENT_SHOW_TIME),
+      );
+    }
+
+    // Jika modal tersedia, kita ambil id yang sudah tertanam dan kita set alert element menjadi hasil seleksi DOM berdasarkan id tersebut
+    else {
+      alertElement = document.getElementById(`${this.modalActive}`);
+
+      // Kita tidak perlu menjalankan animasi dari alert lagi, karena sekarang alert sudah terbuka dan sedang tampil di layar pengguna
+    }
+
+    // Animasi yang akan diberikan ketika autoclose berniali true, defaultnya tidak auto close
+    if (isAUtoClose) {
+      this.timeOutIDS.push(
+        // Hapus class halus pada element alert dan black overlay terlebih dahulu supaya animasi yang tampil dilayar mulus
+        setTimeout(() => {
+          alertElement.classList.remove("active-modal");
+          DOM.blackOverlay.classList.remove("visible", "opacity-100");
+
+          // Setelah selang waktu tertentu, tetapkan semua class dan style kaku
+          // Hapus element alert karena dia hanya bersifat sementara, agar tidak merusaka element permanent seperti form nantinya
+        }, ELEMENT_HIDE_TIME),
+      );
+
+      this.timeOutIDS.push(
+        setTimeout(() => {
+          document.documentElement.style.overflow = "auto";
+          DOM.blackOverlay.classList.add("hidden");
+          alertElement.remove();
+
+          // Set kembali static properti sebelumnya, agar tidak mengganggu iterasi berikutnya
+          this.modalActive = null;
+        }, ELEMENT_DESTROY_TIME),
+      );
+    }
   }
 
   // Show confirmation
@@ -250,7 +376,8 @@ export default class ScheduleView {
     });
   }
 
-  // Show error validation
+  // Show message final ✅
+  // Show message digunakan untuk menampilkan kesalahan input berdasarkan nilai yang diberikan pada user ke input tertentu, tujuannya hampir sama dengan alert untuk memberikan kejelasan pada pengguna agar bisa memasukan input yang tepat serta meningkatkan UX
   static showErrorMessage(errors) {
     // Reinsialisation the content of the object
     // Memastikan text yang ada pada element yang menerima error sebelumnya dihapus, agar tidak ada penampilan pesan error yang janggal
@@ -262,7 +389,8 @@ export default class ScheduleView {
       const errorMessage = errors[key];
 
       if (errorMessage) {
-        errorElement.innerHTML = `${ErrorIcon()} ${errorMessage}`;
+        // Menggunakan reusable icon yang classnya sekarang bisa di custom
+        errorElement.innerHTML = `${ErrorIcon("size-4")} ${errorMessage}`;
       } else {
         errorElement.innerHTML = "";
       }

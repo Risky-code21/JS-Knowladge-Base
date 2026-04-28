@@ -1,51 +1,53 @@
 import CheckedIcon from "./Icons/CheckedIcon.js";
 import ErrorIcon from "./Icons/ErrorIcon.js";
 
-const uiFragmentBase = {
+// Merupakan object yang akan digunakan ketika pesan yang dikirim dari si pemanggil function ini tidak diberikan secara eksplisit, atau dengan kata ganti yang lebih mudahnya, ini adalah fallback pesan agar pesan tidak benar-benar kosong saat pesan tidak diberikan.
+const uiFallbackBase = {
   success: {
-    icon: CheckedIcon(20),
-    defaultHeadingText: "Berhasil memperbarui data yang kamu buat",
-    defaultMessage:
-      "Data berhasil dirubah, silahkan kembali untuk melihat perubahan",
+    icon: CheckedIcon("size-40 text-green-400"),
+    defaultHeadingText: "The process was successful",
+    defaultMessage: "The process was successfully executed smoothly",
   },
   error: {
-    icon: ErrorIcon(20),
-    defaultHeadingText: "Maaf, ada masalah!",
-    defaultMessage: "Terjadi kesalahan pada proses yang anda lakukan",
-  },
-  warning: {
-    icon: ErrorIcon(),
-    defaultHeadingText: "Waspada, sistem bisa terbobol!",
-    defaultMessage: "Pastikan kamu sudah yakin untuk menghapus data ini",
+    icon: ErrorIcon("size-40 text-red-400"),
+    defaultHeadingText: "Sorry, there's a problem!",
+    defaultMessage:
+      "An Sorry, there's a problem!the process you were carrying out",
   },
 };
 
-export default function AlertError(
+// Alert error kini menggunakan param destructuring agar bisa memberikan custon value pada nilai object yang kosong, seperti pada type
+export default function AlertError({
   type = "success",
-  headingText = "",
-  message = [],
-) {
-  const fragmentSelected = uiFragmentBase[type];
+  headingText,
+  message,
+  buttonText,
+} = {}) {
+  // Gunakan object sebelumnya sesuai type dari alert yang dipilih, defaultnya adalah alert success, yang artinya variable ini akan memiliki refrensi nilai dari object pada properti success nantinya
+  const fragmentSelected = uiFallbackBase[type];
 
-  return `<div
-        class="bg-[#1e1f20] p-6 flex flex-col justify-center items-center rounded-xl max-w-md space-y-4"
-      >
+  // Fragment penyusun informasi yang akan disimpan didalam alert
+  // Menggunakan param null coelishing, untuk memastikan nilai default hanya diberikan jika nilai param kosong
+  const title = headingText ?? fragmentSelected.defaultHeadingText;
+  const desc = message ?? fragmentSelected.defaultMessage;
+  const isButtonShow = Boolean(buttonText);
+
+  return `<div class="modal-primary hidden">
+    <!-- Alert icon box -->
+    <div class="modal-icon-box p-6 rounded-full">
       ${fragmentSelected.icon}
-        <header
-          class="flex flex-col items-center justify-center gap-4 text-center"
-        >
-          <h2 class="text-2xl font-semibold">${headingText ? headingText : fragmentSelected.defaultHeadingText}</h2>
-        </header>
+    </div>
 
-        <div class="space-y-2 p-4 bg-black/30 rounded-lg pb-6">
-          <p></p>
-          <ul class="list-disc px-4">
-          ${
-            message.length > 0
-              ? message.map((text) => text)
-              : fragmentSelected.defaultMessage
-          }
-          </ul>
-        </div>
-      </div>`;
+    <!-- Alert title and description -->
+    <div class="flex flex-col items-center gap-2 px-4 text-center">
+      <!-- Title -->
+      <h3 class="font-semibold text-lg md:text-xl">${title}</h3>
+
+      <!-- Description -->
+      <p class="text-sm">${desc}</p>
+    </div>
+
+    <!-- Button to close -->
+    <button class="btn-primary w-full alert-show-off ${isButtonShow ? "inline-flex" : "hidden"}">${buttonText ?? "Close"}</button>
+  </div>`;
 }

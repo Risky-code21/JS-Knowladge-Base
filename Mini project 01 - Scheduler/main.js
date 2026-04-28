@@ -21,7 +21,7 @@ document.body.addEventListener("click", function (event) {
 
   // Show off form
   if (event.target === DOM.blackOverlay) {
-    if (ScheduleView.ElementActive === "form") {
+    if (ScheduleView.elementActive === "form") {
       ScheduleView.showForm(false);
     }
   }
