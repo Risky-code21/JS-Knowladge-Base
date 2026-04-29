@@ -28,6 +28,10 @@ export default class ScheduleView {
   // !! Perlu diperbaiki untuk fugsi close alert
   static modalActive = null;
 
+  // Static const untuk pembuatan time line waktu yang beraturan didalam setimeout yang kita miliki di class ini
+  static CSS_TRANSISTION_DURATION = 500;
+  static BROWSER_LOAD_ELEMEN_DURATION = 50;
+
   // Static properti yang dilakukan untuk mencatat id khusus yang dihasilakn dari WEB API setTimeout yang kemudian akan digunakan untuk membersihkan timeout agar tidak menurunkan performa dari website kita.
   static timeOutIDS = [];
   // Static properti yang akan digunakan ketika permulaan eksekusi function yang memiliki proses setTimeout didalamnya
@@ -110,40 +114,58 @@ export default class ScheduleView {
 
   // !! Fungsionalitas untuk menangani animasi didalam eloemen DOM, entah itu untuk elemen DOM saat berada didesktop device atau saat berada didevice lainnya
 
-  // Insiasi event delegation untuk handle bar element yang digunakan untuk menutup form element di perangkat mobile yang memiliki tampilan bottom sheets
-  static initFormTouchMobile() {
-    // Event untuk insialisasi titik vertikal dari sentuhan jari kita saat swipe form dari kondisi sebelumnya yang sedang hilang
-
+  // Init event dari swipe bar untuk device mobile sudah diperbarui untuk bisa handle beragam elemen yang memiliki swipe bar nantinya ✅
+  // Function ini berfungsi untuk membuat delegation event yang berkaitan dengan swipe, ya walaupun swipe event tidak benar-benar ada di JS, maka dari itu kita mereplikanya dengan menggabungkan 3 jenis event dari touch screen atau event yang dipengaruhi jika jari pengguna menekan layar. Ini berbeda dengan mouse event ya.
+  static initSwipeBarMobile() {
+    // Penampung elemen, dibuat fleksibel agar bisa diganti sesuai dengan element yang aktif saat ini
     let currentElement;
 
+    // !! Event listener #1
+    // Proses insialisasi posisi awal saat pertama kali jari menyentuh layar handphone
     DOM.blackOverlay.addEventListener("touchstart", (event) => {
+      // Mencari handle bar yang aktif saat ini
       const handleBar = event.target.closest(".handle-bar");
+
+      // Pastikan element handle bar ada dan ukuran layar sekarang sudah sesuai dengan ukuran layar perangkat mobile
       if (!handleBar || !this.isMobile()) return;
 
-      // Kita ambil posisi y axis pada interaksi klik yang kita lakukan pertama kalinya saat swipe ini aktif
+      // Kita ambil posisi sentuhan jari pertama di layar, lalu kita jadikan sebagai posisi awal
       this.startY = event.touches[0].clientY;
 
-      // Hapus transition yang ada agar saat swipe, swipe yang kita lakukan tidak terganggu oleh animasi yang kita buat untuk perangkat desktop
-      if (this.elementActive === "form") {
-        currentElement = DOM.containerFlexibleForm;
-      } else if (this.elementActive === "confirmation") {
-        currentElement = document.querySelector(".modal-primary");
+      // Kita cek element yang mmenggunakan handle bar mana yang sedang aktif saat ini
+      switch (this.elementActive) {
+        case "form":
+          currentElement = DOM.containerFlexibleForm;
+          break;
+        case "confirmation":
+          currentElement = document.querySelector(".modal-primary");
+          break;
       }
 
+      // Matikan transisi dari element yang sudah didapatkan. Kenapa? Agar pada saat listener kedua nanti menjalankan prosesnya, interaksi tidak terhalang oleh delay transition yang sudah kita atur sebelumnya didalam file CSS atau inline CSS di file HTML ataupun JS component kita.
       currentElement.style.transition = "none";
     });
 
-    // Event ketika kita melakukan drag pada element touch bar form
+    // !! Event listener #2
+    // Proses perpindahan elemen dari titik awal pada event pertama tadi menuju titik akhir pada event ketiga
     DOM.blackOverlay.addEventListener("touchmove", (event) => {
       const handleBar = event.target.closest(".handle-bar");
       if (!handleBar || !this.isMobile()) return;
 
+      // Mengambil koordinat sentuhan baru, yang kemudian akan digunakan untuk membandingkan jarak
       const touchY = event.touches[0].clientY;
+      // Membandingkan koordinat senuhan saat ini dan koordinat sentuhan pertama di event sebelumnya
       this.currentY = touchY - this.startY;
 
+      // Jika jarak sentuhan sekarang lebih besar dari pada nol atau elemen masih bisa dilihat oleh mata pengguna
       if (this.currentY > 0) {
+        // Kita rubah properti css yang ada di element ini agar mencipatkan efek slide yang realtime
+        // Nantinya akan diberikan batas tertentu agar swipe tidak melebihi batas
         currentElement.style.setProperty("--drag-axisY", `${this.currentY}px`);
 
+        // Melakukan operasi matematika untuk mencari nilai opacity berdasarkan koordinat sekarang
+        // Cara kerjanya adalah, 400 sebagai angka batas scroll, kemudian koordinat akan dibagi oleh angka 400 tadi. Hasilnya akan menjadi sebuah pecahaan yang nilainya adalah nilai desimal dari 0 -1
+        // Kemudian agar menjaga nilai tidak negatif jika hasil pembagian tadi lebih kecil daripada 1 (karena akan menyebabkan mines), kita membandingkan angka terbesar menggunakan methode max dari object Math. Cara kerjanya kita membandingkan 2 angka yang paling besar, antara angka operasi matematika tadi dengan angka 0 disana
         const opacity = 1 - this.currentY / 400;
         currentElement.style.setProperty(
           "--drag-opacity",
@@ -152,31 +174,41 @@ export default class ScheduleView {
       }
     });
 
-    // Event final ketika touch sudah dilepas oleh pengguna
+    // !! Event listener #3
+    // Event final ketika touch sudah dilepas oleh pengguna dan mencapai titik akhir
     DOM.blackOverlay.addEventListener("touchend", (event) => {
       const handleBar = event.target.closest(".handle-bar");
       if (!handleBar || !this.isMobile()) return;
 
-      DOM.containerFlexibleForm.style.transition = "all 0.5s ease-in-out";
+      // Berikan animasi swipe agar swipe lebih halus
+      currentElement.style.transition = "all 500ms ease-in-out";
 
+      // Cek apakah koordinat sekarang lebih kecil dari 150, artinya elemen di swipe ke bawah untuk ditutup
       if (this.currentY > 150) {
-        if (this.elementActive === "form") {
-          this.showForm(false);
-        } else if (this.elementActive === "confirmation") {
-          this.closeConfirmation(false, true);
+        // Kita cek kembali element yang sedang aktif agar bisa mengeksekusi close functionnya sesuai jenis elementnya
+        switch (this.elementActive) {
+          case "form":
+            this.showForm(false);
+            break;
+          case "confirmation":
+            this.closeConfirmation({ resolveValue: false, withOverlay: true });
+            break;
         }
-        currentElement.style.setProperty("--drag-axisY", "0px");
-        currentElement.style.setProperty("--drag-opacity", "1");
-      } else {
-        currentElement.style.setProperty("--drag-axisY", "0px");
-        currentElement.style.setProperty("--drag-opacity", "1");
       }
 
+      // Jika tidak dibawah ambang batas swipe, kita kembalikan nilai variable seperti semula atau netralnya
+      currentElement.style.setProperty("--drag-axisY", "0px");
+      currentElement.style.setProperty("--drag-opacity", "1");
+
+      // Seperti biasa, kita harus selalu mereset properti ataupun variable agar bisa digunakan kembali dengan bersih di iterasi berikutnya
+      this.startY = 0;
       this.currentY = 0;
     });
   }
 
-  // Visibility form setting
+  // Show form function sudah diperbaiki ✅
+  // Show form digunakan untuk membuat element form terlihat dan tersembunyi dari layar pengguna saat ini. Ini memuberikan pengguna kemudahan untuk memahami jika interaksi form terjadi kita hanya perlu fokus padanya, mengapa demikian, karena pengaktifan form otomatis mengaktifkan atau aku lebih suka menyebutnya sebagai membangkitkan black overlay elemen yang akan memblokir semua aksi yang ada dibawahnya dan bahkan scroll layar, agar pengguna bisa fokus pada interaksi form
+  // Show form tidak disertai dengan function close form, karena show form adalah function yang memanipulasi sebuah form independen bukan form disposable (sekali pakai), jadi form sangat mudah dilacak dan dimanipulasi untuk ditampilkan atau untuk disembunyikan
   static showForm(showState) {
     this.clearAllTimeOut();
 
@@ -221,6 +253,7 @@ export default class ScheduleView {
   }
 
   // Show alert sudah diperbaiki ✅
+  // Perlu diperbaiki diiterasi berikutnya: penampilan form pada error alert, manual close, component yang lebih modular dan penggunaan time line waktu time out ⚠️
   // Show alert digunakan untuk mengelola feedback setelah serangkaian proses yang dilakukan oleh pengguna, hal ini sekaligus mempercantik UI dan mempertegas UX yang ingin disampaikan kepada pengguna, serta meminimkan ambiguitas kepada user
   // Show alert kini sudah bisa membedakan kapan dia harus membangun black overlay elemennya sendiri ataupun menggunakan dependensi dari element lain, sudah mendukung fitur auto close dan manual close, pengelolaan setTimeout yang lebih rapi secara keterbacaan dan pengelolaan oleh sistem
   static showAlert({
@@ -267,13 +300,21 @@ export default class ScheduleView {
         setTimeout(() => {
           DOM.containerFlexibleForm.classList.add("hidden");
           this.elementActive = null;
-        }, ELEMENT_LOAD_TIME),
+        }, this.CSS_TRANSISTION_DURATION),
       );
     }
 
     // Jika element yang active
     else if (this.elementActive === "confirmation") {
-      // Kurang lebihnya alurnya akan sama seperti pada form, cuman beda dicara penangkapan elementnya, karena pada confirmation sendiri kita akan menggunakan static class baru yang sekaligus akan berhubungan dengan alert ketika dia mode independen
+      document.querySelector(".modal-primary").classList.remove("active-modal");
+
+      // Selang waktu beberapa detik, kita tambahkan class kaku, dan set default value dari properti element active
+      this.timeOutIDS.push(
+        setTimeout(() => {
+          DOM.containerFlexibleForm.classList.add("hidden");
+          this.elementActive = null;
+        }, this.CSS_TRANSISTION_DURATION),
+      );
     }
 
     // Anggapan jika element active kali ini adalah null atau kosong
@@ -287,7 +328,7 @@ export default class ScheduleView {
       this.timeOutIDS.push(
         setTimeout(() => {
           DOM.blackOverlay.classList.add("visible", "opacity-100");
-        }, ELEMENT_LOAD_TIME),
+        }, this.BROWSER_LOAD_ELEMEN_DURATION + this.CSS_TRANSISTION_DURATION),
       );
     }
 
@@ -358,83 +399,115 @@ export default class ScheduleView {
     }
   }
 
-  // Show confirmation
+  // Show confirmation sudah diperbaiki ✅
+  // Penggunaan guard UI pertama kali di function ini. Guard UI digunakan untuk memberikan pencegahan agar function yang notabanenya adalah sebuah factory UI function yang menghasilkan UI tidak menghasilkan UI dari jumlah yang telah ditentukan dalam kerangka kerja
+  // Penerusan state local menjadi state global yang mudah dikelola dan mudah dimanipulasi oleh function lainnya, contohnya saat pengaplikasian close confirmation untuk menutup confirmation element yang dihasilkan oleh element ini.
   static showConfirmation(confirmationHTMLString) {
-    // pastikan tidak ada elemen yang tampil didalam blackoverlay
+    // Guard mulltiple creation element
+    // Jika element aktif masih ditandai sebagai "confirmation" ataupun elemen confirmation belum dihapus dan masih ada dilayar, maka kita tidak izinkan function ini dieksekusi, lalu kita lempar inversi dari return yang diharapkan atau hal yang bisa membatalkan eksekusi function lebih dalam.
+    // Kenapa harus diquery selector dengan class ".modal-primary"? Karena element di black overlay yang aktif hanyalah elemen dengan class tersebut saat confirmation aktif, alias hanya confirmation saja yang ada.
     if (
       this.elementActive === "confirmation" ||
-      DOM.blackOverlay.querySelector(".active-modal")
+      DOM.blackOverlay.querySelector(".modal-primary")
     ) {
-      // Tolak mentah-mentah eksekusi klik kedua dengan mengembalikan Promise bernilai 'false' (dianggap batal)
       return Promise.resolve(false);
     }
 
+    // Set elemen active saat ini, untuk mengaktifkan guard ui yang telah dipasang sebelumnya
     this.elementActive = "confirmation";
 
+    // Bersihkan timeout yang sudah selesai dijalankan agar tidak membebani engine
     this.clearAllTimeOut();
 
-    // Load class kasar
+    // fase creation untuk element confirmation
+    // Kita buat penampungan div khusus untuk element confirmation nantinya
     const tempDiv = document.createElement("div");
+    // Kemudian kita saring string yang berasal dari param yang berisi string html, agar spasi yang tidak dibutuhkan tidak ikut masuk, dan kita tambahkan string yang sudah bersih kedalam element div yang telah dibuat sebagai child element dari div tersebut.
     tempDiv.innerHTML = confirmationHTMLString.trim();
+    // Kemudian  kita ambil child element pertama dari div yang sudah kita buat tadi, yang akan merujuk ke element confirmation
     const confirmationElement = tempDiv.firstChild;
+    // Kita masukan confirmation element tadi kedalam elemen black overlay sebagai child element
     DOM.blackOverlay.appendChild(confirmationElement);
 
+    // Penghapusan class dan style kaku dari element-element penyokong (documentElement, black overlay) dan confirmation elemnt itu sendiri
     DOM.blackOverlay.classList.remove("hidden");
     confirmationElement.classList.remove("hidden");
     document.documentElement.style.overflow = "hidden";
 
-    // Load class halus
+    // Pasang class halus  setelah fase creation selesai
     this.timeOutIDS.push(
       setTimeout(() => {
         DOM.blackOverlay.classList.add("visible", "opacity-100");
         confirmationElement.classList.add("active-modal");
-      }, 50),
+      }, this.BROWSER_LOAD_ELEMEN_DURATION),
     );
 
+    // Kembalikan sebuah promise agar confirmation bisa bertahan lama di layar sampai pengguna memilih salah satu opsi diantara "ya" atau "tidak" nantinya
     return new Promise((resolve) => {
+      // Kita teruskan resolve yang kita miliki di promise saat ini agar bisa dimanipulasi lebih lanjut oleh function close confirmation, karena kalau kita manipulasi dari luar tapi cara penutup confirmation mengharuskan kita mengembalikan resolve promise dari dalam itu akan sangat susah. Ibaratnya mendapatkan jerami yang dijatuhkan di tumpukan jarum.
+      // Penggunaan static properti nantinya akan digunakan seperti function untuk insialisasi nilainya, karena dia terinject oleh resolve yang memang adalah function
       this.confirmationResolver = resolve;
 
-      const clickOutSide = (event) => {
-        if (event.target == DOM.blackOverlay) {
-          cleanListener();
-          this.closeConfirmation(false, true);
+      // Membuat function delegation sementara pada black overlay untuk handle elemen yang diklik disaat confirmation element ini aktif
+      const clickHandler = (event) => {
+        // Menentuk elemen DOM yang perlu diklik untuk aksi selanjutnya
+        // Disini kita hanya menargetkan dua elemen, yaitu elemen option yang diseleksi dengan atribut data option, dan elemen overlay yang menjadi pembungkus confirmation sekaligus menjadi event click outside ketika pengguna mengklik diluar modal utama
+        const clickOption = event.target.closest("[data-option]");
+        const clickOutside = event.target === DOM.blackOverlay;
+
+        // Kita pastikan proses dibawah tidak dieksekusi sebelum benar-benar mendapatkan elemen yang dituju sekaligus tidak menghapus listener yang telah ditanamkan pada blackoverlay
+        if (!clickOption && !clickOutside) return;
+
+        // Kondisi ketika kita menekan black overlay elemen atau click outside yang sudah kita bahas tadi
+        if (clickOutside) {
+          this.closeConfirmation({ resolveStatus: false, withOverlay: true });
         }
-      };
 
-      const clickOptions = (event) => {
-        const option = event.target.closest("[data-option]");
-        if (!option) return;
-        cleanListener();
+        // Kondisi ketika kita menekan elemen option, dan kemudian kita ambil value rahasia yang disimpan oleh masing-masing option agar bisa meneruskan resolve yang benar kedalam function selanjutnya
+        if (clickOption) {
+          const userChoice = clickOption.getAttribute("data-option");
 
-        const choice = option.getAttribute("data-option");
-        if (choice === "true") {
-          this.confirmationResolver(true);
-        } else {
-          this.closeConfirmation(false, true);
+          // Ketika pilihan true atau artinya setuju untuk melakukan aksi saat ini yang dipilih
+          if (userChoice === "true") {
+            this.closeConfirmation({ resolveStatus: true, withOverlay: false });
+          }
+
+          // Ketika pilihan true atau artinya setuju untuk melakukan aksi saat ini yang dipilih
+          else {
+            this.closeConfirmation({ resolveStatus: false, withOverlay: true });
+          }
         }
+
+        //  Catatan penting, bahwa clear listener hanya boleh diberikan ketika nilai yang kita perlukan sudah didapatka, karena proses sudah tidak diblokir oleh kondisi pertama itu artinya nilai berhasil didapatkan dan kita tinggal menghapus listener yang sudah kita buat didalam elemen black overlay agar tidak memperberat kinerja sistem yang kita buat
+        DOM.blackOverlay.removeEventListener("click", clickHandler);
       };
 
-      const cleanListener = () => {
-        DOM.blackOverlay.removeEventListener("click", clickOutSide);
-        confirmationElement.removeEventListener("click", clickOptions);
-      };
-
-      DOM.blackOverlay.addEventListener("click", clickOutSide);
-      confirmationElement.addEventListener("click", clickOptions);
+      // Jangan khwatir, jika function handler mengembalikan return seperti kondisi pertama tadi, dia tidak akan menghapus listener dibawah ini, karena penghapusan listener hanya terjadi jika nilai yang dibutuhkan sudah didapatkan
+      DOM.blackOverlay.addEventListener("click", clickHandler);
     });
   }
 
-  static closeConfirmation(resolveStatus, withOverlay = false) {
-    const currentConfirmation = document.querySelector(".active-modal");
+  // Close confirmation, function baru 📲
+  // Dipisah karena selain merupakan disposable elemen (elemen sekali pakai) function show confirmation juga mewajibkan mengembalikan sebuah resolve yang sulit dikelola secara internal function, maka dari itu lahir lah function close confirmation dan static properti untuk mengatur state dari resolve secara global
+  static closeConfirmation({ resolveStatus, withOverlay = false } = {}) {
+    // Kita seleksi elemen terlebih dahulu sebelum kita memberikan animasi penutup
+    const currentConfirmation = document.querySelector(".modal-primary");
 
+    // Jika elemen yang di seleksi tidak ada, maka kita batalkan eksekusi function ini
+    if (!currentConfirmation) return;
+
+    // Jika pemanggil tidak membutuhkan black overlay yang sudah diaktifkan oleh confirmation, kita tutup saja overlay tersebut
     if (withOverlay) {
       DOM.blackOverlay.classList.remove("visible", "opacity-100");
     }
 
+    // Jika pemanggil membutuhkan black overlay yang sudah diaktifkan oleh confirmation, kita tidak perlu menutup black overlay tersebut, dan ketika modal berikutnya tampil, dia hanya perlu menampilkan dirinya saja.
     currentConfirmation.classList.remove("active-modal");
 
+    // Kita pastikan setiap timeout yang kita miliki dimasukan kedalam array timeOutIDS supaya bisa dibersihkan secara massal nantinya oleh engine JS dan menghindari penumpukan timeout yang sudah selesai, karena biasanya settimeout yang sudah tidak terpakai akan berserakan dan mengendap didalam memory yang bisa menurukan performa website.
     this.timeOutIDS.push(
       setTimeout(() => {
+        // Keberlanjutan dari kondisi withoverlay yang sudah kita bahas diatas sebelum block kondisi ini.
         if (withOverlay) {
           document.documentElement.style.overflow = "auto";
           DOM.blackOverlay.classList.add("hidden");
@@ -442,18 +515,20 @@ export default class ScheduleView {
         currentConfirmation.classList.add("hidden");
         currentConfirmation.remove();
 
+        // Pastikan untuk mengosongkan status element aktif sekarang menjadi null, agar guard UI di elemen lain tidak terganggu dan tetap bisa berjalan lancar.
         this.elementActive = null;
-      }, 550),
+
+        // Kita memastikan bahwa resolve hanya diberikan dan diset ulang ketika time out ini sudah selesai, agar proses penerpan class kaku dan penerapan resolve ke function delete tidak bentrok secara UI, karena function delete juga mengeluarkan alert berdasarkan resolve yang diteruskan dari function ini
+        if (this.confirmationResolver !== null) {
+          this.confirmationResolver(resolveStatus);
+
+          this.confirmationResolver = null;
+        }
+      }, this.CSS_TRANSISTION_DURATION),
     );
-
-    if (this.confirmationResolver !== null) {
-      this.confirmationResolver(resolveStatus);
-
-      this.confirmationResolver = null;
-    }
   }
 
-  // Show message final ✅
+  // Show message selesai untuk sementara ✅
   // Show message digunakan untuk menampilkan kesalahan input berdasarkan nilai yang diberikan pada user ke input tertentu, tujuannya hampir sama dengan alert untuk memberikan kejelasan pada pengguna agar bisa memasukan input yang tepat serta meningkatkan UX
   static showErrorMessage(errors) {
     // Reinsialisation the content of the object

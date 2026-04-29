@@ -121,6 +121,7 @@ export default class ScheduleController {
   }
 
   // Handle submit yang sudah diperbarui ✅
+  // Perlu perbaikan form yang otomatis terisi ulang ketika pengguna mengalami error ⚠️
   // Handle submit digunakan untuk membuat 1 form memiliki 2 sifat transaksi yang fleksibel, yaitu: create dan update data
   // Handle submit kini sudah memiliki fallback yang lebih rapi dan pemisahan tanggung jawab antara pemroses di latar belakang dan penampil ke UI
   static handleSubmit(formElement) {
@@ -221,7 +222,8 @@ export default class ScheduleController {
     }
   }
 
-  // Delete
+  // Delete function
+  // Perlu perbaikan sistem opperand param ke alert function dan penetapan alert yang lebih diperjelas ⚠️
   static async delete(elementId) {
     const filteredData = this.ScheduleStorage.getData().filter(
       (schedule) => schedule.secretIdentity != elementId,
@@ -229,12 +231,23 @@ export default class ScheduleController {
     const choice = await ScheduleView.showConfirmation(Confirmation());
     const currentTime = this.calculationTime();
 
+    const alertInformation = {
+      type: "success",
+      headingText: "Successfully created a schedule",
+      message: "Schedule creation was successful!",
+      buttonText: "",
+    };
+
     if (choice) {
       this.ScheduleStorage.setData(filteredData);
 
       ScheduleView.updateUI(filteredData, currentTime.remindingTime);
       ScheduleView.updateCategoryDropdown(this.initCategory());
-      ScheduleView.showAlert(Alert("success"));
+      ScheduleView.showAlert({
+        alertHTMLString: Alert(alertInformation),
+        isAutoClose: true,
+        readTime: 4000,
+      });
     }
   }
 
