@@ -19,22 +19,38 @@ export const DOM = {
 };
 
 export default class ScheduleView {
-  // Static properti ini hanya digunakan untuk insiasi elemen yang notabanenya adalah elemen yang tidak mandiri untuk menangani transisi ataupun hal-hal yang berkaitan dengan design.
-  static elementActive = null;
+  // Pemisahan static properti sudah dilakukan berdasarkan kecepatan value didapatkan selama proses eksekusi ✅
+  // !! Tipe #1 -- Properti yang sudah diberi nilai fixed bahkan sebelum eksekusi.
+  // Static properti ini disebut static const propery (dinamain oleh diri sendiri 😹), yang artinya static properti ini sudah diberi nilai yang tidak pernah berganti bahkan sebelum dieksekusi, dan frekuensi digantinya paling kecil.
 
-  // Sebuah properti baru untuk mengambil state dari resolve local agar bisa dimanipulasi oleh blok diluarnya
+  // Properti ini digunakan untuk mentapkan timeline eksekusi dari setTimeout, karena rata-rata penggunaan setTimeOut kita berkaitan dengan manipulasi style dom. Satuan waktu yang digunakan yang menjadi value dari properti ini adalah milidetik. 🚨
+  // Properti yang digunakan untuk membuat set waktu yang sesuai dengan durasi transisi yang kita berikan di file CSS
+  static CSS_TRANSISTION_DURATION = 500;
+  // Properti yang digunakan untuk membuat set waktu yang sesuai dengan durasi browser membuat element dalam fase creation
+  static BROWSER_LOAD_ELEMEN_DURATION = 50;
+
+  // !! Tipe #2 -- Ini masih abu-abu, karena urutan ini dibuat karena function ini menggunakan property dari Window object yang sudah ada pada saat proses eksekusi, kalau tidak dia akan memiliki kedudukan yang sama dengan static property dibawah.
+
+  // Properti yang digunakan untuk handle swipe, untuk memastikan bahwa handle swipe listener hanya berjalan di saat ukuran layar sesuai dengan ukuran layar pada perangkat mobile. 📲
+  static isMobile = () => window.innerWidth < 768;
+
+  // !! Tipe #3 -- Ini adalah tipe property biasa, bisa dibilang mirip dengan let, nilainya memang ga nentu dan baru di assign kalau udah masuk proses didalam block function yang kita bikin.
+
+  // Properti yang digunakan untuk mengatur keberlangsungan hidup modal didalam layar pengguna 🤖
+  // Properti yang digunakan untuk menampung status aktif atau tidaknya elemen berdasarkan nama yang masuk kedalam properti ini
+  static elementActive = null;
+  // Properti yang digunakan untuk modal yang dimana modal itu memiliki masa aktif tak terbatas dan hanya bisa dihilangkan jika pengguna sudah memiliki opsi, biasanya dibantu dengan promise. Jika nantinya kita perlu resolve dari promise tersebut dimanipulasi oleh function luarnya seperti function close, ktta bisa menggunakan metode penangkapan seperti ini.
   static confirmationResolver = null;
 
   // !! Perlu diperbaiki untuk fugsi close alert
+  // Masih berkaitan dengan modal, tapi mungkin akan dihapus di pengembangan berikutnya karena redundan.
   static modalActive = null;
 
-  // Static const untuk pembuatan time line waktu yang beraturan didalam setimeout yang kita miliki di class ini
-  static CSS_TRANSISTION_DURATION = 500;
-  static BROWSER_LOAD_ELEMEN_DURATION = 50;
-
-  // Static properti yang dilakukan untuk mencatat id khusus yang dihasilakn dari WEB API setTimeout yang kemudian akan digunakan untuk membersihkan timeout agar tidak menurunkan performa dari website kita.
+  // Kelompok properti kedua yang digunakan untuk mengelola setTimeout selain properti utama yang berkaitan dengan timeline waktu setTimeout tadi.
+  // Properti yang digunakan untuk menampung seluruh id dari setTimeout yang pernah dieksekusi atau istilah kerennya kalau kata ku "Timeout base" 😹😹
   static timeOutIDS = [];
-  // Static properti yang akan digunakan ketika permulaan eksekusi function yang memiliki proses setTimeout didalamnya
+  // Properti yang digunakan untuk menghapus semua id setTimeout yang ada didalam properti sebelumnya, ibaratnya mesin pembersih rumah yang akan melahap semua barang yang memang sudah tidak terpakai yaitu: setTimeout.
+  // Secara teknis, function ini kita gunakan untuk menghapus refrensi setTimeout yang sudah selesai dieksekusi agar bisa dihapus oleh engine
   static clearAllTimeOut = function () {
     if (this.timeOutIDS.length > 0) {
       this.timeOutIDS.forEach((id) => {
@@ -44,12 +60,6 @@ export default class ScheduleView {
       this.timeOutIDS = [];
     }
   };
-
-  // Static method yang akan digunakan untuk melacak apakah device sudah berganti dari perangkat desktop ke perangkat mobile
-  static isMobile = () => window.innerWidth < 768;
-  // Static properi yang digunakan untuk meletakan nilai kordinat axis pada layar untuk responsivitas di perangkat mobile
-  static startY = 0;
-  static currentY = 0;
 
   // !! Fungsionalitas untuk insialisasi kedalam elemen DOM yang ada atau diseleksi
   // Update UI
@@ -119,6 +129,10 @@ export default class ScheduleView {
   static initSwipeBarMobile() {
     // Penampung elemen, dibuat fleksibel agar bisa diganti sesuai dengan element yang aktif saat ini
     let currentElement;
+
+    // Dipindahkan dari awalnya merupakan properti static yang bisa diakses oleh semua function didalam class ini, sekarang hanya bisa diakses oleh function init swiper ini saja.
+    let startY = 0;
+    let currentY = 0;
 
     // !! Event listener #1
     // Proses insialisasi posisi awal saat pertama kali jari menyentuh layar handphone
