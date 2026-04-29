@@ -573,4 +573,19 @@ export default class ScheduleView {
     document.getElementById("dropdown-sort-category").innerHTML =
       categorySortOption.join("") || "";
   }
+
+  // Function baru untuk mengelola event delegation yang hanya dikhususkan untuk view atau manipulasi styling murni tanpa data tambahan yang dimasukkan kedalam UI
+  static initDelegationView() {
+    document.body.addEventListener("click", () => {
+      if (event.target.closest(`#${DOM.triggerFormCreate.id}`)) {
+        this.showCreateForm();
+      }
+
+      if (event.target === DOM.blackOverlay) {
+        if (ScheduleView.elementActive === "form") {
+          ScheduleView.showForm(false);
+        }
+      }
+    });
+  }
 }

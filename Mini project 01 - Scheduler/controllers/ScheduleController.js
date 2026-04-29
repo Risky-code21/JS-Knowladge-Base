@@ -306,11 +306,63 @@ export default class ScheduleController {
   // Init function
   // Init function digunakan untuk menginsialisasi UI saat website pertama kali dibuka kembali oleh pengguna
   // Bahas sedikit mengenai Boostraping konsep dengan function init ini
-  static init() {
+  static initDataInToUI() {
     const currentData = this.ScheduleStorage.getData();
     const currentTime = this.calculationTime();
 
     ScheduleView.updateUI(currentData, currentTime.remindingTime);
     ScheduleView.updateCategoryDropdown(this.initCategory());
+  }
+
+  static initDelegationController() {
+    document.body.addEventListener("click", (event) => {
+      const editButton = event.target.closest("[data-card-edit]");
+      const deleteButton = event.target.closest("[data-card-delete]");
+      const markAsDoneButton = event.target.closest("[data-card-mark]");
+      const unmarkDoneButton = event.target.closest("[data-card-unmark]");
+      const sortBtnByTime = event.target.closest("[data-sort-by-time]");
+      const sortBtnByCategory = event.target.closest("[data-sort-by-category]");
+
+      if (editButton) {
+        const cardId = editButton.getAttribute("data-card-edit");
+        this.edit(cardId);
+      }
+
+      // Delete button dan fungsionalitasnya
+      if (deleteButton) {
+        const cardId = deleteButton.getAttribute("data-card-delete");
+        this.delete(cardId);
+      }
+
+      // Mark as done button dan fungsionalitasnya
+      if (markAsDoneButton) {
+        const cardId = markAsDoneButton.getAttribute("data-card-mark");
+        this.markUnMarkDone(cardId);
+      }
+
+      // Un mark button dan fungsionalitasnya
+      if (unmarkDoneButton) {
+        const cardId = unmarkDoneButton.getAttribute("data-card-unmark");
+        this.markUnMarkDone(cardId);
+      }
+
+      // Sort by time button dan fungsionalitasnya
+      if (sortBtnByTime) {
+        const sortBy = sortBtnByTime.getAttribute("data-sort-by-time");
+        this.sortBy(sortBy, "");
+      }
+
+      // Sort by category button dan fungsionalitasnya
+      if (sortBtnByCategory) {
+        const sortBy = sortBtnByCategory.getAttribute("data-sort-by-category");
+        this.sortBy("", sortBy);
+      }
+    });
+
+    // Event pada form
+    DOM.flexibleForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      ScheduleController.handleSubmit(this);
+    });
   }
 }
