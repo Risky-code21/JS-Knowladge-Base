@@ -629,16 +629,22 @@ export default class ScheduleView {
       categorySortOption.join("") || "";
   }
 
-  // Function baru untuk mengelola event delegation yang hanya dikhususkan untuk view atau manipulasi styling murni tanpa data tambahan yang dimasukkan kedalam UI
+  // Function baru untuk handle delegation ✅
+  // Function yang digunakan untuk mengelola event delegation yang hanya dikhususkan untuk view atau manipulasi styling murni tanpa data tambahan yang dimasukkan kedalam UI. Ini adalah bentuk dari concern separated.
   static initDelegationView() {
+    // Menambahkan delegation di body element yang khusus untuk menangani perubahan yang berkait dengan design atau UI.
+    // Disini kita sengaja menggunakan if dengan syntax dasarnya (disertai else if) untuk menangani banyak kemungkinan di delegation yang mungkin akan terjadi. !! Ini penting. agar memori hanya menjalankan block kondisi sampai block kondisi yang sesuai didapatkan, dan bukan secara satu persatu secara menyeluruh
     document.body.addEventListener("click", (event) => {
+      // Ketika yang diklik merupakan button create ataupun anak dari button tersebut yang akan memicu event bubbling
       if (event.target.closest(`#${DOM.triggerFormCreate.id}`)) {
         this.showCreateForm();
       }
 
-      if (event.target === DOM.blackOverlay) {
-        if (ScheduleView.elementActive === "form") {
-          ScheduleView.showForm(false);
+      // Ketika yang diklik adalah element black overlay dan harus 1 element yang cocok, tidak ada event bubbling disini
+      else if (event.target === DOM.blackOverlay) {
+        // Pastikan elemen yang sedang aktif saat black overlay ditekan adalah "form" untuk menutup form tersebut
+        if (this.elementActive === "form") {
+          this.showForm(false);
         }
       }
     });

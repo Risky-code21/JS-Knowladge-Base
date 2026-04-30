@@ -121,7 +121,6 @@ export default class ScheduleController {
   }
 
   // Handle submit yang sudah diperbarui ✅
-  // Perlu perbaikan form yang otomatis terisi ulang ketika pengguna mengalami error ⚠️
   // Handle submit digunakan untuk membuat 1 form memiliki 2 sifat transaksi yang fleksibel, yaitu: create dan update data
   // Handle submit kini sudah memiliki fallback yang lebih rapi dan pemisahan tanggung jawab antara pemroses di latar belakang dan penampil ke UI
   static handleSubmit(formElement) {
@@ -315,8 +314,12 @@ export default class ScheduleController {
     ScheduleView.updateCategoryDropdown(this.initCategory());
   }
 
+  // Function baru, function delegation untuk controller 📲
+  // Membuat delegation untuk controller, agar element yang dikhususkan untuk mengelola UI sekaligus memerlukan opperand atau kehadiran data untuk melakukan iterasi selanjutnya dengan aman.
   static initDelegationController() {
+    // Menambahkan event delegation di element body, agar lebih hemat memory. Karena kita hanya memasang listener di satu element tunggal dan element tersebut sudah mencakup semua elemen yang bisa dan perlu kita manipulasi untuk keberlangsungan sistem kita.
     document.body.addEventListener("click", (event) => {
+      // Kita lakukan seleksi element agar event bubbling yang dilakukan oleh method closest bisa berjalan dengan baik dan bisa mengakses element yang ingin dituju walau yang diakses merupakan child dari element yang memiliki properti yang digunakan untuk seleksi.
       const editButton = event.target.closest("[data-card-edit]");
       const deleteButton = event.target.closest("[data-card-delete]");
       const markAsDoneButton = event.target.closest("[data-card-mark]");
@@ -324,46 +327,51 @@ export default class ScheduleController {
       const sortBtnByTime = event.target.closest("[data-sort-by-time]");
       const sortBtnByCategory = event.target.closest("[data-sort-by-category]");
 
+      // Menggunakan if dan else if, ketimbangan jejeran pasukan if
+      // Untuk menghemat memori, karena ketika kondisi yang tepat sudah ditemukan maka kondisi lainnya yang tidak memenuhi syarat akan otomatis diabaikan dan tidak diperiksa oleh engine JS (V8)
       if (editButton) {
         const cardId = editButton.getAttribute("data-card-edit");
         this.edit(cardId);
       }
 
       // Delete button dan fungsionalitasnya
-      if (deleteButton) {
+      else if (deleteButton) {
         const cardId = deleteButton.getAttribute("data-card-delete");
         this.delete(cardId);
       }
 
       // Mark as done button dan fungsionalitasnya
-      if (markAsDoneButton) {
+      else if (markAsDoneButton) {
         const cardId = markAsDoneButton.getAttribute("data-card-mark");
         this.markUnMarkDone(cardId);
       }
 
       // Un mark button dan fungsionalitasnya
-      if (unmarkDoneButton) {
+      else if (unmarkDoneButton) {
         const cardId = unmarkDoneButton.getAttribute("data-card-unmark");
         this.markUnMarkDone(cardId);
       }
 
       // Sort by time button dan fungsionalitasnya
-      if (sortBtnByTime) {
+      else if (sortBtnByTime) {
         const sortBy = sortBtnByTime.getAttribute("data-sort-by-time");
         this.sortBy(sortBy, "");
       }
 
       // Sort by category button dan fungsionalitasnya
-      if (sortBtnByCategory) {
+      else if (sortBtnByCategory) {
         const sortBy = sortBtnByCategory.getAttribute("data-sort-by-category");
         this.sortBy("", sortBy);
       }
     });
 
-    // Event pada form
-    DOM.flexibleForm.addEventListener("submit", function (event) {
+    // Event pada form, sengaja tidak di jadikan event delegation karena event submit hanya diperuntukan khusus untuk mengelola satu form dan bukan untuk mengelola element besar seperti event listener "click".
+    DOM.flexibleForm.addEventListener("submit", (event) => {
+      // Memastikan bahwa ketika event submit terjadi tidak melakukan event bubbling yang bisa merfresh halaman dan mengganggu animasi yang sudah kita temukan sebelumnya.
       event.preventDefault();
-      ScheduleController.handleSubmit(this);
+
+      // Kenapa tidak menggunakan konsep this untuk dilempar pada parameter? Karena this disini kita digunakan  untuk mengakses method pada class yang kita gunakan saat ini, sementara opperand form kita teruskan menggunakan event.target karena otomatis setelah event terjadi, target yang diambil oleh event adalah element tersebut.
+      this.handleSubmit(event.target);
     });
   }
 }
