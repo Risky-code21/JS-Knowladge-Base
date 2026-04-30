@@ -17,7 +17,7 @@ const uiFallbackBase = {
 };
 
 // Alert error kini menggunakan param destructuring agar bisa memberikan custon value pada nilai object yang kosong, seperti pada type
-export default function AlertError({
+export default function Alert({
   type = "success",
   headingText,
   message,
@@ -48,6 +48,6 @@ export default function AlertError({
     </div>
 
     <!-- Button to close -->
-    <button class="btn-primary w-full alert-show-off ${isButtonShow ? "inline-flex" : "hidden"}">${buttonText ?? "Close"}</button>
+    <button class="btn-primary w-full alert-show-off ${isButtonShow ? "inline-flex" : "hidden"}">${buttonText}</button>
   </div>`;
 }

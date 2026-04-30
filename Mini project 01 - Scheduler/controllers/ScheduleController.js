@@ -182,7 +182,7 @@ export default class ScheduleController {
         message: isSuccess
           ? "Successfully updated schedule data! Check the main page for changes."
           : "An error occurred in updating the schedule data, try again in a moment!.",
-        buttonText: isSuccess ? "" : "Back to the dasboard",
+        buttonText: isSuccess ? "" : "Back to the form",
       };
     } else {
       formElement.reset();
@@ -197,7 +197,7 @@ export default class ScheduleController {
         message: isSuccess
           ? "Schedule creation was successful!"
           : "An error occurred in creating the schedule data, try again in a moment!.",
-        buttonText: isSuccess ? "" : "Back to the dasboard",
+        buttonText: isSuccess ? "" : "Back to the form",
       };
     }
 
@@ -212,12 +212,13 @@ export default class ScheduleController {
         readTime: 4000,
       });
     } else {
-      // !! Mungkin diakhir kita pikirkan lagi agar bisa mengembalikan form setelah alert error ini muncul, karena alert baru didesign untuk langsung tutup dan tidak bisa memunculkan form lagi, alias satu arah
       // Memastikan bahwa ketika gagal form tidak direset dan pemnerian manual close pada alert agar pengguna bisa membaca pesan kesalahan sebelum menutup alertnya dan bisa melakukan iterasi kembali setelahnya
+      // Pembaruan sistem alert, kali ini alert sudah bisa menggunakan metode manual close untuk menutup alert tersebut dan bisa membangkitkan elemen lainnya ataupun elemen dari iterasi sebelumnya sesuai jenis elemen yang diberikan pada argumen elemen will shown ✅
       ScheduleView.showAlert({
         alertHTMLString: Alert(alertInformation),
         isAutoClose: false,
         readTime: 4000,
+        elementWillShown: "form",
       });
     }
   }
