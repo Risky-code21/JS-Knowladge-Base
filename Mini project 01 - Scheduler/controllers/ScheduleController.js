@@ -317,6 +317,7 @@ export default class ScheduleController {
   // Function baru, function delegation untuk controller 📲
   // Membuat delegation untuk controller, agar element yang dikhususkan untuk mengelola UI sekaligus memerlukan opperand atau kehadiran data untuk melakukan iterasi selanjutnya dengan aman.
   static initDelegationController() {
+    const dropDownTime = document.getElementById("drop-down-time");
     // Menambahkan event delegation di element body, agar lebih hemat memory. Karena kita hanya memasang listener di satu element tunggal dan element tersebut sudah mencakup semua elemen yang bisa dan perlu kita manipulasi untuk keberlangsungan sistem kita.
     document.body.addEventListener("click", (event) => {
       // Kita lakukan seleksi element agar event bubbling yang dilakukan oleh method closest bisa berjalan dengan baik dan bisa mengakses element yang ingin dituju walau yang diakses merupakan child dari element yang memiliki properti yang digunakan untuk seleksi.
@@ -324,8 +325,8 @@ export default class ScheduleController {
       const deleteButton = event.target.closest("[data-card-delete]");
       const markAsDoneButton = event.target.closest("[data-card-mark]");
       const unmarkDoneButton = event.target.closest("[data-card-unmark]");
-      const sortBtnByTime = event.target.closest("[data-sort-by-time]");
-      const sortBtnByCategory = event.target.closest("[data-sort-by-category]");
+      const dropDownTimeOption = event.target.closest("[data-sort-by-time]");
+      // const dropDownCategoryOption = event.target.closest("");
 
       // Menggunakan if dan else if, ketimbangan jejeran pasukan if
       // Untuk menghemat memori, karena ketika kondisi yang tepat sudah ditemukan maka kondisi lainnya yang tidak memenuhi syarat akan otomatis diabaikan dan tidak diperiksa oleh engine JS (V8)
@@ -347,21 +348,47 @@ export default class ScheduleController {
       }
 
       // Un mark button dan fungsionalitasnya
+      // Akan diperbaiki lagi pada pengembangan fitur sort by setelah fitur CRUD ⚠️
       else if (unmarkDoneButton) {
         const cardId = unmarkDoneButton.getAttribute("data-card-unmark");
         this.markUnMarkDone(cardId);
       }
 
-      // Sort by time button dan fungsionalitasnya
-      else if (sortBtnByTime) {
-        const sortBy = sortBtnByTime.getAttribute("data-sort-by-time");
-        this.sortBy(sortBy, "");
+      // Testing dropdown time
+      else if (event.target.closest(`#${DOM.triggerSort.id}`)) {
+        if (!dropDownTime) return;
+        const isCurrentlyOpen = !dropDownTime.classList.contains("hidden");
+
+        ScheduleView.showDropDown({
+          showState: !isCurrentlyOpen,
+          dropDownElement: dropDownTime,
+          dropDownAttributeSelection: "data-sort-by-time",
+          currentMethodeSelected: this.sortByTime,
+        });
       }
 
-      // Sort by category button dan fungsionalitasnya
-      else if (sortBtnByCategory) {
-        const sortBy = sortBtnByCategory.getAttribute("data-sort-by-category");
-        this.sortBy("", sortBy);
+      // Testing dropdown time
+      // Akan diperbaiki lagi pada pengembangan fitur sort by setelah fitur CRUD ⚠️
+      else if (
+        event.target.closest("body") &&
+        !event.target.closest("#drop-down-time")
+      ) {
+        ScheduleView.showDropDown({
+          showState: false,
+          dropDownElement: dropDownTime,
+          dropDownAttributeSelection: "data-sort-by-time",
+          currentMethodeSelected: this.sortByTime,
+        });
+      }
+
+      // Klik per option
+      // Akan diperbaiki lagi pada pengembangan fitur sort by setelah fitur CRUD ⚠️
+      else if (dropDownTimeOption) {
+        const attributVal =
+          dropDownTimeOption.getAttribute("data-sort-by-time");
+
+        this.sortBy(attributVal, null);
+        ScheduleView.initChoosenOption(attributVal, "data-sort-by-time");
       }
     });
 

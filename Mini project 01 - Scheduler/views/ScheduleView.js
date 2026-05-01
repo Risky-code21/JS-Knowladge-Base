@@ -219,7 +219,7 @@ export default class ScheduleView {
   // Show form function sudah diperbaiki ✅
   // Show form digunakan untuk membuat element form terlihat dan tersembunyi dari layar pengguna saat ini. Ini memuberikan pengguna kemudahan untuk memahami jika interaksi form terjadi kita hanya perlu fokus padanya, mengapa demikian, karena pengaktifan form otomatis mengaktifkan atau aku lebih suka menyebutnya sebagai membangkitkan black overlay elemen yang akan memblokir semua aksi yang ada dibawahnya dan bahkan scroll layar, agar pengguna bisa fokus pada interaksi form
   // Show form tidak disertai dengan function close form, karena show form adalah function yang memanipulasi sebuah form independen bukan form disposable (sekali pakai), jadi form sangat mudah dilacak dan dimanipulasi untuk ditampilkan atau untuk disembunyikan
-  static showForm(showState) {
+  static showForm(showState = false) {
     // Memastikan form hanya bisa ditampilkan atau bisa ditutup berdasarkan kondisi-kondisi berikut, ini merupakan tahap guard UI debouncing kalau kata ku hehehe 😹😹😹
     if (showState === true) {
       if (this.elementActive !== null) return;
@@ -618,18 +618,73 @@ export default class ScheduleView {
     }
   }
 
+  // Fixed untuk sementara ✅
+  // Akan diperbaiki lagi pada pengembangan fitur sort by setelah fitur CRUD ⚠️
+  static initChoosenOption(selectionMethode, attributeName) {
+    const options = document.querySelectorAll(".dropdown-option");
+
+    if (!options) return;
+
+    options.forEach((option) => {
+      option.classList.remove("active-option");
+
+      if (option.getAttribute(attributeName) === selectionMethode) {
+        option.classList.add("active-option");
+      }
+    });
+  }
+  // Akan diperbaiki lagi pada pengembangan fitur sort by setelah fitur CRUD ⚠️
+  // Ingat berikan bottom sheets mode pada cara pemilahan opsi jika sudah masuka kedalam perbaikan
+  static showDropDown({
+    showState = false,
+    dropDownElement,
+    dropDownAttributeSelection,
+    currentMethodeSelected = "All",
+  } = {}) {
+    if (!dropDownElement) return;
+
+    this.initChoosenOption(currentMethodeSelected, dropDownAttributeSelection);
+
+    if (showState) {
+      dropDownElement.classList.remove("hidden");
+
+      this.timeOutIDS.push(
+        setTimeout(() => {
+          dropDownElement.classList.add("active-dropdown");
+        }, this.BROWSER_LOAD_ELEMENT_DURATION),
+      );
+    } else {
+      dropDownElement.classList.remove("active-dropdown");
+
+      this.timeOutIDS.push(
+        setTimeout(() => {
+          dropDownElement.classList.add("hidden");
+        }, this.CSS_TRANSISTION_DURATION),
+      );
+    }
+  }
+
   // Update category dropdown
+  // Akan diperbaiki lagi pada pengembangan fitur sort by setelah fitur CRUD ⚠️
   static updateCategoryDropdown(categories) {
     const categorySortOption = categories.map(
       (category) =>
-        `<button data-sort-by-category="${category}" class="cursor-pointer px-4 py-2 rounded-md hover:bg-white/10 transition-all duration-200">${category}</button>`,
+        `<button data-sort-by-category="${category}" class="dropdown-option">
+            <!-- Label option -->
+            <span>
+              ${category}  
+            </span>
+
+            <!-- Circle status -->
+            <div class="cicle-status"></div>
+        </button>`,
     );
 
     document.getElementById("dropdown-sort-category").innerHTML =
       categorySortOption.join("") || "";
   }
 
-  // Function baru untuk handle delegation ✅
+  // Function baru untuk handle delegation 📲
   // Function yang digunakan untuk mengelola event delegation yang hanya dikhususkan untuk view atau manipulasi styling murni tanpa data tambahan yang dimasukkan kedalam UI. Ini adalah bentuk dari concern separated.
   static initDelegationView() {
     // Menambahkan delegation di body element yang khusus untuk menangani perubahan yang berkait dengan design atau UI.

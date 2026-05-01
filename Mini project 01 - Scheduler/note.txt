@@ -12,8 +12,8 @@ Secara UI dan UX
 4. Animation fade in atau bubble Animation ✅
 
 !! Task hari ini
-1. Memperbaiki concern sparate dari main js ini dengan lebih detail 
+1. Memperbaiki concern sparate dari main js ini dengan lebih detail✅
 2. Memperbaiki kesalahan pada alert yang masih kurang fleksibel ✅
-3. Pembuatan dropdown animation dan UI
+3. Pembuatan dropdown animation dan UI✅
 4. Pembuatan stats sistem dan UI
 5. Pembuatan fitur tab untuk pengelolaan yang lebih baik

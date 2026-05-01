@@ -163,22 +163,18 @@
 
       <!-- Sorting schedule by time-->
       <div class="relative">
-        <button
-          class="flex bg-white/5 items-center gap-2 rounded-lg px-4 py-2 font-medium transition-all hover:bg-white/10 duration-200 cursor-pointer"
-          id="btn-sort-form-trigger"
-          type="button"
-        >
+        <!-- Button yang digunakan untuk mentrigger dropdownsort dengan waktu  -->
+        <button class="btn-primary" id="btn-sort-form-trigger" type="button">
           <!-- Sorting icon -->
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
             class="size-4"
-            aria-hidden="true"
           >
             <path
               fill-rule="evenodd"
-              d="M6.97 2.47a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1-1.06 1.06L8.25 4.81V16.5a.75.75 0 0 1-1.5 0V4.81L3.53 8.03a.75.75 0 0 1-1.06-1.06l4.5-4.5Zm9.53 4.28a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V7.5a.75.75 0 0 1 .75-.75Z"
+              d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z"
               clip-rule="evenodd"
             />
           </svg>
@@ -187,43 +183,52 @@
           <span>Sort by time</span>
         </button>
 
-        <div
-          class="bg-white rounded-md flex flex-col absolute top-full left-0 w-fit text-gray-800 shadow-lg overflow-hidden invisible"
-        >
-          <button
-            class="text-left p-4 hover:bg-gray-200 text-nowrap"
-            data-sort-by-time="Newest"
-          >
-            Sort by time
+        <!-- Dropdown untuk menampilkan aksi yang tersedia yang akan digunakan untuk dijadikan metode sort -->
+        <div class="dropdown-container hidden" id="drop-down-time">
+          <!-- Pengurutan waktu yang dilakukan dari urutan baru ke urutan terlama -->
+          <button class="dropdown-option" data-sort-by-time="Newest">
+            <!-- Label option -->
+            <span>Descending</span>
+
+            <!-- Circle status -->
+            <div class="cicle-status"></div>
           </button>
-          <button
-            class="text-left p-4 hover:bg-gray-200 text-nowrap"
-            data-sort-by-time="Oldest"
-          >
-            Sort by time
+
+          <!-- Pengurutan waktu yang dilakukan dari urutan lama ke urutan terbaru -->
+          <button class="dropdown-option" data-sort-by-time="Oldest">
+            <!-- Label option -->
+            <span>Ascending</span>
+
+            <!-- Circle status -->
+            <div class="cicle-status"></div>
+          </button>
+
+          <!-- Divider sebagai pemisah opsi sort by dan opsi reset urutan ke default -->
+          <div class="my-1 h-px w-full bg-white/[0.1] rounded-full"></div>
+
+          <!-- Opsi reset untuk menampilkan semua jadwal dari urutan sebelumnya -->
+          <button class="dropdown-option" data-sort-by-time="All">
+            <!-- Label option -->
+            <span>Reset option</span>
+
+            <!-- Circle status -->
+            <div class="cicle-status bg-red-400"></div>
           </button>
         </div>
       </div>
 
       <!-- Sorting schedule by time-->
-      <div class="relative">
-        <button
-          class="flex bg-white/5 items-center gap-2 rounded-lg px-4 py-2 font-medium transition-all hover:bg-white/10 duration-200 cursor-pointer"
-          id="btn-sort-form-trigger"
-          type="button"
-        >
+      <div class="relative hidden">
+        <button class="btn-primary" id="btn-sort-form-trigger" type="button">
           <!-- Sorting icon -->
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
             class="size-4"
-            aria-hidden="true"
           >
             <path
-              fill-rule="evenodd"
-              d="M6.97 2.47a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1-1.06 1.06L8.25 4.81V16.5a.75.75 0 0 1-1.5 0V4.81L3.53 8.03a.75.75 0 0 1-1.06-1.06l4.5-4.5Zm9.53 4.28a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V7.5a.75.75 0 0 1 .75-.75Z"
-              clip-rule="evenodd"
+              d="M5.566 4.657A4.505 4.505 0 0 1 6.75 4.5h10.5c.41 0 .806.055 1.183.157A3 3 0 0 0 15.75 3h-7.5a3 3 0 0 0-2.684 1.657ZM2.25 12a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3v-6ZM5.25 7.5c-.41 0-.806.055-1.184.157A3 3 0 0 1 6.75 6h10.5a3 3 0 0 1 2.683 1.657A4.505 4.505 0 0 0 18.75 7.5H5.25Z"
             />
           </svg>
 
@@ -231,10 +236,7 @@
           <span>Sort by category</span>
         </button>
 
-        <div
-          class="bg-white rounded-md flex flex-col absolute top-full left-0 w-fit text-gray-800 shadow-lg overflow-hidden text-start invisible"
-          id="dropdown-sort-category"
-        ></div>
+        <div class="dropdown-container" id="dropdown-sort-category"></div>
       </div>
     </nav>
 
@@ -322,7 +324,7 @@
     <!-- Black screen -->
     <div
       id="black-overlay"
-      class="fixed backdrop-blur-sm inset-0 min-h-full bg-black/60 flex justify-center items-end md:items-center md:px-2 transition-opacity duration-500 invisible opacity-0 hidden"
+      class="fixed z-50 backdrop-blur-sm inset-0 min-h-full bg-black/60 flex justify-center items-end md:items-center md:px-2 transition-opacity duration-500 invisible opacity-0 hidden"
     >
       <!-- Container form -->
       <div
