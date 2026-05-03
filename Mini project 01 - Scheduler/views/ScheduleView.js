@@ -1,4 +1,5 @@
 import CardSchedule from "../components/CardSchedule.js";
+import EmptyState from "../components/EmptyState.js";
 import ErrorIcon from "../components/Icons/ErrorIcon.js";
 
 export const DOM = {
@@ -54,7 +55,7 @@ export default class ScheduleView {
     }
   };
 
-  // !! Fungsionalitas untuk insialisasi kedalam elemen DOM yang ada atau diseleksi
+  // !! Lingkup function UI yang hanya bisa digunakan jika ada terusan data dari controller.
   // Update UI kini sudah diperbaik ✅
   // Function update UI kini lebih ringkas, dan tanpa logika filtering tambahan seperti sebelumnya.
   // Kekurangan yang masih aku rasakan saat membuat function ini adalah, monolitic rendering, yang dimana semua rendering dihold oleh function ini, bahkan data yang tidak perlu di load ulang setiap saat akan di load ulang ketika kita memanggil function monolitic rendering ini, mungkin jika diperbaiki ini akan memakan banyak waktu, jadi akan dijadikan refleksi belajar untuk persiapan react nantinya.
@@ -66,6 +67,7 @@ export default class ScheduleView {
     // Data yang telah diambil di controller sekarang akan dipetakan secara langsung kedalam card, karena sebelumnya sudah difilter didalam controller berdasarkan tab yang sedang akitf saat ini.
     // Kemungkinan nanti kita akan memisahkan data yang sudah di filter dengan data yang masih utuh atau membuat pengirim waktu dengan total waktu yang sudah dipakai
     const htmlCards = schedulesData.map((data) => CardSchedule(data)).join("");
+    console.log(htmlCards);
 
     // Seleksi element tab yang sedang aktif sekarang berdasarkan state tab yang dikirim dari controller
     const currentTabElement = document.querySelector(
@@ -77,7 +79,7 @@ export default class ScheduleView {
     // Kini function tracking tabs dipanggil juga disini untuk membuat insialisasi pertama agar tab pertama otomatis merujuk ke tab all
     this.trackingTabs(currentTabElement);
 
-    DOM.containerSchedule.innerHTML = htmlCards;
+    DOM.containerSchedule.innerHTML = htmlCards || EmptyState();
   }
 
   // Function baru, tracking tabs 📲
@@ -115,7 +117,8 @@ export default class ScheduleView {
     }
   }
 
-  // Function untuk menampapilkan form create dan pengelolaan value dari inputnya
+  // Function untuk menampapilkan form create dan pengelolaan value input ✅
+  // Function ini digunakan untuk memastikan bahwa value dari form sebelumnya ketika mengakses form create tidak terbawa pada saat melakukan proses create data. hal ini sangat berguna agar data yang dikirim bisa tetap fokus ke tujuan akhirnya, misalnya create tujuan akhirnya membuat data schedule, sementara edit tujuan akhirnya memperbarui data schedule.
   static showCreateForm(element) {
     const currentId = DOM.flexibleForm.querySelector("#scheduleId").value;
 
@@ -150,8 +153,7 @@ export default class ScheduleView {
     this.showForm(true);
   }
 
-  // !! Fungsionalitas untuk menangani animasi didalam elemen DOM, entah itu untuk elemen DOM saat berada didesktop device atau saat berada didevice lainnya
-
+  // !! Lingkup function UI yang hanya fokus kedalam pengelolaan smart animate agar bisa memberikan kesan UI dan UX yang mulus
   // Init event dari swipe bar untuk device mobile sudah diperbarui untuk bisa handle beragam elemen yang memiliki swipe bar nantinya ✅
   // Function ini berfungsi untuk membuat delegation event yang berkaitan dengan swipe, ya walaupun swipe event tidak benar-benar ada di JS, maka dari itu kita mereplikanya dengan menggabungkan 3 jenis event dari touch screen atau event yang dipengaruhi jika jari pengguna menekan layar. Ini berbeda dengan mouse event ya.
   static initSwipeBarMobile() {
