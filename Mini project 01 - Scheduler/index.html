@@ -11,7 +11,8 @@
 
   <!-- Body tag -->
   <body class="w-full flex flex-col gap-4 min-h-screen">
-    <!-- Navbar section -->
+    <!-- Header section -->
+    <!-- Sudah di semantican dan diberikan attribut pendukung untuk aksesibilitas ✅ -->
     <header
       class="justify-between items-center w-full max-w-[1440px] mx-auto flex flex-col md:flex-row md:justify-between gap-4 md:gap-0 py-4 px-4 sm:px-12 md:px-20"
     >
@@ -24,6 +25,7 @@
             viewBox="0 0 24 24"
             fill="currentColor"
             class="size-5"
+            aria-hidden="true"
           >
             <path
               fill-rule="evenodd"
@@ -39,7 +41,7 @@
         </div>
 
         <!-- App name -->
-        <p class="text-lg text-heading font-semibold">Smart scheduler</p>
+        <h1 class="text-lg text-heading font-semibold">Smart scheduler</h1>
       </div>
 
       <!-- Reminding time in a day -->
@@ -52,6 +54,7 @@
           viewBox="0 0 24 24"
           fill="currentColor"
           class="size-4"
+          aria-hidden="true"
         >
           <path
             fill-rule="evenodd"
@@ -61,11 +64,13 @@
         </svg>
 
         <!-- Reminding time -->
-        <span id="reminder-time">1 Hour 20 Minutes</span>
+        <span id="reminder-time" aria-label="reminding time"
+          >1 Hour 20 Minutes</span
+        >
       </div>
     </header>
 
-    <!-- Stats -->
+    <!-- Stats section -->
     <article
       class="flex gap-4 w-full mx-auto max-w-[1440px] py-2 px-4 sm:px-12 md:px-20"
     >
@@ -241,87 +246,75 @@
     </nav>
 
     <!-- Main section that contains all schedule that we have created -->
-    <!-- !! Section base on status -->
+    <!-- Sudah di semantican dan diberikan attribut pendukung untuk aksesibilitas ✅ -->
     <main
-      class="flex flex-col md:flex-row py-8 px-4 sm:px-12 md:px-20 gap-6 w-full max-w-[1440px] mx-auto"
-      aria-label="Wrapper from both section status of schedule"
+      class="flex flex-col py-8 px-4 sm:px-12 md:px-20 gap-8 w-full max-w-[1440px] mx-auto"
     >
+      <!-- Tabs bar -->
+      <!-- Sudah semantic dan aria friendly ✅ -->
+      <nav
+        class="tabs-container"
+        role="tablist"
+        aria-label="Filter schedule by status"
+      >
+        <!-- Opsi semua jadwal -->
+        <button
+          class="z-20"
+          role="tab"
+          aria-selected="true"
+          aria-controls="container-schedule"
+          data-tabs-option="All"
+        >
+          All
+        </button>
+
+        <!-- Opsi on proggress jadwal -->
+        <button
+          class="z-20"
+          role="tab"
+          aria-selected="false"
+          aria-controls="container-schedule"
+          data-tabs-option="On progress"
+        >
+          On progress
+        </button>
+
+        <!-- Opsi done -->
+        <button
+          class="z-20"
+          role="tab"
+          aria-selected="false"
+          aria-controls="container-schedule"
+          data-tabs-option="Done"
+        >
+          Done
+        </button>
+
+        <!-- Indikator -->
+        <div
+          id="indicator-bar"
+          class="z-0 absolute top-2 bottom-2 transition-all duration-500 rounded-xl bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)] after:content-[''] after:absolute after:inset-0 after:rounded-xl after:shadow-[inset_2px_2px_4px_rgba(255,255,255,0.3),inset_-2px_-2px_4px_rgba(0,0,0,0.2)]"
+        ></div>
+      </nav>
       <!-- Section on progress -->
       <section
-        class="space-y-6 w-full md:w-1/2"
-        aria-label="Section wrapper to wrap schedule with status on progress"
+        class="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full transition-all duration-500 ease-in"
+        aria-labelledby="list-heading"
+        id="container-schedule"
       >
-        <!-- Header in every section -->
-        <header class="flex place-items-center gap-4">
-          <!-- Container icon -->
-          <div class="card-category text-orange-400 w-fit p-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              class="size-5"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M12.963 2.286a.75.75 0 0 0-1.071-.136 9.742 9.742 0 0 0-3.539 6.176 7.547 7.547 0 0 1-1.705-1.715.75.75 0 0 0-1.152-.082A9 9 0 1 0 15.68 4.534a7.46 7.46 0 0 1-2.717-2.248ZM15.75 14.25a3.75 3.75 0 1 1-7.313-1.172c.628.465 1.35.81 2.133 1a5.99 5.99 0 0 1 1.925-3.546 3.75 3.75 0 0 1 3.255 3.718Z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </div>
-          <!-- Title status -->
-          <h2 class="text-2xl font-semibold">On progress</h2>
-        </header>
-
-        <!-- Schedule card -->
-        <div class="space-y-6" id="container-schedule-on-progresss"></div>
-      </section>
-
-      <!-- Section done -->
-      <section
-        class="space-y-6 w-full md:w-1/2"
-        aria-label="Section wrapper to wrap schedule with status done"
-      >
-        <!-- Header in every section -->
-        <header class="flex place-items-center gap-4">
-          <!-- Container icon -->
-          <div class="card-category text-green-400 w-fit p-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              class="size-5"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M19.916 4.626a.75.75 0 0 1 .208 1.04l-9 13.5a.75.75 0 0 1-1.154.114l-6-6a.75.75 0 0 1 1.06-1.06l5.353 5.353 8.493-12.74a.75.75 0 0 1 1.04-.207Z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </div>
-          <!-- Title status -->
-          <h2
-            class="text-2xl font-semibold"
-            aria-label="Title from section wrapper done"
-          >
-            Done
-          </h2>
-        </header>
-
-        <!-- Schedule card -->
-        <div
-          class="space-y-6"
-          id="container-schedule-done"
-          aria-label="Container data schedule from section wrapper on progress"
-        ></div>
+        <h2 id="list-heading" class="sr-only">List of schedule</h2>
       </section>
     </main>
 
     <!-- Footer for copy right -->
+    <!-- Sudah di semantican dan diberikan attribut pendukung untuk aksesibilitas ✅ -->
     <footer class="bg-[#1e1f20] p-6 mt-auto text-center">
-      <p>&copy; 2026 Smart scheduler. All right reserved.</p>
+      <span>&copy; 2026 Smart scheduler. All right reserved.</span>
     </footer>
 
     <!-- Black screen -->
+    <!-- Sudah di semantican dan diberikan attribut pendukung untuk aksesibilitas ✅ -->
+    <!-- Pastikan elemen yang dibuat melalui fase creation external diberikan semantic tag juga ⚠️ -->
     <div
       id="black-overlay"
       class="fixed z-50 backdrop-blur-sm inset-0 min-h-full bg-black/60 flex justify-center items-end md:items-center md:px-2 transition-opacity duration-500 invisible opacity-0 hidden"
@@ -332,7 +325,10 @@
         id="container-form-flexible"
       >
         <!-- Bar handler untuk swipe diperangkat mobile -->
-        <div class="p-2 flex md:hidden handle-bar" tabindex="-1">
+        <div
+          class="p-2 flex md:hidden handle-bar"
+          aria-label="swipe bar to close bottom sheets"
+        >
           <div class="w-12 h-2 bg-gray-600/50 rounded-full mx-auto mb-2"></div>
         </div>
 
@@ -353,10 +349,10 @@
               <label for="title">Title</label>
 
               <!-- Inline validation next to input -->
-              <p
+              <span
                 id="error-title"
                 class="text-red-400 font-semibold inline-flex gap-1.5 place-items-center error"
-              ></p>
+              ></span>
             </div>
             <!-- Main input -->
             <input
@@ -376,10 +372,10 @@
               <label for="title">Time doing</label>
 
               <!-- Inline validation input -->
-              <p
+              <span
                 id="error-timeDoing"
                 class="text-red-400 font-semibold inline-flex gap-1.5 place-items-center error"
-              ></p>
+              ></span>
             </div>
             <!-- Main input -->
             <input
@@ -399,10 +395,10 @@
               <label for="title">Category</label>
 
               <!-- Inline validation input -->
-              <p
+              <span
                 id="error-category"
                 class="text-red-400 font-semibold inline-flex gap-1.5 place-items-center error"
-              ></p>
+              ></span>
             </div>
             <input
               id="category"
@@ -425,12 +421,20 @@
           </div>
 
           <!-- Button submit create-->
-          <button class="btn-primary ml-auto text-blue-400" id="create-button">
+          <button
+            type="submit"
+            class="btn-primary ml-auto text-blue-400"
+            id="create-button"
+          >
             Create schedule
           </button>
 
           <!-- Button submit update -->
-          <button class="btn-primary ml-auto text-blue-400" id="update-button">
+          <button
+            type="submit"
+            class="btn-primary ml-auto text-blue-400"
+            id="update-button"
+          >
             Update schedule
           </button>
         </form>

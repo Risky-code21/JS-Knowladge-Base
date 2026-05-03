@@ -135,7 +135,7 @@
   /* Card style fragment */
   /* Card container style */
   .card-container {
-    @apply flex flex-col self-start h-fit overflow-hidden bg-primary rounded-xl transition-all duration-200 ease-in-out;
+    @apply flex flex-col col-span-1 self-start h-fit overflow-hidden bg-primary rounded-xl transition-all duration-200 ease-in-out;
     box-shadow:
       -4px -4px 10px rgba(255, 255, 255, 0.05),
       4px 4px 10px rgba(0, 0, 0, 0.5);
@@ -269,5 +269,13 @@
   .dropdown-option:hover .cicle-status,
   .dropdown-option.active-option .cicle-status {
     @apply opacity-100;
+  }
+
+  /* Tabs container */
+  .tabs-container {
+    @apply rounded-2xl overflow-x-auto overflow-y-hidden w-fit  flex gap-4 p-2 relative z-10;
+    box-shadow:
+      inset 4px 4px 8px rgba(0, 0, 0, 0.4),
+      inset -2px -2px 4px rgba(255, 255, 255, 0.02);
   }
 }

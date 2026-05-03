@@ -11,6 +11,7 @@ import { HelperData } from "../utils/Helper.js";
 export default class ScheduleController {
   static sortByTime = "Newest";
   static sortByCategory = "All";
+  static currentTab = "All";
   // Controller property
   // Penggunaan object utama yang berfungsi untuk menangani pengambilan dan penyimpanan data yang ada didalam local storage
   static ScheduleStorage = {
@@ -48,35 +49,81 @@ export default class ScheduleController {
     return { totalTimeSchedule, remindingTime };
   }
 
-  // Create
-  // Implementasi create sebagai trigger form, dan store sebagai handler untuk menyimpan data di local storage
-  static create(information) {
-    // addition #1 Menghentikan eksekusi function jika information kosong
-    if (!information) return;
+  // Filter function yang digunakan untuk mengambil data berdasarkan tab yang sedang aktif saat ini ✅
+  static filterDataByTab(schedulesData, currentActiveTab) {
+    //  Data yang diberikan dan masih tergolong data mentah dalam lingkup function ini
+    const rawData = schedulesData || [];
 
-    const newSchedule = new Schedule({
-      ...information,
-      timeDoing: Number(information.timeDoing) || 0,
+    // Kita olah data mentah jadwal tadi menggunakan fillter, dan memastikan bahwa data scedule dengan status yang tepat sesuai dengan data yang disimpan didalam option sajalah yang akan dikirim kedalam view.
+    // Pengecualian, ketika tab yang aktif adalah tab All, maka kita tidak perlu melakukan penyaringan, dan cukup membuat conditional yang bisa menghasilkan nilai true untuk mengembalikan semua data walau data sedang difilter.
+    const matureData = rawData.filter(
+      (data) => currentActiveTab === "All" || data.status === currentActiveTab,
+    );
+
+    return matureData;
+  }
+
+  // Create function, function yang menjadi cikal bakal permulaan semua function CRUD yang sudah ada saat ini ✅
+  // Aku telah melakukan perubahan pada nama parameter dan variable didalam function ini, agar kesan in, process, dan out datanya lebih terasa dengan baik ketika dibaca
+  static create(scheduleFields) {
+    // Mengembalikan return alert dan memberikan elemen form lagi
+    if (!scheduleFields)
+      return ScheduleView.showAlert({
+        alertHTMLString: Alert({
+          type: "error",
+          headingText: "Failed to catch the fields",
+          message:
+            "An error occurred in catching the data, try again in a moment!.",
+          buttonText: isSuccess.status ? "" : "Back to the form",
+        }),
+        isAutoClose: false,
+        readTime: 0,
+        elementWillShown: "form",
+      });
+
+    // Penamaan variable baru sebagai tempat sementara data baru sebelum dimasukan nantinya kedalam localstorage browser kita
+    const newScheduleEntry = new Schedule({
+      ...scheduleFields,
+      timeDoing: Number(scheduleFields.timeDoing) || 0,
       preference: {
         categoryPreference: HelperUI.generateUniqueColorCategory(),
       },
     });
 
-    // Memperbarui cara menyimpan data yang ambil dari local storage, agar proses pengambilan hanya dilakukan sekali, dan proses selanjutnya akan menggunakan data yang sudah diambil dari local storage
-    const currentStorageData = this.ScheduleStorage.getData() || [];
-    const updatedStorage = [...currentStorageData, newSchedule];
-    const currentTime = this.calculationTime(updatedStorage);
+    // Memperbarui cara menyimpan data yang ambil dari local storage, agar proses pengambilan hanya dilakukan sekali, dan proses selanjutnya akan menggunakan data yang sudah diambil dari local storage sehingga tidak ada proses local storage yang tergolong redundan.
+    const currentSchedulesData = this.ScheduleStorage.getData() || [];
+    const newScheduleEntries = [...currentSchedulesData, newScheduleEntry];
+    const timeStats = this.calculationTime(newScheduleEntries);
 
     // Tidak menggunakan reminding time dari proses caluculating pada fungsi sebelumnya, karena akan menghasilkan false setiap waktu sudah habis dan akan menghasilkan error pop up yang tidak akan terduga, dan bisa mengganggu pengguna
-    if (currentTime.totalTimeSchedule <= 960) {
-      this.ScheduleStorage.setData(updatedStorage);
+    if (timeStats.totalTimeSchedule <= 960) {
+      this.ScheduleStorage.setData(newScheduleEntries);
 
-      ScheduleView.updateUI(updatedStorage, currentTime.remindingTime);
+      ScheduleView.updateUI({
+        schedulesData: this.filterDataByTab(
+          newScheduleEntries,
+          this.currentTab,
+        ),
+        remindingTime: timeStats.remindingTime,
+        currentActiveTab: this.currentTab,
+      });
+
       ScheduleView.updateCategoryDropdown(this.initCategory());
-      return true;
-    } else {
-      // Pop up will be here
-      return false;
+      return {
+        status: true,
+        headingMessage: "Successfully created a schedule",
+        bodyMessage: "Schedule creation was successful!",
+      };
+    }
+
+    // Ketik total time schedules yang dihasilkan dari proses kalukasi melebihi 960 yang artinya waktu yang disediakan sudah digunakan secara total, atau sebutannya waktunya sudah habis. Pada blok ini kita akan menambahkan alert error untuk memperingat pengguna bahwa data tidak bisa dimasukan lagi karena waktu yang disediakan sudah habis digunakan.
+    else {
+      return {
+        status: false,
+        headingMessage: "Failed to make a schedule",
+        bodyMessage:
+          "An error occurred in creating the schedule data, try again in a moment!.",
+      };
     }
   }
 
@@ -189,14 +236,10 @@ export default class ScheduleController {
 
       // Siapkan informasi yang akan diteruskan ke alert nantinya
       alertInformation = {
-        type: isSuccess ? "success" : "error",
-        headingText: isSuccess
-          ? "Successfully created a schedule"
-          : "Failed to make a schedule",
-        message: isSuccess
-          ? "Schedule creation was successful!"
-          : "An error occurred in creating the schedule data, try again in a moment!.",
-        buttonText: isSuccess ? "" : "Back to the form",
+        type: isSuccess.status ? "success" : "error",
+        headingText: isSuccess.headingMessage,
+        message: isSuccess.bodyMessage,
+        buttonText: isSuccess.status ? "" : "Back to the form",
       };
     }
 
@@ -216,7 +259,7 @@ export default class ScheduleController {
       ScheduleView.showAlert({
         alertHTMLString: Alert(alertInformation),
         isAutoClose: false,
-        readTime: 4000,
+        readTime: 0,
         elementWillShown: "form",
       });
     }
@@ -252,6 +295,7 @@ export default class ScheduleController {
   }
 
   // Mark as done
+  // Akan diperbaiki lagi pada pengembangan fitur sort by setelah fitur CRUD ⚠️
   static markUnMarkDone(elementId) {
     const mappedData = this.ScheduleStorage.getData().map((schedule) =>
       schedule.secretIdentity == elementId ? schedule.markAsDone() : schedule,
@@ -266,6 +310,7 @@ export default class ScheduleController {
 
   // Sorting
   // sorting by time
+  // Akan diperbaiki lagi pada pengembangan fitur sort by setelah fitur CRUD ⚠️
   static sortBy(timeType = "", categoryType = "") {
     let procesesData = this.ScheduleStorage.getData();
     const remindingTime = this.calculationTime();
@@ -307,10 +352,14 @@ export default class ScheduleController {
   // Init function digunakan untuk menginsialisasi UI saat website pertama kali dibuka kembali oleh pengguna
   // Bahas sedikit mengenai Boostraping konsep dengan function init ini
   static initDataInToUI() {
-    const currentData = this.ScheduleStorage.getData();
-    const currentTime = this.calculationTime();
+    const currentScheduleData = this.ScheduleStorage.getData();
+    const timeStats = this.calculationTime();
 
-    ScheduleView.updateUI(currentData, currentTime.remindingTime);
+    ScheduleView.updateUI({
+      schedulesData: this.filterDataByTab(currentScheduleData, this.currentTab),
+      remindingTime: timeStats.remindingTime,
+      currentActiveTab: this.currentTab,
+    });
     ScheduleView.updateCategoryDropdown(this.initCategory());
   }
 
@@ -326,10 +375,14 @@ export default class ScheduleController {
       const markAsDoneButton = event.target.closest("[data-card-mark]");
       const unmarkDoneButton = event.target.closest("[data-card-unmark]");
       const dropDownTimeOption = event.target.closest("[data-sort-by-time]");
+      const tabsOption = event.target.closest("[data-tabs-option]");
+
       // const dropDownCategoryOption = event.target.closest("");
 
       // Menggunakan if dan else if, ketimbangan jejeran pasukan if
       // Untuk menghemat memori, karena ketika kondisi yang tepat sudah ditemukan maka kondisi lainnya yang tidak memenuhi syarat akan otomatis diabaikan dan tidak diperiksa oleh engine JS (V8)
+      // !! Pembedaan lingkup delegation dan bubbling
+      // !! Lingkup pertama spesific selector, digunakan untuk delegation dan bubbling yang dimana elemen untuk triggernya ini sulit dicapai yang artinya elemen nya lebih spesifik dari pada elemen di jenis kedua.
       if (editButton) {
         const cardId = editButton.getAttribute("data-card-edit");
         this.edit(cardId);
@@ -342,6 +395,7 @@ export default class ScheduleController {
       }
 
       // Mark as done button dan fungsionalitasnya
+      // Akan diperbaiki lagi pada pengembangan fitur sort by setelah fitur CRUD ⚠️
       else if (markAsDoneButton) {
         const cardId = markAsDoneButton.getAttribute("data-card-mark");
         this.markUnMarkDone(cardId);
@@ -355,6 +409,7 @@ export default class ScheduleController {
       }
 
       // Testing dropdown time
+      // Akan diperbaiki lagi pada pengembangan fitur sort by setelah fitur CRUD ⚠️
       else if (event.target.closest(`#${DOM.triggerSort.id}`)) {
         if (!dropDownTime) return;
         const isCurrentlyOpen = !dropDownTime.classList.contains("hidden");
@@ -367,10 +422,43 @@ export default class ScheduleController {
         });
       }
 
-      // Testing dropdown time
+      // Klik per option delegation
       // Akan diperbaiki lagi pada pengembangan fitur sort by setelah fitur CRUD ⚠️
-      else if (
-        event.target.closest("body") &&
+      else if (dropDownTimeOption) {
+        const attributVal =
+          dropDownTimeOption.getAttribute("data-sort-by-time");
+
+        this.sortBy(attributVal, null);
+        ScheduleView.initChoosenOption(attributVal, "data-sort-by-time");
+      }
+
+      // Tabs option delegation
+      // Untuk action didalam tab setelah  tahap insialisasi pertama kali oleh init function
+      else if (tabsOption) {
+        const tabSelected = tabsOption.getAttribute("data-tabs-option");
+
+        if (!tabSelected) this.currentTab = "All";
+
+        this.currentTab = tabSelected;
+
+        const currentScheduleData = this.ScheduleStorage.getData();
+        const timeStats = this.calculationTime();
+
+        ScheduleView.updateUI({
+          schedulesData: this.filterDataByTab(
+            currentScheduleData,
+            this.currentTab,
+          ),
+          remindingTime: timeStats.remindingTime,
+          currentActiveTab: this.currentTab,
+        });
+      }
+
+      // !! Lingkup keudua general big selector, digunakan untuk delegation dan bubbling yang dimana elemen untuk triggernya ini lebih mudah untuk dicapai, karena dia hampir mempunyai satu cakupan layar yang dimana itu mustahil untuk dihindari.
+      if (
+        dropDownTime &&
+        !dropDownTime.classList.contains("hidden") &&
+        !event.target.closest(`#${DOM.triggerSort.id}`) &&
         !event.target.closest("#drop-down-time")
       ) {
         ScheduleView.showDropDown({
@@ -379,16 +467,6 @@ export default class ScheduleController {
           dropDownAttributeSelection: "data-sort-by-time",
           currentMethodeSelected: this.sortByTime,
         });
-      }
-
-      // Klik per option
-      // Akan diperbaiki lagi pada pengembangan fitur sort by setelah fitur CRUD ⚠️
-      else if (dropDownTimeOption) {
-        const attributVal =
-          dropDownTimeOption.getAttribute("data-sort-by-time");
-
-        this.sortBy(attributVal, null);
-        ScheduleView.initChoosenOption(attributVal, "data-sort-by-time");
       }
     });
 

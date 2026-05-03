@@ -6,12 +6,9 @@ export const DOM = {
   triggerFormCreate: document.getElementById("btn-create-form-trigger"),
   triggerSort: document.getElementById("btn-sort-form-trigger"),
   remainderTime: document.getElementById("reminder-time"),
-  containerScheduleOnProgress: document.getElementById(
-    "container-schedule-on-progresss",
-  ),
+  containerSchedule: document.getElementById("container-schedule"),
 
   // Inner element atau element yang berada didalam black overlay yang hanya aktif dikala tertentu saja
-  containerScheduleDone: document.getElementById("container-schedule-done"),
   blackOverlay: document.getElementById("black-overlay"),
   containerFlexibleForm: document.getElementById("container-form-flexible"),
   flexibleForm: document.getElementById("form-manipulation-flexible"),
@@ -58,33 +55,68 @@ export default class ScheduleView {
   };
 
   // !! Fungsionalitas untuk insialisasi kedalam elemen DOM yang ada atau diseleksi
-  // Update UI
-  static updateUI(scheduleData, remindingTime) {
-    // Mengganti pengecualian menjadi array, agar tipe data tetap konsisten meski nantinya data yang dituju tidak menghasilkan data atau kosong, dia tetap mengembalikan array yang bisa di proses dan tidak menyebabkan error apa pun
-    const data = scheduleData || [];
-    // Fugsi untuk melakukan fillter schedule sesuai status dari section tempat schedule itu diletakan nantinya
-    const filterdMappedSchedule = (status) =>
-      data
-        .filter((schedule) => {
-          return schedule.status == status;
-        })
-        .map((schedule) => {
-          return CardSchedule(schedule);
-        })
-        .join("");
+  // Update UI kini sudah diperbaik ✅
+  // Function update UI kini lebih ringkas, dan tanpa logika filtering tambahan seperti sebelumnya.
+  // Kekurangan yang masih aku rasakan saat membuat function ini adalah, monolitic rendering, yang dimana semua rendering dihold oleh function ini, bahkan data yang tidak perlu di load ulang setiap saat akan di load ulang ketika kita memanggil function monolitic rendering ini, mungkin jika diperbaiki ini akan memakan banyak waktu, jadi akan dijadikan refleksi belajar untuk persiapan react nantinya.
+  static updateUI({
+    schedulesData,
+    remindingTime,
+    currentActiveTab = "All",
+  } = {}) {
+    // Data yang telah diambil di controller sekarang akan dipetakan secara langsung kedalam card, karena sebelumnya sudah difilter didalam controller berdasarkan tab yang sedang akitf saat ini.
+    // Kemungkinan nanti kita akan memisahkan data yang sudah di filter dengan data yang masih utuh atau membuat pengirim waktu dengan total waktu yang sudah dipakai
+    const htmlCards = schedulesData.map((data) => CardSchedule(data)).join("");
 
-    // Update category filter UI
-    // Update reminder time UI
+    // Seleksi element tab yang sedang aktif sekarang berdasarkan state tab yang dikirim dari controller
+    const currentTabElement = document.querySelector(
+      `[data-tabs-option="${currentActiveTab}"]`,
+    );
+
     DOM.remainderTime.textContent = `${remindingTime} Minutes`;
 
-    // Update card list UI
-    DOM.containerScheduleOnProgress.innerHTML =
-      filterdMappedSchedule("On progress");
-    DOM.containerScheduleDone.innerHTML = filterdMappedSchedule("Done");
+    // Kini function tracking tabs dipanggil juga disini untuk membuat insialisasi pertama agar tab pertama otomatis merujuk ke tab all
+    this.trackingTabs(currentTabElement);
+
+    DOM.containerSchedule.innerHTML = htmlCards;
+  }
+
+  // Function baru, tracking tabs 📲
+  // Function tracking tabs, digunakan untuk memberikan state aktif dan default untuk element tabs, sekaligus memberikan indikator bahwa data dengan status tertentu sedang ditampilkan dilayar saat ini oleh js.
+  static trackingTabs(tabElement) {
+    const indicatorElement = document.getElementById("indicator-bar");
+
+    // Kita pastikan setiap kali masuk kedalam function ini, kita refresh terlebih dahulu class penanda aktif pada tulisan tab agar semua tab netral, lalu kita mencari tab yang sesuai dengan tab aktif yang sudah kita seleksi dan diletakan di parameter oleh pemanggil function
+    document.querySelectorAll(`[role="tab"]`).forEach((element) => {
+      // Hapus class indikator agar netral
+      element.setAttribute("aria-selected", false);
+      element.classList.remove("text-slate-200");
+
+      // Tambahkan class yang sudah dihapus dari semua elemen tadi, namun kali ini kita pastikan yang diberikan class adalah tab yang sudah kita seleksi sebagai tab active
+      if (element === tabElement) {
+        element.setAttribute("aria-selected", true);
+        element.classList.add("text-slate-200");
+      }
+    });
+
+    // Kita buat exception ketika tab element tidak ada, atau bisa juga digunakan untuk proses insialiasi awal yang secara otomatis menunjukan bahwa tab yang aktif akan selalu tab all
+    if (!tabElement) {
+      const exceptionElement = document.querySelector(
+        `[data-tabs-option="All"]`,
+      );
+
+      indicatorElement.style.width = `${exceptionElement.offsetWidth}px`;
+      indicatorElement.style.left = `${exceptionElement.offsetLeft}px`;
+    }
+
+    // Jika element tab tersedia, kita pastikan indikator slide sesuai dengan jarak dan memiliki ukuran yang sama denga tab active yang dipilih oleh pengguna saat ini
+    else {
+      indicatorElement.style.width = `${tabElement.offsetWidth}px`;
+      indicatorElement.style.left = `${tabElement.offsetLeft}px`;
+    }
   }
 
   // Function untuk menampapilkan form create dan pengelolaan value dari inputnya
-  static showCreateForm() {
+  static showCreateForm(element) {
     const currentId = DOM.flexibleForm.querySelector("#scheduleId").value;
 
     if (currentId) {
@@ -118,7 +150,7 @@ export default class ScheduleView {
     this.showForm(true);
   }
 
-  // !! Fungsionalitas untuk menangani animasi didalam eloemen DOM, entah itu untuk elemen DOM saat berada didesktop device atau saat berada didevice lainnya
+  // !! Fungsionalitas untuk menangani animasi didalam elemen DOM, entah itu untuk elemen DOM saat berada didesktop device atau saat berada didevice lainnya
 
   // Init event dari swipe bar untuk device mobile sudah diperbarui untuk bisa handle beragam elemen yang memiliki swipe bar nantinya ✅
   // Function ini berfungsi untuk membuat delegation event yang berkaitan dengan swipe, ya walaupun swipe event tidak benar-benar ada di JS, maka dari itu kita mereplikanya dengan menggabungkan 3 jenis event dari touch screen atau event yang dipengaruhi jika jari pengguna menekan layar. Ini berbeda dengan mouse event ya.
@@ -633,6 +665,7 @@ export default class ScheduleView {
       }
     });
   }
+
   // Akan diperbaiki lagi pada pengembangan fitur sort by setelah fitur CRUD ⚠️
   // Ingat berikan bottom sheets mode pada cara pemilahan opsi jika sudah masuka kedalam perbaikan
   static showDropDown({
