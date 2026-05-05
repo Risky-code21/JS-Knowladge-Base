@@ -6,6 +6,14 @@ export const DOM = {
   // Outer elemen atau element yang ada diluar blackoverlay dan akan selalu ada di tampilan layar kapan pun
   triggerFormCreate: document.getElementById("btn-create-form-trigger"),
   triggerSort: document.getElementById("btn-sort-form-trigger"),
+
+  timeUsed: document.getElementById("time-used"),
+  remindingTime: document.getElementById("time-reminding"),
+  statTotal: document.getElementById("stat-total-schedule"),
+  statProgress: document.getElementById("stat-progress-schedule"),
+  statDone: document.getElementById("stat-done-schedule"),
+
+  // Perlu diganti untuk menyesuaikan dengan fitur stats terbaru
   remainderTime: document.getElementById("reminder-time"),
   containerSchedule: document.getElementById("container-schedule"),
 
@@ -61,13 +69,13 @@ export default class ScheduleView {
   // Kekurangan yang masih aku rasakan saat membuat function ini adalah, monolitic rendering, yang dimana semua rendering dihold oleh function ini, bahkan data yang tidak perlu di load ulang setiap saat akan di load ulang ketika kita memanggil function monolitic rendering ini, mungkin jika diperbaiki ini akan memakan banyak waktu, jadi akan dijadikan refleksi belajar untuk persiapan react nantinya.
   static updateUI({
     schedulesData,
+    schedulesCategoryAmount,
     remindingTime,
     currentActiveTab = "All",
   } = {}) {
     // Data yang telah diambil di controller sekarang akan dipetakan secara langsung kedalam card, karena sebelumnya sudah difilter didalam controller berdasarkan tab yang sedang akitf saat ini.
     // Kemungkinan nanti kita akan memisahkan data yang sudah di filter dengan data yang masih utuh atau membuat pengirim waktu dengan total waktu yang sudah dipakai
     const htmlCards = schedulesData.map((data) => CardSchedule(data)).join("");
-    console.log(htmlCards);
 
     // Seleksi element tab yang sedang aktif sekarang berdasarkan state tab yang dikirim dari controller
     const currentTabElement = document.querySelector(
@@ -80,6 +88,34 @@ export default class ScheduleView {
     this.trackingTabs(currentTabElement);
 
     DOM.containerSchedule.innerHTML = htmlCards || EmptyState();
+
+    DOM.timeUsed.textContent = `${960 - remindingTime}` || 0;
+    DOM.remindingTime.textContent = `${remindingTime} Minutes reminding` || 0;
+    DOM.statTotal.textContent = schedulesCategoryAmount.total || 0;
+    DOM.statProgress.textContent = schedulesCategoryAmount.on_progress || 0;
+    DOM.statDone.textContent = schedulesCategoryAmount.done || 0;
+    this.setCircleiagram(960 - remindingTime);
+  }
+
+  static setCircleiagram(timeUsed) {
+    if (!timeUsed) return;
+    const circle = document.getElementById("progress");
+    const text = document.getElementById("text");
+
+    if (!circle && !text) return;
+
+    const radius = 70;
+    const circumFerence = 2 * Math.PI * radius;
+
+    circle.setAttribute("stroke-dasharray", circumFerence);
+
+    const percentegeOffProgress = Math.floor((timeUsed / 960) * 100);
+    console.log(percentegeOffProgress);
+    const offsetStroke =
+      circumFerence - (percentegeOffProgress / 100) * circumFerence;
+    console.log(offsetStroke);
+    circle.setAttribute("stroke-dashoffset", offsetStroke);
+    text.textContent = `${percentegeOffProgress}%` || 0;
   }
 
   // Function baru, tracking tabs 📲

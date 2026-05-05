@@ -91,34 +91,45 @@
 }
 
 @layer components {
-  /* Custom components class */
+  /* Class custom neumorph untuk elemen yang tidak memerlukan state dari class semu*/
+  /* Neumorph yang menonjol */
+  .neumorph-raised {
+    box-shadow:
+      -5px -5px 16px rgba(255, 255, 255, 0.04),
+      5px 5px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Meumorph yang menjorok kebawah seperti ditekan */
+  .neumorph-suppressed {
+    box-shadow:
+      inset 4px 4px 8px rgba(0, 0, 0, 0.4),
+      inset -4px -4px 4px rgba(255, 255, 255, 0.02);
+  }
+
+  /* !! Class kompleks yang tidak perlu di refactor lagi karena sudah memiliki interaksi antar state */
+  /* ----------- Button style fragment */
   /* Button primary default state */
   .btn-primary {
     /* Tambahkan animasi fokus untuk button primary di esok hari */
     @apply bg-primary transition-all duration-200 ease-in-out border-none;
     box-shadow:
-      -4px -4px 10px rgba(255, 255, 255, 0.05),
-      4px 4px 10px rgba(0, 0, 0, 0.5),
-      inset 2px 2px 4px rgba(255, 255, 255, 0.05),
-      inset -2px -2px 4px rgba(0, 0, 0, 0.2);
+      -5px -5px 16px rgba(255, 255, 255, 0.04),
+      5px 5px 12px rgba(0, 0, 0, 0.4);
   }
 
   /* Button primary hover state */
   .btn-primary:hover {
     box-shadow:
-      -6px -6px 15px rgba(255, 255, 255, 0.08),
-      6px 6px 20px rgba(0, 0, 0, 0.6),
-      inset 1px 1px 2px rgba(255, 255, 255, 0.05),
-      inset -2px -2px 2px rgba(0, 0, 0, 0.6);
+      -8px -8px 20px rgba(255, 255, 255, 0.03),
+      8px 8px 24px rgba(0, 0, 0, 0.5);
     @apply -translate-y-0.5;
   }
 
   /* Button primary active state */
   .btn-primary:active {
     box-shadow:
-      -2px -2px 8px rgba(255, 255, 255, 0.05),
-      inset 6px 6px 12px rgba(0, 0, 0, 0.8),
-      inset -4px -4px 10px rgba(255, 255, 255, 0.05);
+      inset 4px 4px 8px rgba(0, 0, 0, 0.4),
+      inset -4px -4px 4px rgba(255, 255, 255, 0.02);
     @apply translate-y-0 scale-[0.98] border border-white/[0.0001];
   }
 
@@ -126,40 +137,30 @@
   .btn-primary:focus-visible {
     outline: none;
     box-shadow:
-      -4px -4px 10px rgba(255, 255, 255, 0.05),
-      4px 4px 10px rgba(0, 0, 0, 0.5),
-      inset 0 0 10px rgba(255, 255, 255, 0.1),
-      inset 2px 2px 4px rgba(255, 255, 255, 0.1);
+      -5px -5px 15px rgba(255, 255, 255, 0.06),
+      5px 5px 15px rgba(0, 0, 0, 0.6),
+      0 0 10px rgba(59, 130, 246, 0.4);
   }
 
-  /* Card style fragment */
-  /* Card container style */
+  /* ----------- Card style fragment */
+  /* Card container or default state style */
   .card-container {
     @apply flex flex-col col-span-1 self-start h-fit overflow-hidden bg-primary rounded-xl transition-all duration-200 ease-in-out;
     box-shadow:
-      -4px -4px 10px rgba(255, 255, 255, 0.05),
-      4px 4px 10px rgba(0, 0, 0, 0.5);
+      -5px -5px 16px rgba(255, 255, 255, 0.04),
+      5px 5px 12px rgba(0, 0, 0, 0.4);
   }
 
   /* Card container hover state */
   .card-container:hover {
     @apply -translate-y-0.5;
     box-shadow:
-      -4px -4px 12px rgba(255, 255, 255, 0.05),
-      4px 4px 14px rgba(0, 0, 0, 0.5);
+      -8px -8px 20px rgba(255, 255, 255, 0.03),
+      8px 8px 24px rgba(0, 0, 0, 0.5);
   }
 
-  /* Card category */
-  .card-category {
-    @apply px-4 py-2 inline-flex justify-center items-center w-fit rounded-full font-semibold;
-    box-shadow:
-      -4px -4px 4px rgba(255, 255, 255, 0.05),
-      4px 4px 10px rgba(0, 0, 0, 0.5),
-      inset 2px 2px 4px rgba(255, 255, 255, 0.05),
-      inset -2px -2px 4px rgba(0, 0, 0, 0.2);
-  }
-
-  /* Form style default */
+  /* ----------- Form style fragment */
+  /* Form default state style */
   .form-container {
     --drag-axisY: 0px;
     --drag-opacity: 1;
@@ -184,15 +185,8 @@
     @apply translate-y-[var(--drag-axisY)] opacity-[var(--drag-opacity)] blur-none md:scale-100;
   }
 
-  .input-primary {
-    box-shadow:
-      -2px -2px 8px rgba(255, 255, 255, 0.05),
-      inset 4px 4px 10px rgba(0, 0, 0, 0.6),
-      inset -4px -4px 10px rgba(255, 255, 255, 0.05);
-    @apply w-full px-4 py-2.5 border border-white/[0.0001] rounded-lg focus:outline-none transition-shadow duration-200 ease-in-out;
-  }
-
-  /* Alert and confirmation style */
+  /* ----------- Modal style fragment */
+  /* Alert and confirmation default state style */
   .modal-primary {
     /* Ini akan digunakan pada modal confirmation saja, pada modal alert semua tetap menggunakan nilai default untuk state akhirnya */
     --drag-axisY: 0px;
@@ -223,27 +217,13 @@
     @apply translate-y-[var(--drag-axisY)] opacity-[var(--drag-opacity)] blur-none md:scale-100;
   }
 
-  .modal-icon-box {
-    @apply inline-flex place-items-center rounded-full bg-primary;
-    box-shadow:
-      -2px -2px 8px rgba(255, 255, 255, 0.05),
-      inset 6px 6px 12px rgba(0, 0, 0, 0.8),
-      inset -4px -4px 10px rgba(255, 255, 255, 0.05);
-  }
-
-  /* Stats style */
-  .stats-box-primary {
-    @apply flex w-full flex-col gap-8 p-6 rounded-xl;
-    box-shadow:
-      -4px -4px 10px rgba(255, 255, 255, 0.05),
-      4px 4px 10px rgba(0, 0, 0, 0.5);
-  }
-
+  /* ----------- Container style fragment */
   /* Container dropdown */
   .dropdown-container {
     @apply bg-primary py-2 rounded-xl gap-2 flex flex-col absolute top-full translate-y-2 left-0 w-fit overflow-hidden z-20 opacity-0 transition-all duration-500;
   }
 
+  /* Container dropdown ketika dishow */
   .dropdown-container.active-dropdown {
     @apply opacity-100;
     box-shadow:
@@ -251,10 +231,12 @@
       12px 12px 32px rgba(0, 0, 0, 0.6);
   }
 
+  /* Dropdown option */
   .dropdown-option {
     @apply flex justify-between items-center min-w-40 mx-2 px-4 py-2.5 transition-shadow duration-500;
   }
 
+  /* Dropdown option ketika di hover atau ketika berada dalam kondisi dipilih oleh pengguna */
   .dropdown-option:hover,
   .dropdown-option.active-option {
     box-shadow:
@@ -262,13 +244,48 @@
       inset -2px -2px 4px rgba(255, 255, 255, 0.02);
   }
 
+  /* Penambahan circle status untuk indikator tambahan*/
   .dropdown-option .cicle-status {
     @apply size-2 rounded-full bg-blue-400 opacity-0 transition-opacity duration-500;
   }
 
+  /* Circle status aktif ketika dropdown di option atau ketika option sedang berada dalam kondisi dipilih */
   .dropdown-option:hover .cicle-status,
   .dropdown-option.active-option .cicle-status {
     @apply opacity-100;
+  }
+
+  /* !! Kelas statis yang perlu di optimasi secara deklarasinya atau penggunaan class redundannya dengan neumorph class */
+  /* Card category */
+  .card-category {
+    @apply px-4 py-2 inline-flex justify-center items-center w-fit rounded-full font-semibold;
+    box-shadow:
+      -5px -5px 16px rgba(255, 255, 255, 0.04),
+      5px 5px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Input form style */
+  .input-primary {
+    box-shadow:
+      inset 4px 4px 8px rgba(0, 0, 0, 0.4),
+      inset -4px -4px 4px rgba(255, 255, 255, 0.02);
+    @apply w-full px-4 py-2.5 rounded-lg focus:outline-none transition-shadow duration-200 ease-in-out;
+  }
+
+  /* Modal icon container */
+  .modal-icon-box {
+    @apply inline-flex place-items-center rounded-full bg-primary;
+    box-shadow:
+      inset 4px 4px 8px rgba(0, 0, 0, 0.4),
+      inset -4px -4px 4px rgba(255, 255, 255, 0.02);
+  }
+
+  /* Stats container style */
+  .stats-box-primary {
+    @apply flex w-full col-span-1 flex-col justify-between gap-4 p-6 rounded-2xl;
+    box-shadow:
+      -5px -5px 16px rgba(255, 255, 255, 0.04),
+      5px 5px 12px rgba(0, 0, 0, 0.4);
   }
 
   /* Tabs container */

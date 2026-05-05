@@ -63,6 +63,29 @@ export default class ScheduleController {
     return matureData;
   }
 
+  static calculationData(schedulesData) {
+    const calcuationResult = {
+      total: 0,
+      on_progress: 0,
+      done: 0,
+    };
+
+    const rawData = schedulesData || [];
+
+    // Lakukan pengulangan untuk mengecek status di setiap data agar penambahan data bisa dilakukan sesuai dengan kategorinya masing-masing
+    rawData.forEach((schedule) => {
+      // Jika status data sama dengan on progress maka tambahkan hasil kalukasi on_progress
+      if (schedule.status === "On progress") calcuationResult.on_progress++;
+      // Jika status data sama dengan done maka tambahkan hasil kalukasi done
+      else if (schedule.status === "Done") calcuationResult.done++;
+
+      // Setelah pengecekan tadi, kalukasikan sebagai total jadwal, entah itu data dari status on progress ataupun done
+      calcuationResult.total++;
+    });
+
+    return calcuationResult;
+  }
+
   // Create function, function yang menjadi cikal bakal permulaan semua function CRUD yang sudah ada saat ini ✅
   // Aku telah melakukan perubahan pada nama parameter dan variable didalam function ini, agar kesan in, process, dan out datanya lebih terasa dengan baik ketika dibaca
   static create(scheduleFields) {
@@ -104,6 +127,7 @@ export default class ScheduleController {
           newScheduleEntries,
           this.currentTab,
         ),
+        schedulesCategoryAmount: this.calculationData(newScheduleEntries),
         remindingTime: timeStats.remindingTime,
         currentActiveTab: this.currentTab,
       });
@@ -357,6 +381,7 @@ export default class ScheduleController {
 
     ScheduleView.updateUI({
       schedulesData: this.filterDataByTab(currentScheduleData, this.currentTab),
+      schedulesCategoryAmount: this.calculationData(currentScheduleData),
       remindingTime: timeStats.remindingTime,
       currentActiveTab: this.currentTab,
     });

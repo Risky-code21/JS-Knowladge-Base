@@ -7,10 +7,25 @@
 
     <!-- Title app -->
     <title>Scheduler - App</title>
+
+    <style>
+      .container {
+        width: 160px;
+        height: 160px;
+      }
+
+      text {
+        fill: white;
+        font-size: 20px;
+        text-anchor: middle;
+        dominant-baseline: middle;
+        font-family: sans-serif;
+      }
+    </style>
   </head>
 
   <!-- Body tag -->
-  <body class="w-full flex flex-col gap-4 min-h-screen">
+  <body class="w-full flex flex-col min-h-screen">
     <!-- Header section -->
     <!-- Sudah di semantican dan diberikan attribut pendukung untuk aksesibilitas ✅ -->
     <header
@@ -72,16 +87,86 @@
 
     <!-- Stats section -->
     <article
-      class="flex gap-4 w-full mx-auto max-w-[1440px] py-2 px-4 sm:px-12 md:px-20"
+      class="grid grid-cols-3 md:grid-cols-5 gap-4 w-full mx-auto max-w-[1440px] py-2 px-4 sm:px-12 md:px-20"
     >
-      <!-- Total schedules -->
-      <div class="stats-box-primary">
-        <div class="card-category text-blue-400 w-fit p-4">
+      <!-- Circle diagaram and time stats -->
+      <div
+        class="neumorph-raised gap-4 p-6 rounded-2xl col-span-full md:col-span-2 flex flex-row items-center justify-between"
+      >
+        <!-- Stats information -->
+        <div class="flex flex-col">
+          <!-- Total waktu yang digunakan dalam sehari -->
+          <h2 class="text-6xl leading-none" id="time-used"></h2>
+          <p class="text-xl font-semibold text-heading mt-2">Minutes today</p>
+
+          <!-- Waktu yang tersisa dari waktu keseluruhan -->
+          <p id="time-reminding"></p>
+        </div>
+
+        <!-- Circle diagaram -->
+        <svg class="container" viewBox="0 0 200 200">
+          <!-- Filter neumorphism -->
+          <defs>
+            <filter id="neumorph">
+              <!-- shadow gelap -->
+              <feDropShadow
+                dx="6"
+                dy="6"
+                stdDeviation="6"
+                flood-color="#020617"
+              />
+
+              <!-- highlight terang -->
+              <feDropShadow
+                dx="-6"
+                dy="-6"
+                stdDeviation="6"
+                flood-color="#1e293b"
+              />
+            </filter>
+          </defs>
+
+          <!-- Background circle -->
+          <circle
+            cx="100"
+            cy="100"
+            r="80"
+            fill="#18181b"
+            filter="url(#neumorph)"
+          />
+
+          <!-- Progress -->
+          <circle
+            id="progress"
+            cx="100"
+            cy="100"
+            r="70"
+            fill="none"
+            stroke="#3b82f6"
+            style="filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5))"
+            stroke-width="14"
+            stroke-linecap="round"
+            transform="rotate(-90 100 100)"
+          />
+
+          <!-- Text -->
+          <text id="text" x="100" y="100">0%</text>
+        </svg>
+      </div>
+
+      <!-- Total schedules ✅ -->
+      <div class="stats-box-primary" aria-label="stat total schedule">
+        <!-- Icon container total schedules -->
+        <div
+          class="neumorph-raised w-fit rounded-full text-blue-400 p-4 hidden md:block"
+          aria-hidden="true"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
             class="size-6"
+            aria-hidden="true"
           >
             <path
               d="M16.5 6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v7.5a3 3 0 0 0 3 3v-6A4.5 4.5 0 0 1 10.5 6h6Z"
@@ -91,20 +176,35 @@
             />
           </svg>
         </div>
-        <div class="">
-          <h2 class="text-lg">Total schedules</h2>
-          <p>20 schedules</p>
+
+        <!-- Stats info -->
+        <div
+          class="flex flex-col gap-2 items-center md:items-start"
+          aria-label="stat information"
+        >
+          <!-- Stats calculation -->
+          <h2
+            class="text-4xl md:text-6xl text-blue-400 leading-none"
+            id="stat-total-schedule"
+          ></h2>
+          <!-- Stats context -->
+          <p class="text-base md:text-lg">Total</p>
         </div>
       </div>
 
-      <!-- On progress schedules -->
-      <div class="stats-box-primary">
-        <div class="card-category text-orange-400 w-fit p-4">
+      <!-- On progress schedules ✅ -->
+      <div class="stats-box-primary" aria-label="stat progress schedule">
+        <!-- Icon container total schedules -->
+        <div
+          class="neumorph-raised w-fit rounded-full text-orange-400 p-4 hidden md:block"
+          aria-hidden="true"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
             class="size-6"
+            aria-hidden=" true"
           >
             <path
               fill-rule="evenodd"
@@ -113,20 +213,35 @@
             />
           </svg>
         </div>
-        <div class="">
-          <h2 class="text-lg">On progress schedules</h2>
-          <p>20 schedules</p>
+
+        <!-- Stats info -->
+        <div
+          class="flex flex-col gap-2 items-center md:items-start"
+          aria-label="stat information"
+        >
+          <!-- Stats calculation -->
+          <h2
+            class="text-4xl md:text-6xl text-orange-400 leading-none"
+            id="stat-progress-schedule"
+          ></h2>
+          <!-- Stats context -->
+          <p class="text-base md:text-lg">Progress</p>
         </div>
       </div>
 
-      <!-- Done schedules -->
-      <div class="stats-box-primary">
-        <div class="card-category text-green-400 w-fit p-4">
+      <!-- Done schedules ✅ -->
+      <div class="stats-box-primary" aria-label="stat done schedule">
+        <!-- Icon container total schedules -->
+        <div
+          class="neumorph-raised w-fit rounded-full text-green-400 p-4 hidden md:block"
+          aria-hidden="true"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
             class="size-6"
+            aria-hidden="true"
           >
             <path
               fill-rule="evenodd"
@@ -135,9 +250,19 @@
             />
           </svg>
         </div>
-        <div class="">
-          <h2 class="text-lg">Done schedules</h2>
-          <p>12 schedules</p>
+
+        <!-- Stats info -->
+        <div
+          class="flex flex-col gap-2 items-center md:items-start"
+          aria-label="stat information"
+        >
+          <!-- Stats calculation -->
+          <h2
+            class="text-4xl md:text-6xl text-green-400 leading-none"
+            id="stat-done-schedule"
+          ></h2>
+          <!-- Stats context -->
+          <p class="text-base md:text-lg">Done</p>
         </div>
       </div>
     </article>
