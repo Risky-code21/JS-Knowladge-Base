@@ -7,21 +7,6 @@
 
     <!-- Title app -->
     <title>Scheduler - App</title>
-
-    <style>
-      .container {
-        width: 160px;
-        height: 160px;
-      }
-
-      text {
-        fill: white;
-        font-size: 20px;
-        text-anchor: middle;
-        dominant-baseline: middle;
-        font-family: sans-serif;
-      }
-    </style>
   </head>
 
   <!-- Body tag -->
@@ -29,7 +14,7 @@
     <!-- Header section -->
     <!-- Sudah di semantican dan diberikan attribut pendukung untuk aksesibilitas ✅ -->
     <header
-      class="justify-between items-center w-full max-w-[1440px] mx-auto flex flex-col md:flex-row md:justify-between gap-4 md:gap-0 py-4 px-4 sm:px-12 md:px-20"
+      class="w-full max-w-[1440px] mx-auto flex flex-row items-center gap-4 md:gap-0 py-4 px-4 sm:px-12 md:px-20"
     >
       <!-- Logo smart scheduler -->
       <div class="flex place-items-center gap-4">
@@ -61,7 +46,7 @@
 
       <!-- Reminding time in a day -->
       <div
-        class="card-container flex-row place-items-center gap-2 p-4 rounded-lg font-semibold"
+        class="card-container hidden flex-row place-items-center gap-2 p-4 rounded-lg font-semibold"
       >
         <!-- Icon -->
         <svg
@@ -96,7 +81,10 @@
         <!-- Stats information -->
         <div class="flex flex-col">
           <!-- Total waktu yang digunakan dalam sehari -->
-          <h2 class="text-6xl leading-none" id="time-used"></h2>
+          <h2
+            class="text-6xl leading-none [text-shadow:0_0_15px_rgba(255,255,255,0.2),0_0_30px_rgba(255,255,255,0.1)]"
+            id="time-used"
+          ></h2>
           <p class="text-xl font-semibold text-heading mt-2">Minutes today</p>
 
           <!-- Waktu yang tersisa dari waktu keseluruhan -->
@@ -104,53 +92,108 @@
         </div>
 
         <!-- Circle diagaram -->
-        <svg class="container" viewBox="0 0 200 200">
-          <!-- Filter neumorphism -->
+        <svg
+          width="200"
+          height="200"
+          viewBox="0 0 200 200"
+          class="overflow-visible"
+        >
           <defs>
-            <filter id="neumorph">
-              <!-- shadow gelap -->
-              <feDropShadow
-                dx="6"
-                dy="6"
-                stdDeviation="6"
-                flood-color="#020617"
+            <filter
+              id="inset-shadow"
+              x="-50%"
+              y="-50%"
+              width="200%"
+              height="200%"
+              color-interpolation-filters="sRGB"
+            >
+              <feGaussianBlur stdDeviation="3" in="SourceAlpha" result="blur" />
+              <feOffset dx="3" dy="3" in="blur" result="offsetBlur" />
+              <feComposite
+                operator="out"
+                in="SourceAlpha"
+                in2="offsetBlur"
+                result="inverse"
               />
+              <feFlood
+                flood-color="#000000"
+                flood-opacity="0.8"
+                result="color"
+              />
+              <feComposite
+                operator="in"
+                in="color"
+                in2="inverse"
+                result="shadow"
+              />
+              <feComposite operator="over" in="shadow" in2="SourceGraphic" />
+            </filter>
 
-              <!-- highlight terang -->
-              <feDropShadow
-                dx="-6"
-                dy="-6"
-                stdDeviation="6"
-                flood-color="#1e293b"
-              />
+            <filter
+              id="blue-glow"
+              x="-50%"
+              y="-50%"
+              width="200%"
+              height="200%"
+              color-interpolation-filters="sRGB"
+            >
+              <feGaussianBlur stdDeviation="4" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
             </filter>
           </defs>
 
-          <!-- Background circle -->
           <circle
             cx="100"
             cy="100"
-            r="80"
-            fill="#18181b"
-            filter="url(#neumorph)"
+            r="75"
+            fill="none"
+            stroke="#1a1a1a"
+            stroke-width="20"
           />
 
-          <!-- Progress -->
           <circle
-            id="progress"
             cx="100"
             cy="100"
-            r="70"
+            r="75"
+            fill="none"
+            stroke="#141414"
+            stroke-width="20"
+            filter="url(#inset-shadow)"
+          />
+
+          <circle
+            id="progress-circle"
+            cx="100"
+            cy="100"
+            r="75"
             fill="none"
             stroke="#3b82f6"
-            style="filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5))"
             stroke-width="14"
             stroke-linecap="round"
+            filter="url(#blue-glow)"
+            style="
+              transition: stroke-dashoffset 0.8s ease-in-out;
+              stroke-dasharray: 471.2;
+              stroke-dashoffset: 471.2;
+            "
             transform="rotate(-90 100 100)"
           />
 
-          <!-- Text -->
-          <text id="text" x="100" y="100">0%</text>
+          <text
+            id="text"
+            x="100"
+            y="100"
+            fill="white"
+            font-weight="bold"
+            font-size="24"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            font-family="sans-serif"
+            class="[text-shadow:0_0_15px_rgba(255,255,255,0.2),0_0_30px_rgba(255,255,255,0.1)]"
+          ></text>
         </svg>
       </div>
 
@@ -184,7 +227,7 @@
         >
           <!-- Stats calculation -->
           <h2
-            class="text-4xl md:text-6xl text-blue-400 leading-none"
+            class="text-4xl md:text-6xl text-blue-400 [text-shadow:0_0_10px_rgba(96,165,250,0.4),0_0_20px_rgba(96,165,250,0.2)] leading-none"
             id="stat-total-schedule"
           ></h2>
           <!-- Stats context -->
@@ -221,7 +264,7 @@
         >
           <!-- Stats calculation -->
           <h2
-            class="text-4xl md:text-6xl text-orange-400 leading-none"
+            class="text-4xl md:text-6xl text-orange-400 [text-shadow:0_0_10px_rgba(251,146,60,0.4),0_0_20px_rgba(251,146,60,0.2)] leading-none"
             id="stat-progress-schedule"
           ></h2>
           <!-- Stats context -->
@@ -258,7 +301,7 @@
         >
           <!-- Stats calculation -->
           <h2
-            class="text-4xl md:text-6xl text-green-400 leading-none"
+            class="text-4xl md:text-6xl text-green-400 [text-shadow:0_0_10px_rgba(74,222,128,0.4),0_0_20px_rgba(74,222,128,0.2)] leading-none"
             id="stat-done-schedule"
           ></h2>
           <!-- Stats context -->

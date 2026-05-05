@@ -94,28 +94,28 @@ export default class ScheduleView {
     DOM.statTotal.textContent = schedulesCategoryAmount.total || 0;
     DOM.statProgress.textContent = schedulesCategoryAmount.on_progress || 0;
     DOM.statDone.textContent = schedulesCategoryAmount.done || 0;
-    this.setCircleiagram(960 - remindingTime);
+    this.setCircleDiagram(960 - remindingTime);
   }
 
-  static setCircleiagram(timeUsed) {
-    if (!timeUsed) return;
-    const circle = document.getElementById("progress");
+  static setCircleDiagram(timeUsed) {
+    const used = timeUsed || 0;
+    const circle = document.getElementById("progress-circle");
     const text = document.getElementById("text");
 
-    if (!circle && !text) return;
+    if (!circle || !text) return;
 
-    const radius = 70;
+    const radius = circle.getAttribute("r") || 75;
     const circumFerence = 2 * Math.PI * radius;
 
-    circle.setAttribute("stroke-dasharray", circumFerence);
+    circle.style.strokeDasharray = circumFerence;
 
-    const percentegeOffProgress = Math.floor((timeUsed / 960) * 100);
-    console.log(percentegeOffProgress);
-    const offsetStroke =
-      circumFerence - (percentegeOffProgress / 100) * circumFerence;
-    console.log(offsetStroke);
-    circle.setAttribute("stroke-dashoffset", offsetStroke);
-    text.textContent = `${percentegeOffProgress}%` || 0;
+    const percentage = Math.min(Math.floor((used / 960) * 100), 100);
+    const offsetStroke = circumFerence - (percentage / 100) * circumFerence;
+
+    circle.style.strokeDashoffset = offsetStroke;
+    text.textContent = `${percentage}%`;
+
+    circle.style.opacity = percentage === 0 ? "0" : "1";
   }
 
   // Function baru, tracking tabs 📲
