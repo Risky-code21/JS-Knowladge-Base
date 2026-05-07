@@ -282,7 +282,7 @@
 
   /* Stats container style */
   .stats-box-primary {
-    @apply flex w-full col-span-1 flex-col justify-between gap-4 p-6 rounded-2xl;
+    @apply flex w-full col-span-1 flex-col justify-between gap-8 p-6 rounded-2xl;
     box-shadow:
       -5px -5px 16px rgba(255, 255, 255, 0.04),
       5px 5px 12px rgba(0, 0, 0, 0.4);
