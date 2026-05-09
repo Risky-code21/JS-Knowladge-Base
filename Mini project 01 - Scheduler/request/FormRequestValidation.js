@@ -1,19 +1,48 @@
 export default class ScheduleRequest {
+  // Form validation sudah kini sudah diperbaki ✅
+  // Form validation berfungsi untuk memeriksa kesesuaiaan nilai input yang diberikan oleh pengguna dengan nilai yang dibutuhkan untuk membuat atau mengupdate data dari jadwal yang sudah dibuat oleh pengguna sebelumnya
+  // Form validation kini disertai komentar agar mudah dipelajari di masa depan, dan pemberian conditional untuk category, yang dimana jika pengguna ingin membuat category, pengguna harus memastikan category itu memiliki karakter dibawah atau sama dengan 12, tidak boleh lebih.
   static formValidation(formInputs) {
+    // Membuat insialisasi object penampung errors yang akan dikembalikan untuk ditampilkan pada layar pengguna
+    // Kosongkan key object agar proses checking key di controller tidak terus menghalangi eksekusi berikutnya
     const errors = {};
+    const conditionalEmptyInput = (input) => !input || input.trim() === "";
 
-    if (!formInputs.title || formInputs.title.trim() === "") {
+    // Pengecekan properti title atau nilai dari input title, agar memastikan bahwa input tidak kosong
+    if (conditionalEmptyInput(formInputs.title)) {
       errors.title = "Title cannot be empty";
     }
 
-    const timeDoing = Number(formInputs.timeDoing);
+    // Pengecekan tipe data, karena aku menggunakan tipe text pada input time doing, jadi harus dirubah dulu type datanya
+    const timeDoingHours = Number(formInputs.timeDoingHours);
+    const timeDoingMinutes = Number(formInputs.timeDoingMinutes);
 
-    if (!formInputs.timeDoing || formInputs.timeDoing.trim() === "") {
+    // Pengecekan pada input time doing
+    // Pengecekan pertama, mengecek apakah input time doing ini kosong atau tidak
+    if (
+      conditionalEmptyInput(formInputs.timeDoingHours) ||
+      conditionalEmptyInput(formInputs.timeDoingMinutes)
+    ) {
       errors.timeDoing = "Time doing cannot be empty";
-    } else if (isNaN(timeDoing)) {
+    }
+    //  Pengecekan kedua, mengecek apakah input time doing ini berupa angka atau tidak
+    else if (isNaN(timeDoingHours) || isNaN(timeDoingMinutes)) {
       errors.timeDoing = "Time doing must be a number";
-    } else if (timeDoing <= 0) {
-      errors.timeDoing = "Time doing must be more than 1 minute";
+    }
+
+    // Pengecekan ketiga, menegcek apakah input time doing ini lebih kecil dari 0, misal pengguna iseng memasukan angka negatif, decimal atau angka unreal lainnya yang tidak masuk akal untuk sebuah input waktu
+    else if (timeDoingHours <= 0 && timeDoingMinutes <= 0) {
+      errors.timeDoing = "Time must be greater";
+    }
+
+    // Pengeckan pada input category
+    // Pengecekan pertama, mengecek apakah input category kosong atau tidak
+    if (conditionalEmptyInput(formInputs.category)) {
+      errors.category = "Category cannot be empty";
+    }
+    // Pengecek kedua, mengecek apakah panjang karakter category melebihi batas maksimal karakter yaitu 12
+    else if (formInputs.category.length > 12) {
+      errors.category = "Maximum characters 12";
     }
 
     return errors;

@@ -1,3 +1,6 @@
+import ErrorIcon from "../components/Icons/ErrorIcon.js";
+import { DOM } from "../views/ScheduleView.js";
+
 export const HelperData = {
   // Convertion date helper
   convertionDate: (date) => {
@@ -40,5 +43,26 @@ export const HelperUI = {
       baseOfColor[Math.floor(Math.random() * baseOfColor.length)];
 
     return selectedColor;
+  },
+
+  renderTimeStats(timeUsed, timeReminding) {
+    if (timeReminding == null || isNaN(timeReminding)) return;
+
+    // Opperand kedalam UI time used
+    const timeUsedHours = Math.floor(timeUsed / 60);
+    const timeUsedMinutes = timeUsed % 60;
+
+    // Opperand kedalam UI time remining
+    const remindingHours = Math.floor(timeReminding / 60);
+    const remindingMinutes = timeReminding % 60;
+
+    DOM.timeUsedHoursDisplay.textContent = timeUsedHours;
+    DOM.timeUsedMinutesDisplay.textContent = timeUsedMinutes;
+    DOM.remindingDisplay.innerHTML = `
+      ${ErrorIcon("size-4")} 
+      <span class="text-inherit shrink-0">
+        ${timeReminding <= 0 ? "Your daily time is up!" : `${remindingHours} Hours ${remindingMinutes} Minutes remaining!`}
+      </span>
+    `;
   },
 };

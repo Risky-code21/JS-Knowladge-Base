@@ -1,12 +1,12 @@
 File ini hanya bersifat sementara, dan akan dihapus pada penutupan project
 Fitur-Fitur
-1. Mark as done
-2. Sorting by category, dan by created at
-3. Refactor kode redudan, dan pengoptimalannya
-4. Launching ke vercel atau hosting gratis lainnya
+1. Mark as done ✅ --> masih harus distabilkan
+2. Sorting by category, dan by created at ✅ --> masih harus distabilkan
+3. Refactor kode redudan, dan pengoptimalannya 🔄️ --> masih proses
+4. Launching ke vercel atau hosting gratis lainnya 
 
 Secara UI dan UX
-1. Styling refactor: font, typograhpy, color, theme, component
+1. Styling refactor: font, typograhpy, color, theme, component ✅
 2. State refactor, contoh: empty state, none state ketika data di edit sama saja dan tidak berubah
-3. Graph card untuk melihat berapa banyak jadwal yang sudah pernah diselesaikan atau dibuat, dan sisanya
-4. Animation fade in atau bubble Animation
+3. Graph card untuk melihat berapa banyak jadwal yang sudah pernah diselesaikan atau dibuat, dan sisanya 
+4. Animation fade in atau bubble Animation ✅
