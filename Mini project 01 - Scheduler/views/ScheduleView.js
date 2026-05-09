@@ -1,6 +1,7 @@
 import CardSchedule from "../components/CardSchedule.js";
 import EmptyState from "../components/EmptyState.js";
 import ErrorIcon from "../components/Icons/ErrorIcon.js";
+import { HelperUI } from "../utils/Helper.js";
 
 export const DOM = {
   // CTA Button elements
@@ -11,7 +12,8 @@ export const DOM = {
   ),
 
   // Stats elements
-  timeUsedDisplay: document.getElementById("time-used"),
+  timeUsedHoursDisplay: document.getElementById("time-used-hours"),
+  timeUsedMinutesDisplay: document.getElementById("time-used-minutes"),
   remindingDisplay: document.getElementById("time-reminding"),
   statTotalDisplay: document.getElementById("stat-total-schedule"),
   statProgressDisplay: document.getElementById("stat-progress-schedule"),
@@ -219,20 +221,18 @@ export default class ScheduleView {
     )
       return;
 
-    const currentTimeUsed = 960 - timeReminding || 0;
-    const currentTimeReminding = timeReminding || 0;
+    const timeUsed = 960 - timeReminding || 0;
     const totalAllSchedules = schedulesDataQuantity.totalAmount || 0;
     const totalOnProgressSchedules =
       schedulesDataQuantity.onProggressAmount || 0;
     const totalDoneSchedules = schedulesDataQuantity.doneAmount || 0;
 
     // Render elemen circle diagram yang ada pada stats
-    this.renderCircleDiagram(currentTimeUsed);
-    // Render elemen stats yang lainnya
+    this.renderCircleDiagram(timeUsed);
     // Render element yang masih berdekatan dengan circle diagram
-    DOM.timeUsedDisplay.textContent = currentTimeUsed;
-    DOM.remindingDisplay.textContent = `${currentTimeReminding} Minutes reminding`;
+    HelperUI.renderTimeStats(timeUsed, timeReminding);
 
+    // Render elemen stats yang lainnya
     // Render tiga stats lainnya yang menjadi pendukung stats
     DOM.statTotalDisplay.textContent = totalAllSchedules;
     DOM.statProgressDisplay.textContent = totalOnProgressSchedules;

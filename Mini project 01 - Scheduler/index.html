@@ -76,21 +76,44 @@
     >
       <!-- Circle diagaram and time stats -->
       <div
-        class="neumorph-raised gap-4 p-6 rounded-2xl col-span-full md:col-span-2 flex flex-row items-center justify-between"
+        class="neumorph-raised p-6 rounded-2xl col-span-full md:col-span-2 flex flex-col-reverse md:flex-row-reverse items-center justify-between"
       >
         <!-- Stats information -->
-        <div class="flex flex-col">
-          <!-- Total waktu yang digunakan dalam sehari -->
+        <div class="w-full rounded-xl flex flex-col gap-2 place-items-center">
+          <!-- Design total waktu baru yang digunakan dalam sehari -->
           <h2
-            class="text-6xl leading-none [text-shadow:0_0_15px_rgba(255,255,255,0.2),0_0_30px_rgba(255,255,255,0.1)]"
-            id="time-used"
-          ></h2>
-          <p class="text-xl font-semibold text-heading mt-2">Minutes today</p>
+            class="flex text-heading items-baseline leading-none font-semibold [text-shadow:0_0_15px_rgba(255,255,255,0.2),0_0_30px_rgba(255,255,255,0.1)]"
+          >
+            <!-- Time hours -->
+            <span
+              class="text-inherit leading-none text-6xl"
+              id="time-used-hours"
+              >0</span
+            >
+            <span class="text-inherit leading-none text-4xl mr-2">h</span>
+
+            <!-- Time minutes -->
+            <span
+              class="text-inherit leading-none text-6xl"
+              id="time-used-minutes"
+              >0</span
+            >
+            <span class="text-inherit leading-none text-4xl">m</span>
+          </h2>
+
+          <!-- Sisa waktu dari total waktu keseluruhan yang sudah digunakan -->
+          <p class="text-xl font-semibold text-heading mt-2">
+            Total time used today
+          </p>
 
           <!-- Waktu yang tersisa dari waktu keseluruhan -->
-          <p id="time-reminding"></p>
+          <p
+            class="mt-2 text-red-400 flex gap-2 w-fit place-items-center neumorph-raised rounded-xl px-4 py-2"
+            id="time-reminding"
+          ></p>
         </div>
 
+        <!-- Circle diagram time used container -->
         <!-- Circle diagaram -->
         <svg
           width="200"
@@ -537,7 +560,7 @@
             />
           </div>
 
-          <!-- Time doing -->
+          <!-- Time doing in two category time -->
           <div class="flex flex-col gap-2">
             <div class="flex justify-between items-center">
               <!-- Label input -->
@@ -549,15 +572,29 @@
                 class="text-red-400 font-semibold inline-flex gap-1.5 place-items-center error"
               ></span>
             </div>
+
             <!-- Main input -->
-            <input
-              id="timeDoing"
-              name="timeDoing"
-              type="text"
-              class="input-primary"
-              placeholder="Insert time doing"
-              value=""
-            />
+            <div class="flex gap-2">
+              <!-- Hours -->
+              <input
+                id="timeDoingHours"
+                name="timeDoingHours"
+                type="text"
+                class="input-primary"
+                placeholder="Hours"
+                value=""
+              />
+
+              <!-- Minutes -->
+              <input
+                id="timeDoingMinutes"
+                name="timeDoingMinutes"
+                type="text"
+                class="input-primary"
+                placeholder="Minutes"
+                value=""
+              />
+            </div>
           </div>
 
           <!-- Category -->

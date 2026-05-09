@@ -22,12 +22,19 @@ export default class Schedule {
     return this.#id;
   }
 
+  get formattedTime() {
+    const hours = Math.floor(this.timeDoing / 60);
+    const minutes = this.timeDoing % 60;
+
+    if (hours > 0 && minutes > 0) return `${hours} Hours ${minutes} Minutes`;
+    if (hours > 0) return `${hours} Hours`;
+    return `${minutes} Minutes`;
+  }
+
   // Mark as done
   // Digunakan untuk mengganti status dari yang defaultnya "On proggres" menjadi "Done" untuk menandai jadwal sebagai selesai
   markAsDone() {
-    this.status == "Done"
-      ? (this.status = "On progress")
-      : (this.status = "Done");
+    this.status = this.status === "Done" ? "On progress" : "Done";
     return this;
   }
 

@@ -6,33 +6,38 @@ export default class ScheduleRequest {
     // Membuat insialisasi object penampung errors yang akan dikembalikan untuk ditampilkan pada layar pengguna
     // Kosongkan key object agar proses checking key di controller tidak terus menghalangi eksekusi berikutnya
     const errors = {};
+    const conditionalEmptyInput = (input) => !input || input.trim() === "";
 
     // Pengecekan properti title atau nilai dari input title, agar memastikan bahwa input tidak kosong
-    if (!formInputs.title || formInputs.title.trim() === "") {
+    if (conditionalEmptyInput(formInputs.title)) {
       errors.title = "Title cannot be empty";
     }
 
     // Pengecekan tipe data, karena aku menggunakan tipe text pada input time doing, jadi harus dirubah dulu type datanya
-    const timeDoing = Number(formInputs.timeDoing);
+    const timeDoingHours = Number(formInputs.timeDoingHours);
+    const timeDoingMinutes = Number(formInputs.timeDoingMinutes);
 
     // Pengecekan pada input time doing
     // Pengecekan pertama, mengecek apakah input time doing ini kosong atau tidak
-    if (!formInputs.timeDoing || formInputs.timeDoing.trim() === "") {
+    if (
+      conditionalEmptyInput(formInputs.timeDoingHours) ||
+      conditionalEmptyInput(formInputs.timeDoingMinutes)
+    ) {
       errors.timeDoing = "Time doing cannot be empty";
     }
     //  Pengecekan kedua, mengecek apakah input time doing ini berupa angka atau tidak
-    else if (isNaN(timeDoing)) {
+    else if (isNaN(timeDoingHours) || isNaN(timeDoingMinutes)) {
       errors.timeDoing = "Time doing must be a number";
     }
 
     // Pengecekan ketiga, menegcek apakah input time doing ini lebih kecil dari 0, misal pengguna iseng memasukan angka negatif, decimal atau angka unreal lainnya yang tidak masuk akal untuk sebuah input waktu
-    else if (timeDoing <= 0) {
-      errors.timeDoing = "Time doing must be more than 1 minute";
+    else if (timeDoingHours <= 0 && timeDoingMinutes <= 0) {
+      errors.timeDoing = "Time must be greater";
     }
 
     // Pengeckan pada input category
     // Pengecekan pertama, mengecek apakah input category kosong atau tidak
-    if (!formInputs.category && formInputs.category.trim() === "") {
+    if (conditionalEmptyInput(formInputs.category)) {
       errors.category = "Category cannot be empty";
     }
     // Pengecek kedua, mengecek apakah panjang karakter category melebihi batas maksimal karakter yaitu 12

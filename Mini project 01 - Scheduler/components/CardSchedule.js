@@ -26,7 +26,7 @@ export default function CardSchedule(informationCard) {
           />
         </svg>
 
-        <span>${informationCard.timeDoing}</span>
+        <span>${informationCard.formattedTime}</span>
       </p>
     </header>
 

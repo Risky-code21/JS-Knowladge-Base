@@ -189,10 +189,16 @@ export default class ScheduleController {
     if (Object.keys(formErrors).length > 0) {
       return ScheduleView.showErrorMessage(formErrors);
     }
-
     // Insialisasi untuk proses percabangan selanjutnya antara transaksi create dan update
     const currentId = formInputsValue["scheduleId"];
-    let isSuccess = false;
+    const timeDoingInMinutes =
+      Number(formInputsValue.timeDoingHours * 60) +
+      Number(formInputsValue.timeDoingMinutes);
+    let isSuccess = {
+      status: false,
+      headingMessage: "",
+      bodyMessage: "",
+    };
     let alertInformation = {
       type: "",
       headingText: "",
@@ -208,28 +214,31 @@ export default class ScheduleController {
       const mappedObject = {
         ...filterdSchedule,
         ...formInputsValue,
-        timeDoing: Number(formInputsValue.timeDoing) || 0,
+        timeDoing: Number(timeDoingInMinutes) || 0,
       };
       const opperandData = new Schedule(mappedObject);
 
       // Membuat operand selanjutnya untuk alert
       isSuccess = this.update(currentId, opperandData);
       alertInformation = {
-        type: isSuccess ? "success" : "error",
-        headingText: isSuccess
+        type: isSuccess.status ? "success" : "error",
+        headingText: isSuccess.headingMessage
           ? "Successfully updated schedule"
           : "Failed to update schedule",
-        message: isSuccess
+        message: isSuccess.bodyMessage
           ? "Successfully updated schedule data! Check the main page for changes."
           : "An error occurred in updating the schedule data, try again in a moment!.",
-        buttonText: isSuccess ? "" : "Back to the form",
+        buttonText: isSuccess.status ? "" : "Back to the form",
       };
     }
 
     // Jika input hidden id kosong, maka form akan menjadi form create
     else {
       formElement.reset();
-      isSuccess = this.create({ ...formInputsValue });
+      isSuccess = this.create({
+        ...formInputsValue,
+        timeDoing: timeDoingInMinutes,
+      });
 
       // Membuat operand selanjutnya untuk alert
       alertInformation = {
@@ -241,7 +250,7 @@ export default class ScheduleController {
     }
 
     // Pengelolaan alert yang akan ditampilkan kelayar
-    if (isSuccess) {
+    if (isSuccess.status === true) {
       formElement.reset();
       ScheduleView.showAlert({
         alertHTMLString: Alert(alertInformation),
@@ -264,9 +273,9 @@ export default class ScheduleController {
    * @param {Array} schedulesData
    * @returns
    */
-  static calculateAllStats() {
+  static calculateAllStats(schedulesData) {
     // Melakukan pengecekan data untuk menghindari error dini
-    const rawData = this.ScheduleStorage.getData() || [];
+    const rawData = schedulesData || this.ScheduleStorage.getData() || [];
 
     // Melakukan reduce berdasarkan data sebelumnya untuk melengkapi beberapa properti pada object untuk dilemparkan ke pengelolaan stats nantinya
     const statsResult = rawData.reduce(
@@ -346,7 +355,7 @@ export default class ScheduleController {
           headingText: "Failed to catch the fields",
           message:
             "An error occurred in catching the data, try again in a moment!.",
-          buttonText: isSuccess.status ? "" : "Back to the form",
+          buttonText: "Back to the form",
         }),
         isAutoClose: false,
         readTime: 0,
