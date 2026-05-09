@@ -5,7 +5,6 @@ import { HelperUI } from "../utils/Helper.js";
 
 export const DOM = {
   // CTA Button elements
-  triggerFormCreateButton: document.getElementById("btn-create-form-trigger"),
   triggerSortTimeButton: document.getElementById("btn-sort-time-trigger"),
   triggerSortCategoryButton: document.getElementById(
     "btn-sort-category-trigger",
@@ -70,7 +69,7 @@ export default class ScheduleView {
     // Disini kita sengaja menggunakan if dengan syntax dasarnya (disertai else if) untuk menangani banyak kemungkinan di delegation yang mungkin akan terjadi. !! Ini penting. agar memori hanya menjalankan block kondisi sampai block kondisi yang sesuai didapatkan, dan bukan secara satu persatu secara menyeluruh
     document.body.addEventListener("click", (event) => {
       // Ketika yang diklik merupakan button create ataupun anak dari button tersebut yang akan memicu event bubbling
-      if (event.target.closest(`#${DOM.triggerFormCreateButton.id}`)) {
+      if (event.target.closest(".btn-create")) {
         this.showCreateForm();
       }
 
