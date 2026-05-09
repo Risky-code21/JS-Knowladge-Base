@@ -203,7 +203,7 @@ export default class ScheduleView {
     this.renderStats(schedulesDataQuantity, currentTimeReminding);
     this.updateCategoryDropdown(currentCategories);
     this.renderTabs(currentTabElement);
-    this.renderCards(filtredSchedulesData);
+    this.renderCards(filtredSchedulesData, currentActiveTab);
   }
 
   /**
@@ -271,13 +271,22 @@ export default class ScheduleView {
    * Untuk memuat card schedule kedalam main container display
    * @param {Array} SchedulesData
    */
-  static renderCards(SchedulesData) {
+  static renderCards(SchedulesData, activeTab) {
     const rawData = SchedulesData || [];
+    const headingText =
+      activeTab !== "All"
+        ? `List of schedule with status ${activeTab}`
+        : `List of all schedule`;
     const schedulesCardHTML = rawData
       .map((data) => CardSchedule(data))
       .join("");
 
-    DOM.containerScheduleDisplay.innerHTML = schedulesCardHTML || EmptyState();
+    if (schedulesCardHTML && schedulesCardHTML.length != 0) {
+      DOM.containerScheduleDisplay.innerHTML = `<h2 class="sr-only" id="list-section-title">${headingText}</h2>
+      ${schedulesCardHTML}`;
+    } else {
+      DOM.containerScheduleDisplay.innerHTML = `<h2 class="sr-only" id="list-section-title">${headingText}</h2> ${EmptyState()}`;
+    }
   }
 
   /**

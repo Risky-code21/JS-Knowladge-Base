@@ -89,6 +89,7 @@ export default class ScheduleController {
         ScheduleView.renderTabs(currentTabElement);
         ScheduleView.renderCards(
           this.filterDataByTab(currentScheduleData, this.currentTab),
+          this.currentTab,
         );
       }
 
@@ -391,6 +392,7 @@ export default class ScheduleController {
       ScheduleView.renderStats(statsAmountEntries, calcStats.remindingTime);
       ScheduleView.renderCards(
         this.filterDataByTab(newScheduleEntries, this.currentTab),
+        this.currentTab,
       );
 
       // Memastikan kategori hanya diupdate jika ada kategori baru

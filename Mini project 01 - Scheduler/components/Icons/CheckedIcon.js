@@ -6,6 +6,7 @@ export default function CheckedIcon(className) {
             stroke-width="1.5"
             stroke="currentColor"
             class="${className}"
+            aria-hidden="true"
           >
             <path
               fill-rule="evenodd"

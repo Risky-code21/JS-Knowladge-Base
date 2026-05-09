@@ -1,6 +1,6 @@
 export default function EmptyState(message) {
   return `<div
-            class="bg-primary col-span-full w-full mx-auto text-center p-8 flex flex-col gap-2 justify-center items-center rounded-xl shadow-[inset_4px_4px_8px_rgba(0,0,0,0.4),inset_-2px_-2px_4px_rgba(255,255,255,0.02)]"
+            class="bg-primary col-span-full w-full mx-auto text-center p-8 flex flex-col gap-2 justify-center items-center rounded-xl shadow-[inset_4px_4px_8px_rgba(0,0,0,0.4),inset_-2px_-2px_4px_rgba(255,255,255,0.02)]" aria-label="empty data warning for selected states"
           >
             <!-- Icon empty state -->
             <svg
@@ -20,6 +20,6 @@ export default function EmptyState(message) {
             </svg>
 
             <!-- Message empty state -->
-            <p>${message || "There are no schedules available for this category."}</p>
+            <p>${message || "There are no schedules available for this status."}</p>
           </div>`;
 }

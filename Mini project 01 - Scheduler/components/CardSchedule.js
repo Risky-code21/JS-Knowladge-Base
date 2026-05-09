@@ -32,7 +32,7 @@ export default function CardSchedule(informationCard) {
 
     <!-- Content -->
     <div class="p-4 pb-6">
-      <h2 class="w-full truncate">${informationCard.title}</h2>
+      <h3 class="w-full truncate">${informationCard.title}</h3>
       <p class="w-full">${informationCard.description}</p>
     </div>
 

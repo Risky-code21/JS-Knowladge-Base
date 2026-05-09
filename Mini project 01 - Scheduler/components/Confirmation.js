@@ -1,17 +1,16 @@
 export default function Confirmation() {
-  return `<div class="modal-primary hidden">
-            <!-- Bar handler untuk swipe diperangkat mobile -->
-            <div class="p-2 w-full flex md:hidden handle-bar" tabindex="-1">
+  return `<section role="dialog" aria-modal="true" aria-labelledby="conf-title" aria-describedby="conf-desc" class="modal-primary hidden">
+            <div class="p-2 w-full flex md:hidden handle-bar" role="button" aria-label="swipe bar to close bottom sheets">
               <div class="w-12 h-2 bg-gray-600/50 rounded-full mx-auto mb-2"></div>
             </div>
 
-            <!-- Alert icon box -->
-            <div class="modal-icon-box h-auto p-6 w-fit text-orange-400 rounded-full ">
+            <div class="modal-icon-box h-auto p-6 w-fit text-orange-400 rounded-full">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
                 fill="currentColor"
                 class="size-40"
+                aria-hidden="true"
               >
                 <path
                   fill-rule="evenodd"
@@ -21,23 +20,22 @@ export default function Confirmation() {
               </svg>
             </div>
 
-            <!-- Alert title and description -->
             <div class="flex flex-col items-center gap-1 px-4 text-center">
-              <h4 class="font-semibold text-xl">Confirm Deletion</h4>
-              <p class="text-sm">Are you sure you want to delete this schedule?</p>
+              <h2 id="conf-title" class="font-semibold text-xl">Confirm Deletion</h2>
+              <p id="conf-desc" class="text-sm">Are you sure you want to delete this schedule?</p>
             </div>
 
-            <!-- Action button, to close or to accept -->
             <div class="flex flex-col md:flex-row gap-4 w-full">
-              <button data-option="false" class="btn-primary w-full md:w-1/2">
+              <button type="button" data-option="false" class="btn-primary w-full md:w-1/2">
                 Close
               </button>
               <button
+                type="button"
                 data-option="true"
                 class="btn-primary w-full md:w-1/2 text-green-400"
               >
                 Accept
               </button>
             </div>
-          </div>`;
+          </section>`;
 }
