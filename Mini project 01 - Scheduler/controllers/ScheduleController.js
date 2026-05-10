@@ -490,27 +490,54 @@ export default class ScheduleController {
     }
   }
 
-  // Delete function
-  // Perlu perbaikan sistem opperand param ke alert function dan penetapan alert yang lebih diperjelas ⚠️
-  static async delete(elementId) {
+  /**
+   * (Inggris)
+   * Untuk menghapus data schedule secara spesifik berdasarkan target id dari element yang diakses
+   * @param {String} targetId
+   */
+  static async delete(targetId) {
     const filteredData = this.ScheduleStorage.getData().filter(
-      (schedule) => schedule.secretIdentity != elementId,
+      (schedule) => schedule.secretIdentity != targetId,
     );
+
     const choice = await ScheduleView.showConfirmation(Confirmation());
-    const currentTime = this.calculationTime();
+    const oldCategories = this.calcCategory();
+
+    const calcStats = this.calculateAllStats(filteredData);
+    const statsAmountEntries = {
+      totalAmount: calcStats.totalSchedule,
+      onProggressAmount: calcStats.onProgressSchedule,
+      doneAmount: calcStats.doneSchedule,
+    };
 
     const alertInformation = {
-      type: "success",
-      headingText: "Successfully created a schedule",
-      message: "Schedule creation was successful!",
+      type: choice ? "success" : "error",
+      headingText: choice
+        ? "Successfully deleted the schedule"
+        : "Failed to delete schedule",
+      message: choice
+        ? "The process of deleting the selected schedule was successful. Check the main page to see changes!"
+        : "The process of deleting the selected schedule failed, please try again in a few moments!",
       buttonText: "",
     };
 
     if (choice) {
       this.ScheduleStorage.setData(filteredData);
 
-      ScheduleView.overallUpdateUI(filteredData, currentTime.remindingTime);
-      ScheduleView.updateCategoryDropdown(this.calcCategory());
+      const newCategories = this.calcCategory();
+
+      // Penerusan hasil kalkulasi ke beberapa function
+      ScheduleView.renderStats(statsAmountEntries, calcStats.remindingTime);
+      ScheduleView.renderCards(
+        this.filterDataByTab(filteredData, this.currentTab),
+        this.currentTab,
+      );
+
+      // Memastikan kategori hanya diupdate jika ada kategori baru
+      if (oldCategories.length !== newCategories.length) {
+        ScheduleView.updateCategoryDropdown(newCategories);
+      }
+
       ScheduleView.showAlert({
         alertHTMLString: Alert(alertInformation),
         isAutoClose: true,
