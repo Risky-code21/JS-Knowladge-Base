@@ -398,13 +398,23 @@ export default class ScheduleView {
     DOM.flexibleFormElement.reset();
 
     // Kita petakan value baru berdasarkan data yang sedang diakses saat ini
-    let scheduleData = data;
+    let scheduleData = data || {};
+
+    const totalMinutes = Number(scheduleData.timeDoing) || 0;
 
     DOM.flexibleFormElement.querySelectorAll("[name]").forEach((element) => {
       const fieldName = element.getAttribute("name");
-      const value = scheduleData[fieldName];
+      let value;
 
-      if (!value) return;
+      if (fieldName === "timeDoingHours") {
+        value = Math.floor(totalMinutes / 60);
+      } else if (fieldName === "timeDoingMinutes") {
+        value = totalMinutes % 60;
+      } else {
+        value = scheduleData[fieldName];
+      }
+
+      if (value == null || value === "") return;
 
       element.value = value;
     });
