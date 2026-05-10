@@ -223,12 +223,8 @@ export default class ScheduleController {
       isSuccess = this.update(currentId, opperandData);
       alertInformation = {
         type: isSuccess.status ? "success" : "error",
-        headingText: isSuccess.headingMessage
-          ? "Successfully updated schedule"
-          : "Failed to update schedule",
-        message: isSuccess.bodyMessage
-          ? "Successfully updated schedule data! Check the main page for changes."
-          : "An error occurred in updating the schedule data, try again in a moment!.",
+        headingText: isSuccess.headingMessage,
+        message: isSuccess.bodyMessage,
         buttonText: isSuccess.status ? "" : "Back to the form",
       };
     }
@@ -422,10 +418,10 @@ export default class ScheduleController {
    * Untuk menginsialisasi form dengan nilai yang ada pada data schedule yang dipilih
    * @param {String} elementId
    */
-  static edit(elementId) {
+  static edit(targetId) {
     // filter data berdasarkan id yang didapat dari button
     const scheduleData = this.ScheduleStorage.getData().find((schedule) => {
-      return schedule.secretIdentity == elementId;
+      return schedule.secretIdentity == targetId;
     });
 
     const opperandData = {
@@ -444,26 +440,53 @@ export default class ScheduleController {
    * @param {*} updatedData
    * @returns
    */
-  static update(elementId, updatedData) {
-    // Melakukan mapping untuk memasikan data yang sedang di update sekarang sudah diedit tidak akan tertimpa dengan data lamanya
+  static update(targetId, updatedDataEntry) {
+    const newDataEntries =
+      this.ScheduleStorage.getData().map((schedule) => {
+        return schedule.secretIdentity == targetId
+          ? updatedDataEntry
+          : schedule;
+      }) || [];
 
-    const newData = this.ScheduleStorage.getData().map((schedule) => {
-      return schedule.secretIdentity == elementId ? updatedData : schedule;
-    });
+    const oldCategories = this.calcCategory();
+    const calcStats = this.calculateAllStats(newDataEntries);
+    const statsAmountEntries = {
+      totalAmount: calcStats.totalSchedule,
+      onProggressAmount: calcStats.onProgressSchedule,
+      doneAmount: calcStats.doneSchedule,
+    };
 
-    // Buat array baru berdasarkan data yang telah di maping ditambah 1 data hasil dari update data sebelumnya
-    // const newData = [...filteredData, updatedData];
-    console.log(newData);
-    const currentTime = this.calculationTime(newData);
+    if (calcStats.totalTimeUsed <= 960) {
+      this.ScheduleStorage.setData(newDataEntries);
 
-    if (currentTime.totalTimeSchedule <= 960) {
-      this.ScheduleStorage.setData(newData);
+      const newCategories = this.calcCategory();
 
-      ScheduleView.overallUpdateUI(newData, currentTime.remindingTime);
-      ScheduleView.updateCategoryDropdown(this.calcCategory());
-      return true;
+      // Penerusan hasil kalkulasi ke beberapa function
+      ScheduleView.renderStats(statsAmountEntries, calcStats.remindingTime);
+      ScheduleView.renderCards(
+        this.filterDataByTab(newDataEntries, this.currentTab),
+        this.currentTab,
+      );
+
+      // Memastikan kategori hanya diupdate jika ada kategori baru
+      if (oldCategories.length !== newCategories.length) {
+        ScheduleView.updateCategoryDropdown(newCategories);
+      }
+
+      // Pengembalian object untuk membuat pesan alert
+      return {
+        status: true,
+        headingMessage: "Successfully updated schedule",
+        bodyMessage:
+          "Successfully updated schedule data! Check the main page for changes!",
+      };
     } else {
-      return false;
+      // Pengembalian object untuk membuat pesan alert
+      return {
+        status: false,
+        headingMessage: "Failed to update schedule",
+        bodyMessage: "The time allocation exceeds the provided limit!",
+      };
     }
   }
 
